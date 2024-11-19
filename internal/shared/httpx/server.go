@@ -53,6 +53,7 @@ func (s *GinServer) Start(ctx contextx.Contextx) error {
 
 		if err := s.httpserver.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			ctx.Fatal("start http server error", zap.Error(err))
+			return
 		}
 	}()
 
