@@ -1,6 +1,9 @@
 # Variables
 APP_NAME := $(shell basename $(CURDIR))
 BUILD_DIR := build
+DOCKER_IMAGE := $(APP_NAME):latest
+CONTAINER_NAME := $(APP_NAME)-container
+
 GO_FILES := $(shell find . -type f -name '*.go')
 GO_TESTS := $(shell go list ./...)
 
@@ -10,7 +13,13 @@ GOLINT := golangci-lint
 
 # Default target
 .PHONY: all
-all: build ## Build the application
+all: help
+
+# Show help
+.PHONY: help
+help: ## Show this help message
+	@grep -hE '^[ a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-17s\033[0m %s\n", $$1, $$2}'
 
 # Build the application
 .PHONY: build
@@ -55,8 +64,27 @@ deps: ## Install or tidy dependencies
 	@echo "Tidying up dependencies..."
 	$(GO) mod tidy
 
-# Show help
-.PHONY: help
-help: ## Show this help message
-	@grep -hE '^[ a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-17s\033[0m %s\n", $$1, $$2}'
+# Docker build
+.PHONY: docker-build
+docker-build: ## Build the Docker image
+	@echo "Building Docker image..."
+	docker build -t $(DOCKER_IMAGE) .
+
+# Docker run
+.PHONY: docker-run
+docker-run: ## Run the Docker container
+	@echo "Running Docker container..."
+	docker run --rm --name $(CONTAINER_NAME) -p 8080:8080 $(DOCKER_IMAGE)
+
+# Docker stop
+.PHONY: docker-stop
+docker-stop: ## Stop the Docker container
+	@echo "Stopping Docker container..."
+	docker stop $(CONTAINER_NAME)
+
+# Docker clean
+.PHONY: docker-clean
+docker-clean: ## Remove Docker image
+	@echo "Removing Docker image..."
+	docker rmi $(DOCKER_IMAGE)
+
