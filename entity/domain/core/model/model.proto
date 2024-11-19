@@ -1,0 +1,5 @@
+syntax = "proto3";
+
+package entity.domain.core.model;
+
+option go_package = "github.com/blackhorseya/pelith-assessment/entity/domain/core/model;model";

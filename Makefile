@@ -64,6 +64,12 @@ deps: ## Install or tidy dependencies
 	@echo "Tidying up dependencies..."
 	$(GO) mod tidy
 
+# Generate protobuf
+.PHONY: gen-pb
+gen-pb: ## generate protobuf
+	buf generate
+	protoc-go-inject-tag -input="./entity/domain/*/*/*.pb.go"
+
 # Docker build
 .PHONY: docker-build
 docker-build: ## Build the Docker image
