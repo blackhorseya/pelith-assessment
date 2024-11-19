@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 
+	"github.com/blackhorseya/pelith-assessment/cmd/server/wirex"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
@@ -10,11 +11,11 @@ import (
 )
 
 type impl struct {
-	injector  *injector
+	injector  *wirex.Injector
 	ginServer *httpx.GinServer
 }
 
-func newImpl(injector *injector, ginServer *httpx.GinServer) adapterx.Server {
+func newImpl(injector *wirex.Injector, ginServer *httpx.GinServer) adapterx.Server {
 	return &impl{
 		injector:  injector,
 		ginServer: ginServer,

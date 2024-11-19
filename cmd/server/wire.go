@@ -5,6 +5,7 @@
 package server
 
 import (
+	"github.com/blackhorseya/pelith-assessment/cmd/server/wirex"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
@@ -25,7 +26,7 @@ func initAPP(config *configx.Configx) (*configx.Application, error) {
 func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	panic(wire.Build(
 		newImpl,
-		wire.Struct(new(injector), "*"),
+		wire.Struct(new(wirex.Injector), "*"),
 		initConfigx,
 		initAPP,
 
