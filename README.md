@@ -94,6 +94,17 @@ campaign management platform for Uniswap users, enabling them to complete tasks,
    make help
    ```
 
+## Documentation
+
+For more detailed information, please refer to the documentation in the `docs/` directory:
+
+- [System Architecture](docs/architecture.md): Explanation of the system's architecture and components.
+- [Project Layout](docs/project-layout.md): Overview of the project's directory structure and organization.
+
+---
+
+Explore the `docs/` folder for additional details.
+
 ## References
 
 - [Uniswap V2 Documentation](https://docs.uniswap.org/contracts/v2/reference/smart-contracts/pair)
