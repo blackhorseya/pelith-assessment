@@ -25,7 +25,7 @@ func LoadConfig(path string) (*Configx, error) {
 		return nil, err
 	}
 
-	var config *Configx
+	var config Configx
 	if err := v.Unmarshal(&config); err != nil {
 		return nil, err
 	}
@@ -36,5 +36,5 @@ func LoadConfig(path string) (*Configx, error) {
 		return nil, err
 	}
 
-	return config, nil
+	return &config, nil
 }
