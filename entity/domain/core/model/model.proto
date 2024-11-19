@@ -2,4 +2,183 @@ syntax = "proto3";
 
 package entity.domain.core.model;
 
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/blackhorseya/pelith-assessment/entity/domain/core/model;model";
+
+// Task entity
+message Task {
+  // Unique identifier for the task
+  string id = 1;
+
+  // Task name (e.g., "Onboarding Task")
+  string name = 2;
+
+  // Detailed description of the task
+  string description = 3;
+
+  // Enum for task type (e.g., Onboarding, SharePool)
+  TaskType type = 4;
+
+  // Rules or thresholds for task completion
+  TaskCriteria criteria = 5;
+
+  // Enum for task status (Active, Inactive)
+  TaskStatus status = 6;
+}
+
+// Enum for task types
+enum TaskType {
+  // Default unspecified value
+  TASK_TYPE_UNSPECIFIED = 0;
+
+  // Onboarding task type
+  TASK_TYPE_ONBOARDING = 1;
+
+  // Share pool task type
+  TASK_TYPE_SHARE_POOL = 2;
+}
+
+// Enum for task status
+enum TaskStatus {
+  // Default unspecified value
+  TASK_STATUS_UNSPECIFIED = 0;
+
+  // Active status
+  TASK_STATUS_ACTIVE = 1;
+
+  // Inactive status
+  TASK_STATUS_INACTIVE = 2;
+}
+
+// Rules or thresholds for task completion
+message TaskCriteria {
+  // Minimum transaction amount required for completion
+  double min_transaction_amount = 1;
+
+  // Pool ID for pool-specific tasks (optional)
+  string pool_id = 2;
+}
+
+// Task result entity
+message TaskResult {
+  // ID of the evaluated task
+  string task_id = 1;
+
+  // ID of the user
+  string user_id = 2;
+
+  // ISO8601 timestamp of task completion
+  google.protobuf.Timestamp completed_at = 3;
+
+  // Completion status (true if completed)
+  bool status = 4;
+}
+
+// Campaign entity
+message Campaign {
+  // Unique identifier for the campaign
+  string id = 1;
+
+  // Campaign name
+  string name = 2;
+
+  // Campaign description
+  string description = 3;
+
+  // ISO8601 timestamp for campaign start
+  google.protobuf.Timestamp start_time = 4;
+
+  // ISO8601 timestamp for campaign end (optional)
+  google.protobuf.Timestamp end_time = 5;
+
+  // List of associated task IDs
+  repeated string tasks = 6;
+
+  // Enum for campaign mode (Real-time or Backtest)
+  CampaignMode mode = 7;
+
+  // Enum for campaign status
+  CampaignStatus status = 8;
+}
+
+// Enum for campaign modes
+enum CampaignMode {
+  // Default unspecified value
+  CAMPAIGN_MODE_UNSPECIFIED = 0;
+
+  // Real-time campaign mode
+  CAMPAIGN_MODE_REAL_TIME = 1;
+
+  // Backtest campaign mode
+  CAMPAIGN_MODE_BACKTEST = 2;
+}
+
+// Enum for campaign status
+enum CampaignStatus {
+  // Default unspecified value
+  CAMPAIGN_STATUS_UNSPECIFIED = 0;
+
+  // Pending status
+  CAMPAIGN_STATUS_PENDING = 1;
+
+  // Active status
+  CAMPAIGN_STATUS_ACTIVE = 2;
+
+  // Completed status
+  CAMPAIGN_STATUS_COMPLETED = 3;
+}
+
+// User entity
+message User {
+  // Unique identifier for the user
+  string id = 1;
+
+  // User name or identifier
+  string name = 2;
+
+  // Address of blockchain wallet
+  string address = 3;
+
+  // Mapping of task ID to completion status
+  map<string, bool> task_progress = 4;
+
+  // Total points earned by the user
+  int64 points = 5;
+
+  // List of transaction IDs for tracking
+  repeated string transaction_ids = 6;
+}
+
+// Point allocation entity
+message PointAllocation {
+  // ID of the user receiving points
+  string user_id = 1;
+
+  // Associated task ID
+  string task_id = 2;
+
+  // Points allocated
+  int64 points = 3;
+
+  // Allocation percentage for share pool tasks
+  double allocation = 4;
+}
+
+// Reward entity
+message Reward {
+  // Unique identifier for the reward
+  string id = 1;
+
+  // User receiving the reward
+  string user_id = 2;
+
+  // Associated campaign ID
+  string campaign_id = 3;
+
+  // Points used to redeem the reward
+  int64 points = 4;
+
+  // ISO8601 timestamp of reward redemption
+  google.protobuf.Timestamp redeemed_at = 5;
+}

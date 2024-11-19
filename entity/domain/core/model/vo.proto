@@ -3,3 +3,24 @@ syntax = "proto3";
 package entity.domain.core.model;
 
 option go_package = "github.com/blackhorseya/pelith-assessment/entity/domain/core/model;model";
+
+// Transaction volume value object
+message TransactionVolume {
+  // User ID
+  string user_id = 1;
+
+  // Pool ID
+  string pool_id = 2;
+
+  // Transaction volume in the pool
+  double volume = 3;
+}
+
+// Reward points value object
+message RewardPoints {
+  // Total points available for distribution
+  int64 total_points = 1;
+
+  // Proportion of points for a specific user
+  double proportion = 2;
+}
