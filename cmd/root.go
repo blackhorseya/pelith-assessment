@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"log/slog"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -24,7 +23,6 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		slog.Error("error executing root command", "err", err)
 		os.Exit(1)
 	}
 }
