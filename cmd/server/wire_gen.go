@@ -7,6 +7,8 @@
 package server
 
 import (
+	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/spf13/viper"
 )
@@ -14,7 +16,36 @@ import (
 // Injectors from wire.go:
 
 func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
-	server := newImpl()
+	configx, err := initConfigx(v)
+	if err != nil {
+		return nil, nil, err
+	}
+	application, err := initAPP(configx)
+	if err != nil {
+		return nil, nil, err
+	}
+	serverInjector := &injector{
+		C: configx,
+		A: application,
+	}
+	initRoutes := NewInitRoutesFn()
+	ginServer, err := httpx.NewGinServer(application, initRoutes)
+	if err != nil {
+		return nil, nil, err
+	}
+	server := newImpl(serverInjector, ginServer)
 	return server, func() {
 	}, nil
+}
+
+// wire.go:
+
+const serviceName = "server"
+
+func initConfigx(v *viper.Viper) (*configx.Configx, error) {
+	return configx.LoadConfig(v.GetString("config"))
+}
+
+func initAPP(config *configx.Configx) (*configx.Application, error) {
+	return config.GetService(serviceName)
 }

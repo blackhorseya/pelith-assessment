@@ -1,6 +1,8 @@
 package configx
 
 import (
+	"fmt"
+
 	"github.com/blackhorseya/pelith-assessment/pkg/logger"
 	"github.com/spf13/viper"
 )
@@ -40,4 +42,14 @@ func LoadConfig(path string) (*Configx, error) {
 	}
 
 	return &config, nil
+}
+
+// GetService is used to get the service by name.
+func (x *Configx) GetService(name string) (*Application, error) {
+	service, ok := x.Services[name]
+	if !ok {
+		return nil, fmt.Errorf("service %s not found", name)
+	}
+
+	return service, nil
 }
