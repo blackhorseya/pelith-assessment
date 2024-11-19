@@ -11,6 +11,9 @@ type Configx struct {
 
 	// Logger is the logger configuration.
 	Logger logger.Options `json:"logger" yaml:"logger" mapstructure:"logger"`
+
+	// Services is the services configuration.
+	Services map[string]*Application `json:"services" yaml:"services" mapstructure:"services"`
 }
 
 // LoadConfig is used to load the configuration.
