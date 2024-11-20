@@ -2,8 +2,10 @@ package biz
 
 import (
 	"errors"
+	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Campaign represents the aggregate root for campaigns.
@@ -14,15 +16,17 @@ type Campaign struct {
 }
 
 // NewCampaign creates a new Campaign aggregate.
-func NewCampaign(id, name, description string) (*Campaign, error) {
-	if id == "" || name == "" {
-		return nil, errors.New("campaign ID and name are required")
+func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
+	if name == "" {
+		return nil, errors.New("name cannot be empty")
 	}
 	return &Campaign{
 		Campaign: model.Campaign{
-			Id:          id,
+			Id:          "",
 			Name:        name,
-			Description: description,
+			Description: "",
+			StartTime:   timestamppb.New(startAt),
+			EndTime:     timestamppb.New(startAt.Add(4 * 7 * 24 * time.Hour)),
 			Status:      model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 		},
 		Tasks: make([]*Task, 0),
