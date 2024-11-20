@@ -15,7 +15,7 @@ func NewUserService() biz.UserService {
 	return &userServiceImpl{}
 }
 
-func (i *userServiceImpl) RegisterUser(c context.Context, name string, address string) (*model.User, error) {
+func (i *userServiceImpl) RegisterUser(c context.Context, username string, address string) (*model.User, error) {
 	// TODO: 2024/11/20|sean|implement me
 	panic("implement me")
 }

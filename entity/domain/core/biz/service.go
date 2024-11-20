@@ -36,7 +36,7 @@ type RewardService interface {
 // UserService defines the domain logic for user management.
 type UserService interface {
 	// RegisterUser creates a new user in the system.
-	RegisterUser(c context.Context, name string, address string) (*model.User, error)
+	RegisterUser(c context.Context, username string, address string) (*model.User, error)
 
 	// UpdateUserProgress updates the progress of a specific task for a user.
 	UpdateUserProgress(c context.Context, userID string, taskID string, completed bool) error

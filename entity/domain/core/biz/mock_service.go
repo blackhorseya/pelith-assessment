@@ -186,18 +186,18 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 }
 
 // RegisterUser mocks base method.
-func (m *MockUserService) RegisterUser(c context.Context, name, address string) (*model.User, error) {
+func (m *MockUserService) RegisterUser(c context.Context, username, address string) (*model.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterUser", c, name, address)
+	ret := m.ctrl.Call(m, "RegisterUser", c, username, address)
 	ret0, _ := ret[0].(*model.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RegisterUser indicates an expected call of RegisterUser.
-func (mr *MockUserServiceMockRecorder) RegisterUser(c, name, address any) *gomock.Call {
+func (mr *MockUserServiceMockRecorder) RegisterUser(c, username, address any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockUserService)(nil).RegisterUser), c, name, address)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockUserService)(nil).RegisterUser), c, username, address)
 }
 
 // UpdateUserProgress mocks base method.
