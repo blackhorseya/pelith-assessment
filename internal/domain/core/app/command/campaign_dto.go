@@ -1,6 +1,7 @@
 package command
 
 import (
+	"errors"
 	"time"
 )
 
@@ -10,7 +11,19 @@ type createCampaignCommand struct {
 	StartTime time.Time `json:"start_time"`
 }
 
-// campaignResponse represents the response data of a campaign.
-type campaignResponse struct {
-	ID string `json:"id"`
+func (cmd createCampaignCommand) Key() int {
+	return createCampaignCommandKey
+}
+
+// Validate is used to validate the createCampaignCommand.
+func (cmd createCampaignCommand) Validate() error {
+	if cmd.Name == "" {
+		return errors.New("name is required")
+	}
+
+	if cmd.StartTime.IsZero() {
+		return errors.New("start time is required")
+	}
+
+	return nil
 }
