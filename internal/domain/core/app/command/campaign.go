@@ -8,6 +8,7 @@ import (
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
 )
 
 type (
@@ -35,27 +36,21 @@ func NewCreateCampaignHandler(service biz.CampaignService, repo CampaignCreator)
 	return &CreateCampaignHandler{service: service, repo: repo}
 }
 
-// Handle is used to handle the creation of a new campaign.
-func (h *CreateCampaignHandler) Handle(c context.Context, cmd createCampaignCommand) (string, error) {
-	// validate the command
-	if cmd.Name == "" {
-		return "", errors.New("campaign name cannot be empty")
-	}
-	if cmd.StartTime.IsZero() {
-		return "", errors.New("campaign start time is required")
+func (h *CreateCampaignHandler) Handle(c context.Context, msg usecase.Message) error {
+	cmd, ok := msg.(createCampaignCommand)
+	if !ok {
+		return errors.New("cannot handle the message")
 	}
 
-	// call domain service to start a new campaign
+	err := cmd.Validate()
+	if err != nil {
+		return err
+	}
+
 	campaign, err := h.service.StartCampaign(c, cmd.Name, cmd.StartTime)
 	if err != nil {
-		return "", err
+		return err
 	}
 
-	// save the campaign to the repository
-	err = h.repo.Create(c, campaign)
-	if err != nil {
-		return "", err
-	}
-
-	return campaign.Id, nil
+	return h.repo.Create(c, campaign)
 }
