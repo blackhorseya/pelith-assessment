@@ -15,6 +15,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/pgx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/spf13/viper"
 )
@@ -40,7 +41,14 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	campaignService := biz.NewCampaignService()
-	campaignCreator := pg.NewCampaignRepo()
+	db, err := pgx.NewClient(application)
+	if err != nil {
+		return nil, nil, err
+	}
+	campaignCreator, err := pg.NewCampaignRepo(db)
+	if err != nil {
+		return nil, nil, err
+	}
 	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
 	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler)
 	initServers := grpc.NewInitServersFn(campaignServiceServer)

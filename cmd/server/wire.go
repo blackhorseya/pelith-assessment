@@ -13,6 +13,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/pgx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/google/wire"
 	"github.com/spf13/viper"
@@ -53,5 +54,6 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		// infra
 		httpx.NewGinServer,
 		grpcx.NewServer,
+		pgx.NewClient,
 	))
 }

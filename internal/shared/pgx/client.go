@@ -13,8 +13,6 @@ const (
 	defaultConns       = 100
 	defaultMaxLifetime = 15 * time.Minute
 	defaultTimeout     = 5 * time.Second
-	defaultLimit       = 10
-	defaultMaxLimit    = 100
 )
 
 // NewClient init mysql client.
