@@ -46,7 +46,7 @@ func (h *CreateCampaignHandler) Handle(c context.Context, msg usecase.Message) e
 		return err
 	}
 
-	campaign, err := biz.NewCampaign(cmd.Name, cmd.StartTime)
+	campaign, err := h.service.StartCampaign(c, cmd.Name, cmd.StartTime, nil)
 	if err != nil {
 		return err
 	}

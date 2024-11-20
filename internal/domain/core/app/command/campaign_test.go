@@ -60,11 +60,26 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 			wantErr: true,
 		},
 		{
+			name: "start campaign failed",
+			args: args{msg: CreateCampaignCommand{
+				Name:      "test",
+				StartTime: time.Now(),
+			}, mock: func() {
+				s.service.EXPECT().StartCampaign(gomock.Any(), "test", gomock.Any(), gomock.Any()).
+					Return(nil, errors.New("mock error")).
+					Times(1)
+			}},
+			wantErr: true,
+		},
+		{
 			name: "save campaign failed",
 			args: args{msg: CreateCampaignCommand{
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
+				s.service.EXPECT().StartCampaign(gomock.Any(), "test", gomock.Any(), gomock.Any()).
+					Return(&biz.Campaign{}, nil).
+					Times(1)
 				s.repo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(errors.New("mock error")).Times(1)
 			}},
 			wantErr: true,
@@ -75,6 +90,9 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
+				s.service.EXPECT().StartCampaign(gomock.Any(), "test", gomock.Any(), gomock.Any()).
+					Return(&biz.Campaign{}, nil).
+					Times(1)
 				s.repo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil).Times(1)
 			}},
 			wantErr: false,
