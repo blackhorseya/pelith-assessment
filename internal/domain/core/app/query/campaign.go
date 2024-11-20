@@ -18,5 +18,5 @@ type CampaignGetter interface {
 	GetByID(c context.Context, id string) (*model.Campaign, error)
 
 	// List is used to list the campaign.
-	List(c context.Context, cond ListCampaignCondition) ([]*model.Campaign, error)
+	List(c context.Context, cond ListCampaignCondition) (items []*model.Campaign, total int, err error)
 }
