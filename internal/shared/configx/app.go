@@ -11,6 +11,7 @@ type Application struct {
 	Name string `json:"name" yaml:"name" mapstructure:"name"`
 
 	HTTP HTTP `json:"http" yaml:"http" mapstructure:"http"`
+	GRPC GRPC `json:"grpc" yaml:"grpc" mapstructure:"grpc"`
 
 	Storage struct {
 		DSN string `json:"dsn" yaml:"dsn" mapstructure:"dsn"`
@@ -36,4 +37,24 @@ func (http *HTTP) GetAddr() string {
 	}
 
 	return fmt.Sprintf("%s:%d", http.Host, http.Port)
+}
+
+// GRPC is the gRPC configuration.
+type GRPC struct {
+	URL  string `json:"url" yaml:"url"`
+	Host string `json:"host" yaml:"host"`
+	Port int    `json:"port" yaml:"port"`
+}
+
+// GetAddr is used to get the gRPC address.
+func (x *GRPC) GetAddr() string {
+	if x.Host == "" {
+		x.Host = "0.0.0.0"
+	}
+
+	if x.Port == 0 {
+		x.Port = netx.GetAvailablePort()
+	}
+
+	return fmt.Sprintf("%s:%d", x.Host, x.Port)
 }
