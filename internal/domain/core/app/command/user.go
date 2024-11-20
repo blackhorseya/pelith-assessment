@@ -26,19 +26,25 @@ type (
 	}
 )
 
-// RegisterUserHandler handles the registration of a new user.
-type RegisterUserHandler struct {
+// RegisterUserCommand is a command to register a new user.
+type RegisterUserCommand struct {
+	Username string
+	Address  string
+}
+
+// UserRegistrationHandler handles the registration of a new user.
+type UserRegistrationHandler struct {
 	biz  biz.UserService
 	repo UserCreator
 }
 
-// NewRegisterUserHandler creates a new RegisterUserHandler instance.
-func NewRegisterUserHandler(b biz.UserService, r UserCreator) RegisterUserHandler {
-	return RegisterUserHandler{biz: b, repo: r}
+// NewRegisterUserHandler creates a new UserRegistrationHandler instance.
+func NewRegisterUserHandler(b biz.UserService, r UserCreator) UserRegistrationHandler {
+	return UserRegistrationHandler{biz: b, repo: r}
 }
 
 // Handle creates a new user in the system.
-func (h *RegisterUserHandler) Handle(c context.Context, name string, address string) error {
+func (h *UserRegistrationHandler) Handle(c context.Context, cmd RegisterUserCommand) error {
 	// TODO: 2024/11/20|sean|implement me
 	panic("implement me")
 }
