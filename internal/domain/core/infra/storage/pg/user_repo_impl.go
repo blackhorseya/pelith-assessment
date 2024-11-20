@@ -10,8 +10,6 @@ import (
 	_ "github.com/lib/pq" // import postgres driver
 )
 
-const migrationFolder = "file://scripts/migrations/user"
-
 // UserRepoImpl is a postgres implementation of UserRepo
 type UserRepoImpl struct {
 }
@@ -23,7 +21,7 @@ func NewUserRepo(rw *sqlx.DB) (*UserRepoImpl, error) {
 		return nil, err
 	}
 
-	migration, err := migrate.NewWithDatabaseInstance(migrationFolder, "postgres", driver)
+	migration, err := migrate.NewWithDatabaseInstance(migrationFolder+"/user", "postgres", driver)
 	if err != nil {
 		return nil, err
 	}
