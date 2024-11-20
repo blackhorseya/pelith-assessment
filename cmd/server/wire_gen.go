@@ -7,8 +7,10 @@
 package server
 
 import (
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/spf13/viper"
@@ -34,8 +36,14 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	server := newImpl(injector, ginServer)
-	return server, func() {
+	initServers := grpc.NewInitServersFn()
+	healthServer := grpc.NewHealthServer()
+	server, err := grpcx.NewServer(application, initServers, healthServer)
+	if err != nil {
+		return nil, nil, err
+	}
+	adapterxServer := newImpl(injector, ginServer, server)
+	return adapterxServer, func() {
 	}, nil
 }
 

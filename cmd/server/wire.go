@@ -5,8 +5,10 @@
 package server
 
 import (
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/google/wire"
@@ -32,8 +34,11 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 
 		// adapter
 		http.NewInitUserRoutesFn,
+		grpc.NewInitServersFn,
+		grpc.NewHealthServer,
 
 		// infra
 		httpx.NewGinServer,
+		grpcx.NewServer,
 	))
 }
