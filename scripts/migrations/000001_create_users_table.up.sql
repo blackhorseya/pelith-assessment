@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    address  BINARY(20) PRIMARY KEY,
+    address  bytea PRIMARY KEY check ( octet_length(address) = 20 ),
     username VARCHAR(50) UNIQUE NOT NULL
 );
