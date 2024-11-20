@@ -1,7 +1,6 @@
 package http
 
 import (
-	v1 "github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http/v1"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
 	"github.com/gin-gonic/gin"
 )
@@ -11,7 +10,18 @@ func NewInitUserRoutesFn() httpx.InitRoutes {
 	return func(router *gin.Engine) {
 		api := router.Group("/api")
 		{
-			v1.Handler(api)
+			v1 := api.Group("/v1")
+			{
+				users := v1.Group("/users")
+				{
+					user := users.Group("/:address")
+					{
+						// TODO: 2024/11/20|sean|implement the handler
+						user.GET("/tasks/status")
+						user.GET("/points/history")
+					}
+				}
+			}
 		}
 	}
 }
