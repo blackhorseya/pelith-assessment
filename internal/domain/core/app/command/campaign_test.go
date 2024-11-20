@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
-	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -61,26 +60,11 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 			wantErr: true,
 		},
 		{
-			name: "start campaign failed",
-			args: args{msg: CreateCampaignCommand{
-				Name:      "test",
-				StartTime: time.Now(),
-			}, mock: func() {
-				s.service.EXPECT().StartCampaign(gomock.Any(), "test", gomock.Any()).
-					Return(nil, errors.New("mock error")).
-					Times(1)
-			}},
-			wantErr: true,
-		},
-		{
 			name: "save campaign failed",
 			args: args{msg: CreateCampaignCommand{
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
-				s.service.EXPECT().StartCampaign(gomock.Any(), "test", gomock.Any()).
-					Return(&model.Campaign{}, nil).
-					Times(1)
 				s.repo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(errors.New("mock error")).Times(1)
 			}},
 			wantErr: true,
@@ -91,9 +75,6 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
-				s.service.EXPECT().StartCampaign(gomock.Any(), "test", gomock.Any()).
-					Return(&model.Campaign{}, nil).
-					Times(1)
 				s.repo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil).Times(1)
 			}},
 			wantErr: false,

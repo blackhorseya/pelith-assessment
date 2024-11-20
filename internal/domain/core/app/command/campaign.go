@@ -7,7 +7,6 @@ import (
 	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
-	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
 )
 
@@ -15,13 +14,13 @@ type (
 	// CampaignCreator is used to create a new campaign.
 	CampaignCreator interface {
 		// Create is used to create a new campaign.
-		Create(c context.Context, campaign *model.Campaign) error
+		Create(c context.Context, campaign *biz.Campaign) error
 	}
 
 	// CampaignUpdater is used to update the campaign.
 	CampaignUpdater interface {
 		// Update is used to update the campaign.
-		Update(c context.Context, campaign *model.Campaign) error
+		Update(c context.Context, campaign *biz.Campaign) error
 	}
 )
 
@@ -47,7 +46,7 @@ func (h *CreateCampaignHandler) Handle(c context.Context, msg usecase.Message) e
 		return err
 	}
 
-	campaign, err := h.service.StartCampaign(c, cmd.Name, cmd.StartTime)
+	campaign, err := biz.NewCampaign(cmd.Name, cmd.StartTime)
 	if err != nil {
 		return err
 	}

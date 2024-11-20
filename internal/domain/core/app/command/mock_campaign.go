@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	model "github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	biz "github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,7 +41,7 @@ func (m *MockCampaignCreator) EXPECT() *MockCampaignCreatorMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockCampaignCreator) Create(c context.Context, campaign *model.Campaign) error {
+func (m *MockCampaignCreator) Create(c context.Context, campaign *biz.Campaign) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", c, campaign)
 	ret0, _ := ret[0].(error)
@@ -78,7 +78,7 @@ func (m *MockCampaignUpdater) EXPECT() *MockCampaignUpdaterMockRecorder {
 }
 
 // Update mocks base method.
-func (m *MockCampaignUpdater) Update(c context.Context, campaign *model.Campaign) error {
+func (m *MockCampaignUpdater) Update(c context.Context, campaign *biz.Campaign) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", c, campaign)
 	ret0, _ := ret[0].(error)

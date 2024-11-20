@@ -3,7 +3,7 @@ package pg
 import (
 	"context"
 
-	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 )
 
@@ -15,7 +15,7 @@ func NewCampaignRepo() command.CampaignCreator {
 	return &campaignRepoImpl{}
 }
 
-func (i *campaignRepoImpl) Create(c context.Context, campaign *model.Campaign) error {
+func (i *campaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) error {
 	// TODO: 2024/11/20|sean|implement create campaign
 	panic("implement me")
 }
