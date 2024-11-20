@@ -7,6 +7,9 @@
 package server
 
 import (
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
@@ -36,7 +39,11 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	initServers := grpc.NewInitServersFn()
+	campaignService := biz.NewCampaignService()
+	campaignCreator := pg.NewCampaignRepo()
+	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
+	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler)
+	initServers := grpc.NewInitServersFn(campaignServiceServer)
 	healthServer := grpc.NewHealthServer()
 	server, err := grpcx.NewServer(application, initServers, healthServer)
 	if err != nil {

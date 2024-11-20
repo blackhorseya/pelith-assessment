@@ -5,6 +5,9 @@
 package server
 
 import (
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
@@ -36,6 +39,16 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		http.NewInitUserRoutesFn,
 		grpc.NewInitServersFn,
 		grpc.NewHealthServer,
+		grpc.NewCampaignServer,
+
+		// app layer
+		command.NewCreateCampaignHandler,
+
+		// entity layer
+		biz.NewCampaignService,
+
+		// repo layer
+		pg.NewCampaignRepo,
 
 		// infra
 		httpx.NewGinServer,

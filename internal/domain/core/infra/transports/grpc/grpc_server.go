@@ -2,15 +2,16 @@ package grpc
 
 import (
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
+	"github.com/blackhorseya/pelith-assessment/proto/core"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 // NewInitServersFn is used to create a new init servers function.
-func NewInitServersFn() grpcx.InitServers {
+func NewInitServersFn(campaignServer core.CampaignServiceServer) grpcx.InitServers {
 	return func(s *grpc.Server) {
-		// TODO: 2024/11/20|sean|register grpc server
+		core.RegisterCampaignServiceServer(s, campaignServer)
 	}
 }
 
