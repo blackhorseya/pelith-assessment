@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package core;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/blackhorseya/pelith-assessment/proto/core";
+
+// StartCampaignRequest is the request for start campaign
+message StartCampaignRequest {
+  string name = 1;
+  string description = 2;
+  google.protobuf.Timestamp start_time = 3;
+}
+
+// StartCampaignResponse is the response for start campaign
+message StartCampaignResponse {
+  string id = 1;
+}
+
+// CampaignService is the service for campaign
+service CampaignService {
+  rpc StartCampaign(StartCampaignRequest) returns (StartCampaignResponse) {}
+}
