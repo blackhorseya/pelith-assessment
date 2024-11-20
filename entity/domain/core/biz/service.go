@@ -21,7 +21,7 @@ type TaskService interface {
 // CampaignService defines the domain logic for campaign management.
 type CampaignService interface {
 	// StartCampaign initializes a new campaign.
-	StartCampaign(c context.Context, name string, startAt time.Time) (*model.Campaign, error)
+	StartCampaign(c context.Context, name string, startAt time.Time, tasks []*Task) (*Campaign, error)
 }
 
 // RewardService defines the domain logic for rewards and point allocation.
