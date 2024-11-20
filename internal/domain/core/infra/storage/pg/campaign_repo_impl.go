@@ -7,16 +7,15 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 )
 
-// CampaignRepoImpl is the campaign repository implementation.
-type CampaignRepoImpl struct {
+type campaignRepoImpl struct {
 }
 
-// NewCampaignRepo is used to create a new CampaignRepoImpl.
+// NewCampaignRepo is used to create a new campaignRepoImpl.
 func NewCampaignRepo() command.CampaignCreator {
-	return &CampaignRepoImpl{}
+	return &campaignRepoImpl{}
 }
 
-func (i *CampaignRepoImpl) Create(c context.Context, campaign *model.Campaign) error {
+func (i *campaignRepoImpl) Create(c context.Context, campaign *model.Campaign) error {
 	// TODO: 2024/11/20|sean|implement create campaign
 	panic("implement me")
 }
