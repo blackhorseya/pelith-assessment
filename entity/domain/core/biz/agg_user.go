@@ -14,15 +14,15 @@ type User struct {
 }
 
 // NewUser creates a new User aggregate.
-func NewUser(id, name, address string) (*User, error) {
-	if id == "" || name == "" {
-		return nil, errors.New("user ID and name are required")
+func NewUser(username, address string) (*User, error) {
+	if username == "" {
+		return nil, errors.New("username cannot be empty")
 	}
 
 	return &User{
 		User: model.User{
-			Id:             id,
-			Name:           name,
+			Id:             "",
+			Name:           username,
 			Address:        address,
 			TaskProgress:   make(map[string]bool),
 			Points:         0,
