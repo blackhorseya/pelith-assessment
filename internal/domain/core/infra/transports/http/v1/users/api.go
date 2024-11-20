@@ -1,11 +1,10 @@
 package users
 
 import (
-	"github.com/blackhorseya/pelith-assessment/cmd/server/wirex"
 	"github.com/gin-gonic/gin"
 )
 
-func Handler(g *gin.RouterGroup, injector *wirex.Injector) {
+func Handler(g *gin.RouterGroup) {
 	users := g.Group("/users")
 	{
 		user := users.Group("/:address")

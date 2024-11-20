@@ -6,6 +6,7 @@ package server
 
 import (
 	"github.com/blackhorseya/pelith-assessment/cmd/server/wirex"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
@@ -31,7 +32,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		initAPP,
 
 		// adapter
-		NewInitRoutesFn,
+		http.NewInitUserRoutesFn,
 
 		// infra
 		httpx.NewGinServer,
