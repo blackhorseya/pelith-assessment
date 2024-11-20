@@ -56,12 +56,13 @@ func (mr *MockCampaignGetterMockRecorder) GetByID(c, id any) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockCampaignGetter) List(c context.Context, cond ListCampaignCondition) ([]*model.Campaign, error) {
+func (m *MockCampaignGetter) List(c context.Context, cond ListCampaignCondition) ([]*model.Campaign, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", c, cond)
 	ret0, _ := ret[0].([]*model.Campaign)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
 }
 
 // List indicates an expected call of List.
