@@ -21,10 +21,7 @@ type TaskService interface {
 // CampaignService defines the domain logic for campaign management.
 type CampaignService interface {
 	// StartCampaign initializes a new campaign.
-	StartCampaign(c context.Context, campaign *model.Campaign) (string, error)
-
-	// EndCampaign completes a running campaign.
-	EndCampaign(c context.Context, campaignID string) error
+	StartCampaign(c context.Context, name string, startAt time.Time) (*model.Campaign, error)
 }
 
 // RewardService defines the domain logic for rewards and point allocation.
@@ -39,7 +36,7 @@ type RewardService interface {
 // UserService defines the domain logic for user management.
 type UserService interface {
 	// RegisterUser creates a new user in the system.
-	RegisterUser(c context.Context, user *model.User) (string, error)
+	RegisterUser(c context.Context, name string, address string) (*model.User, error)
 
 	// UpdateUserProgress updates the progress of a specific task for a user.
 	UpdateUserProgress(c context.Context, userID string, taskID string, completed bool) error
