@@ -12,6 +12,7 @@ import (
 
 const migrationFolder = "file://scripts/migrations/user"
 
+// UserRepoImpl is a postgres implementation of UserRepo
 type UserRepoImpl struct {
 }
 
