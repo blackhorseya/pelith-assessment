@@ -37,7 +37,7 @@ func NewCreateCampaignHandler(service biz.CampaignService, repo CampaignCreator)
 }
 
 func (h *CreateCampaignHandler) Handle(c context.Context, msg usecase.Message) error {
-	cmd, ok := msg.(createCampaignCommand)
+	cmd, ok := msg.(CreateCampaignCommand)
 	if !ok {
 		return errors.New("cannot handle the message")
 	}

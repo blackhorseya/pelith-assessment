@@ -54,7 +54,7 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 	}{
 		{
 			name: "invalid command",
-			args: args{msg: createCampaignCommand{
+			args: args{msg: CreateCampaignCommand{
 				Name:      "",
 				StartTime: time.Time{},
 			}},
@@ -62,7 +62,7 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 		},
 		{
 			name: "start campaign failed",
-			args: args{msg: createCampaignCommand{
+			args: args{msg: CreateCampaignCommand{
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
@@ -74,7 +74,7 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 		},
 		{
 			name: "save campaign failed",
-			args: args{msg: createCampaignCommand{
+			args: args{msg: CreateCampaignCommand{
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
@@ -87,7 +87,7 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 		},
 		{
 			name: "success",
-			args: args{msg: createCampaignCommand{
+			args: args{msg: CreateCampaignCommand{
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {

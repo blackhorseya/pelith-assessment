@@ -5,18 +5,18 @@ import (
 	"time"
 )
 
-// createCampaignCommand represents the input data to create a campaign.
-type createCampaignCommand struct {
+// CreateCampaignCommand represents the input data to create a campaign.
+type CreateCampaignCommand struct {
 	Name      string    `json:"name"`
 	StartTime time.Time `json:"start_time"`
 }
 
-func (cmd createCampaignCommand) Key() int {
+func (cmd CreateCampaignCommand) Key() int {
 	return createCampaignCommandKey
 }
 
-// Validate is used to validate the createCampaignCommand.
-func (cmd createCampaignCommand) Validate() error {
+// Validate is used to validate the CreateCampaignCommand.
+func (cmd CreateCampaignCommand) Validate() error {
 	if cmd.Name == "" {
 		return errors.New("name is required")
 	}
