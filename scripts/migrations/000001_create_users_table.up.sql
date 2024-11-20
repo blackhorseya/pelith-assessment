@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS users
+(
+    address  BINARY(20) PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL
+);
