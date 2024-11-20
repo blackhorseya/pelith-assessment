@@ -7,7 +7,6 @@
 package server
 
 import (
-	"github.com/blackhorseya/pelith-assessment/cmd/server/wirex"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
@@ -26,7 +25,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	injector := &wirex.Injector{
+	injector := &Injector{
 		C: configx,
 		A: application,
 	}

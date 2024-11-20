@@ -1,4 +1,4 @@
-package wirex
+package server
 
 import (
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
