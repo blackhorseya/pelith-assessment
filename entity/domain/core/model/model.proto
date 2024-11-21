@@ -196,3 +196,53 @@ message Reward {
   // ISO8601 timestamp of reward redemption
   google.protobuf.Timestamp redeemed_at = 5;
 }
+
+// Transaction entity
+message Transaction {
+  // Unique identifier for the transaction (blockchain hash)
+  // @gotags: db:"tx_hash"
+  bytes tx_hash = 1;
+
+  // Blockchain sender address
+  // @gotags: db:"from_address"
+  bytes from_address = 2;
+
+  // Blockchain receiver address
+  // @gotags: db:"to_address"
+  bytes to_address = 3;
+
+  // Transaction amount
+  // @gotags: db:"amount"
+  double amount = 4;
+
+  // Timestamp of the transaction on the blockchain
+  // @gotags: db:"timestamp"
+  google.protobuf.Timestamp timestamp = 5;
+
+  // Associated task ID (optional for task tracking)
+  // @gotags: db:"task_id"
+  optional string task_id = 6;
+
+  // Associated campaign ID (optional for campaign tracking)
+  // @gotags: db:"campaign_id"
+  optional string campaign_id = 7;
+
+  // Status of the transaction
+  // @gotags: db:"status"
+  TransactionStatus status = 8;
+}
+
+// Enum for transaction status
+enum TransactionStatus {
+  // Default unspecified value
+  TRANSACTION_STATUS_UNSPECIFIED = 0;
+
+  // Transaction is pending
+  TRANSACTION_STATUS_PENDING = 1;
+
+  // Transaction is completed
+  TRANSACTION_STATUS_COMPLETED = 2;
+
+  // Transaction has failed
+  TRANSACTION_STATUS_FAILED = 3;
+}
