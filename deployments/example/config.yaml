@@ -9,3 +9,6 @@ services:
 
     grpc:
       port: 50051
+
+    storage:
+      dsn: "postgres://root:changeme@localhost:5432/pelith?sslmode=disable"
