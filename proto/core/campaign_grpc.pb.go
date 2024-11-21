@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	CampaignService_StartCampaign_FullMethodName = "/core.CampaignService/StartCampaign"
+	CampaignService_GetCampaign_FullMethodName   = "/core.CampaignService/GetCampaign"
 )
 
 // CampaignServiceClient is the client API for CampaignService service.
@@ -29,6 +30,7 @@ const (
 // CampaignService is the service for campaign
 type CampaignServiceClient interface {
 	StartCampaign(ctx context.Context, in *StartCampaignRequest, opts ...grpc.CallOption) (*StartCampaignResponse, error)
+	GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error)
 }
 
 type campaignServiceClient struct {
@@ -49,6 +51,16 @@ func (c *campaignServiceClient) StartCampaign(ctx context.Context, in *StartCamp
 	return out, nil
 }
 
+func (c *campaignServiceClient) GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCampaignResponse)
+	err := c.cc.Invoke(ctx, CampaignService_GetCampaign_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CampaignServiceServer is the server API for CampaignService service.
 // All implementations should embed UnimplementedCampaignServiceServer
 // for forward compatibility.
@@ -56,6 +68,7 @@ func (c *campaignServiceClient) StartCampaign(ctx context.Context, in *StartCamp
 // CampaignService is the service for campaign
 type CampaignServiceServer interface {
 	StartCampaign(context.Context, *StartCampaignRequest) (*StartCampaignResponse, error)
+	GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error)
 }
 
 // UnimplementedCampaignServiceServer should be embedded to have
@@ -67,6 +80,9 @@ type UnimplementedCampaignServiceServer struct{}
 
 func (UnimplementedCampaignServiceServer) StartCampaign(context.Context, *StartCampaignRequest) (*StartCampaignResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartCampaign not implemented")
+}
+func (UnimplementedCampaignServiceServer) GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCampaign not implemented")
 }
 func (UnimplementedCampaignServiceServer) testEmbeddedByValue() {}
 
@@ -106,6 +122,24 @@ func _CampaignService_StartCampaign_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CampaignService_GetCampaign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCampaignRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CampaignServiceServer).GetCampaign(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CampaignService_GetCampaign_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CampaignServiceServer).GetCampaign(ctx, req.(*GetCampaignRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CampaignService_ServiceDesc is the grpc.ServiceDesc for CampaignService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -116,6 +150,10 @@ var CampaignService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StartCampaign",
 			Handler:    _CampaignService_StartCampaign_Handler,
+		},
+		{
+			MethodName: "GetCampaign",
+			Handler:    _CampaignService_GetCampaign_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

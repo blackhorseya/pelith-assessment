@@ -20,7 +20,19 @@ message StartCampaignResponse {
   string id = 1;
 }
 
+// GetCampaignRequest is the request for get campaign
+message GetCampaignRequest {
+  string id = 1;
+}
+
+// GetCampaignResponse is the response for get campaign
+message GetCampaignResponse {
+  entity.domain.core.model.Campaign campaign = 1;
+  repeated entity.domain.core.model.Task tasks = 2;
+}
+
 // CampaignService is the service for campaign
 service CampaignService {
   rpc StartCampaign(StartCampaignRequest) returns (StartCampaignResponse) {}
+  rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse) {}
 }

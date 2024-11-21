@@ -34,6 +34,26 @@ func (m *MockCampaignServiceClient) EXPECT() *MockCampaignServiceClientMockRecor
 	return m.recorder
 }
 
+// GetCampaign mocks base method.
+func (m *MockCampaignServiceClient) GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetCampaign", varargs...)
+	ret0, _ := ret[0].(*GetCampaignResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCampaign indicates an expected call of GetCampaign.
+func (mr *MockCampaignServiceClientMockRecorder) GetCampaign(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCampaign", reflect.TypeOf((*MockCampaignServiceClient)(nil).GetCampaign), varargs...)
+}
+
 // StartCampaign mocks base method.
 func (m *MockCampaignServiceClient) StartCampaign(ctx context.Context, in *StartCampaignRequest, opts ...grpc.CallOption) (*StartCampaignResponse, error) {
 	m.ctrl.T.Helper()
@@ -75,6 +95,21 @@ func NewMockCampaignServiceServer(ctrl *gomock.Controller) *MockCampaignServiceS
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCampaignServiceServer) EXPECT() *MockCampaignServiceServerMockRecorder {
 	return m.recorder
+}
+
+// GetCampaign mocks base method.
+func (m *MockCampaignServiceServer) GetCampaign(ctx context.Context, in *GetCampaignRequest) (*GetCampaignResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCampaign", ctx, in)
+	ret0, _ := ret[0].(*GetCampaignResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCampaign indicates an expected call of GetCampaign.
+func (mr *MockCampaignServiceServerMockRecorder) GetCampaign(ctx, in interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCampaign", reflect.TypeOf((*MockCampaignServiceServer)(nil).GetCampaign), ctx, in)
 }
 
 // StartCampaign mocks base method.

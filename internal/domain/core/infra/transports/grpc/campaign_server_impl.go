@@ -35,3 +35,11 @@ func (i *campaignServerImpl) StartCampaign(
 		Id: "you need to fill the campaign id",
 	}, nil
 }
+
+func (i *campaignServerImpl) GetCampaign(
+	c context.Context,
+	req *core.GetCampaignRequest,
+) (*core.GetCampaignResponse, error) {
+	// TODO: 2024/11/21|sean|implement get campaign
+	panic("implement me")
+}
