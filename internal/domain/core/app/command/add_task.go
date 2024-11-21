@@ -31,8 +31,16 @@ type AddTaskHandler struct {
 }
 
 // NewAddTaskHandler 用於建立 AddTaskHandler
-func NewAddTaskHandler(service biz.CampaignService, taskCreator TaskCreator) *AddTaskHandler {
-	return &AddTaskHandler{service: service, taskCreator: taskCreator}
+func NewAddTaskHandler(
+	service biz.CampaignService,
+	taskService biz.TaskService,
+	taskCreator TaskCreator,
+) *AddTaskHandler {
+	return &AddTaskHandler{
+		service:     service,
+		taskService: taskService,
+		taskCreator: taskCreator,
+	}
 }
 
 func (h *AddTaskHandler) Handle(c context.Context, msg usecase.Message) (string, error) {

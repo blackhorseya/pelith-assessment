@@ -48,6 +48,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 
 		// entity layer
 		biz.NewCampaignService,
+		biz.NewTaskService,
 
 		// repo layer
 		pg.NewCampaignRepo,

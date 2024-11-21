@@ -54,9 +54,10 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
+	taskService := biz.NewTaskService()
 	taskRepoImpl := pg.NewTaskRepo(db)
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
-	addTaskHandler := command.NewAddTaskHandler(campaignService, taskCreator)
+	addTaskHandler := command.NewAddTaskHandler(campaignService, taskService, taskCreator)
 	campaignGetter, err := pg.NewCampaignGetter(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
