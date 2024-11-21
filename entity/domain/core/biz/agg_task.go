@@ -12,14 +12,13 @@ type Task struct {
 }
 
 // NewTask creates a new Task aggregate.
-func NewTask(id, name, description string, taskType model.TaskType, criteria *model.TaskCriteria) (*Task, error) {
-	if id == "" || name == "" {
-		return nil, errors.New("task ID and name are required")
+func NewTask(name, description string, taskType model.TaskType, criteria *model.TaskCriteria) (*Task, error) {
+	if name == "" {
+		return nil, errors.New("task name is required")
 	}
 
 	return &Task{
 		Task: model.Task{
-			Id:          id,
 			Name:        name,
 			Description: description,
 			Type:        taskType,
