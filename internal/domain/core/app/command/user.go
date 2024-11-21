@@ -7,6 +7,7 @@ import (
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
 )
 
 type (
@@ -39,12 +40,11 @@ type UserRegistrationHandler struct {
 }
 
 // NewRegisterUserHandler creates a new UserRegistrationHandler instance.
-func NewRegisterUserHandler(b biz.UserService, r UserCreator) UserRegistrationHandler {
-	return UserRegistrationHandler{biz: b, repo: r}
+func NewRegisterUserHandler(b biz.UserService, r UserCreator) *UserRegistrationHandler {
+	return &UserRegistrationHandler{biz: b, repo: r}
 }
 
-// Handle creates a new user in the system.
-func (h *UserRegistrationHandler) Handle(c context.Context, cmd RegisterUserCommand) error {
-	// TODO: 2024/11/20|sean|implement me
+func (h *UserRegistrationHandler) Handle(c context.Context, msg usecase.Message) (string, error) {
+	// TODO: 2024/11/21|sean|Implement the user registration handler.
 	panic("implement me")
 }
