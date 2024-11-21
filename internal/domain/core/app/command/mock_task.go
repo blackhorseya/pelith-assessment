@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	model "github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	biz "github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,15 +41,15 @@ func (m *MockTaskCreator) EXPECT() *MockTaskCreatorMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockTaskCreator) Create(c context.Context, task *model.Task) error {
+func (m *MockTaskCreator) Create(c context.Context, task *biz.Task, campaignID string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", c, task)
+	ret := m.ctrl.Call(m, "Create", c, task, campaignID)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockTaskCreatorMockRecorder) Create(c, task any) *gomock.Call {
+func (mr *MockTaskCreatorMockRecorder) Create(c, task, campaignID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockTaskCreator)(nil).Create), c, task)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockTaskCreator)(nil).Create), c, task, campaignID)
 }

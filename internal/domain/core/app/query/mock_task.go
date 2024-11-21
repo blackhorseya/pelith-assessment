@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	model "github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	biz "github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockTaskGetter) EXPECT() *MockTaskGetterMockRecorder {
 }
 
 // GetByID mocks base method.
-func (m *MockTaskGetter) GetByID(c context.Context, id string) (*model.Task, error) {
+func (m *MockTaskGetter) GetByID(c context.Context, id string) (*biz.Task, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", c, id)
-	ret0, _ := ret[0].(*model.Task)
+	ret0, _ := ret[0].(*biz.Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -56,10 +56,10 @@ func (mr *MockTaskGetterMockRecorder) GetByID(c, id any) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockTaskGetter) List(c context.Context, cond ListTaskCondition) ([]*model.Task, int, error) {
+func (m *MockTaskGetter) List(c context.Context, cond ListTaskCondition) ([]*biz.Task, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", c, cond)
-	ret0, _ := ret[0].([]*model.Task)
+	ret0, _ := ret[0].([]*biz.Task)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
