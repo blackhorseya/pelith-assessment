@@ -12,10 +12,10 @@ import (
 // TaskService provides operations related to task management.
 type TaskService interface {
 	// EvaluateTask checks if a user has completed a specific task.
-	EvaluateTask(c context.Context, userID string, taskID string) (*model.TaskResult, error)
+	// EvaluateTask(c context.Context, userID string, taskID string) (*model.TaskResult, error)
 
 	// CreateTask creates a new task in the system.
-	CreateTask(c context.Context, task *model.Task) (string, error)
+	CreateTask(c context.Context, campaignID string, task *model.Task) (*Task, error)
 }
 
 // CampaignService defines the domain logic for campaign management.
