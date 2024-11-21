@@ -22,6 +22,8 @@ type TaskService interface {
 type CampaignService interface {
 	// StartCampaign initializes a new campaign.
 	StartCampaign(c context.Context, name string, startAt time.Time, tasks []*Task) (*Campaign, error)
+
+	AddTasks(c context.Context, campaignID string, tasks []*Task) error
 }
 
 // RewardService defines the domain logic for rewards and point allocation.
