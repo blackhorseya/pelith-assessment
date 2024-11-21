@@ -35,21 +35,26 @@ func NewCreateCampaignHandler(service biz.CampaignService, repo CampaignCreator)
 	return &CreateCampaignHandler{service: service, repo: repo}
 }
 
-func (h *CreateCampaignHandler) Handle(c context.Context, msg usecase.Message) error {
+func (h *CreateCampaignHandler) Handle(c context.Context, msg usecase.Message) (string, error) {
 	cmd, ok := msg.(CreateCampaignCommand)
 	if !ok {
-		return errors.New("cannot handle the message")
+		return "", errors.New("cannot handle the message")
 	}
 
 	err := cmd.Validate()
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	campaign, err := h.service.StartCampaign(c, cmd.Name, cmd.StartTime, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return h.repo.Create(c, campaign)
+	err = h.repo.Create(c, campaign)
+	if err != nil {
+		return "", err
+	}
+
+	return campaign.Id, nil
 }

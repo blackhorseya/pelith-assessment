@@ -105,7 +105,8 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 				tt.args.mock()
 			}
 
-			if err := s.handler.Handle(tt.args.c, tt.args.msg); (err != nil) != tt.wantErr {
+			_, err := s.handler.Handle(tt.args.c, tt.args.msg)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Handle() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

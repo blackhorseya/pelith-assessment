@@ -22,7 +22,7 @@ func (i *campaignServerImpl) StartCampaign(
 	c context.Context,
 	req *core.StartCampaignRequest,
 ) (*core.StartCampaignResponse, error) {
-	err := i.createCampaignHandler.Handle(c, command.CreateCampaignCommand{
+	id, err := i.createCampaignHandler.Handle(c, command.CreateCampaignCommand{
 		Name:      req.Name,
 		StartTime: req.StartTime.AsTime(),
 	})
@@ -31,8 +31,7 @@ func (i *campaignServerImpl) StartCampaign(
 	}
 
 	return &core.StartCampaignResponse{
-		// TODO: 2024/11/20|sean|return campaign id
-		Id: "you need to fill the campaign id",
+		Id: id,
 	}, nil
 }
 

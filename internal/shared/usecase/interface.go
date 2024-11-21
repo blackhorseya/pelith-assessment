@@ -9,7 +9,7 @@ import (
 type (
 	// Handler is the interface for handling a message.
 	Handler interface {
-		Handle(context.Context, Message) error
+		Handle(context.Context, Message) (string, error)
 	}
 
 	// PipelineBehaviour is the interface for processing a message in a pipeline.
