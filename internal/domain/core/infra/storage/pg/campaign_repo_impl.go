@@ -3,47 +3,48 @@ package pg
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"sync"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
-type campaignRepoImpl struct {
+var (
+	instance *CampaignRepoImpl
+	mu       sync.Mutex
+)
+
+// CampaignRepoImpl is the implementation of CampaignRepo.
+type CampaignRepoImpl struct {
 	rw *sqlx.DB
 }
 
-// NewCampaignRepo is used to create a new campaignRepoImpl.
-func NewCampaignRepo(rw *sqlx.DB) (command.CampaignCreator, error) {
-	driver, err := postgres.WithInstance(rw.DB, &postgres.Config{})
+func NewCampaignRepo(rw *sqlx.DB) (*CampaignRepoImpl, error) {
+	err := migrateUp(rw, "campaign")
 	if err != nil {
 		return nil, err
 	}
 
-	migration, err := migrate.NewWithDatabaseInstance(migrationFolder+"/campaign", "postgres", driver)
-	if err != nil {
-		return nil, err
-	}
+	return &CampaignRepoImpl{rw: rw}, nil
+}
 
-	err = migration.Up()
-	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return nil, err
-	}
+// NewCampaignCreator is used to create a new CampaignCreator.
+func NewCampaignCreator(impl *CampaignRepoImpl) (command.CampaignCreator, error) {
+	return impl, nil
+}
 
-	return &campaignRepoImpl{
-		rw: rw,
-	}, nil
+// NewCampaignGetter is used to create a new CampaignGetter.
+func NewCampaignGetter(impl *CampaignRepoImpl) (query.CampaignGetter, error) {
+	return impl, nil
 }
 
 //nolint:funlen // it's okay
-func (i *campaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) error {
+func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) error {
 	ctx := contextx.WithContext(c)
 
 	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
@@ -161,12 +162,12 @@ func (i *campaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 	return nil
 }
 
-func (i *campaignRepoImpl) GetByID(c context.Context, id string) (*biz.Campaign, error) {
+func (i *CampaignRepoImpl) GetByID(c context.Context, id string) (*biz.Campaign, error) {
 	// TODO: 2024/11/21|sean|implement me
 	panic("implement me")
 }
 
-func (i *campaignRepoImpl) List(
+func (i *CampaignRepoImpl) List(
 	c context.Context,
 	cond query.ListCampaignCondition,
 ) (items []*biz.Campaign, total int, err error) {

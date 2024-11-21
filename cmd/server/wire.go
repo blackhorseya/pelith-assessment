@@ -50,6 +50,8 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 
 		// repo layer
 		pg.NewCampaignRepo,
+		pg.NewCampaignCreator,
+		pg.NewCampaignGetter,
 
 		// infra
 		httpx.NewGinServer,

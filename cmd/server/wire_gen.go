@@ -45,12 +45,20 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	campaignCreator, err := pg.NewCampaignRepo(db)
+	campaignRepoImpl, err := pg.NewCampaignRepo(db)
+	if err != nil {
+		return nil, nil, err
+	}
+	campaignCreator, err := pg.NewCampaignCreator(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
 	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
-	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler)
+	campaignGetter, err := pg.NewCampaignGetter(campaignRepoImpl)
+	if err != nil {
+		return nil, nil, err
+	}
+	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, campaignGetter)
 	initServers := grpc.NewInitServersFn(campaignServiceServer)
 	healthServer := grpc.NewHealthServer()
 	server, err := grpcx.NewServer(application, initServers, healthServer)
