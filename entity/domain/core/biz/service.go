@@ -15,7 +15,14 @@ type TaskService interface {
 	// EvaluateTask(c context.Context, userID string, taskID string) (*model.TaskResult, error)
 
 	// CreateTask creates a new task in the system.
-	CreateTask(c context.Context, campaignID string, task *model.Task) (*Task, error)
+	CreateTask(
+		c context.Context,
+		campaign *Campaign,
+		name, description string,
+		taskType model.TaskType,
+		minAmount float64,
+		poolID string,
+	) (*Task, error)
 }
 
 // CampaignService defines the domain logic for campaign management.

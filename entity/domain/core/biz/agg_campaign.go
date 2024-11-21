@@ -39,6 +39,7 @@ func (c *Campaign) AddTask(task *Task) error {
 	if c.Status != model.CampaignStatus_CAMPAIGN_STATUS_PENDING {
 		return errors.New("tasks can only be added to pending campaigns")
 	}
+	task.CampaignID = c.Id
 	c.Tasks = append(c.Tasks, task)
 	return nil
 }

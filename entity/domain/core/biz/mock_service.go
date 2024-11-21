@@ -42,18 +42,18 @@ func (m *MockTaskService) EXPECT() *MockTaskServiceMockRecorder {
 }
 
 // CreateTask mocks base method.
-func (m *MockTaskService) CreateTask(c context.Context, campaignID string, task *model.Task) (*Task, error) {
+func (m *MockTaskService) CreateTask(c context.Context, campaign *Campaign, name, description string, taskType model.TaskType, minAmount float64, poolID string) (*Task, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateTask", c, campaignID, task)
+	ret := m.ctrl.Call(m, "CreateTask", c, campaign, name, description, taskType, minAmount, poolID)
 	ret0, _ := ret[0].(*Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateTask indicates an expected call of CreateTask.
-func (mr *MockTaskServiceMockRecorder) CreateTask(c, campaignID, task any) *gomock.Call {
+func (mr *MockTaskServiceMockRecorder) CreateTask(c, campaign, name, description, taskType, minAmount, poolID any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskService)(nil).CreateTask), c, campaignID, task)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockTaskService)(nil).CreateTask), c, campaign, name, description, taskType, minAmount, poolID)
 }
 
 // MockCampaignService is a mock of CampaignService interface.
