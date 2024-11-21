@@ -37,12 +37,14 @@ type AddTaskHandler struct {
 
 // NewAddTaskHandler 用於建立 AddTaskHandler
 func NewAddTaskHandler(
-	service biz.CampaignService,
+	campaignService biz.CampaignService,
+	campaignGetter query.CampaignGetter,
 	taskService biz.TaskService,
 	taskCreator TaskCreator,
 ) *AddTaskHandler {
 	return &AddTaskHandler{
-		campaignService: service,
+		campaignService: campaignService,
+		campaignGetter:  campaignGetter,
 		taskService:     taskService,
 		taskCreator:     taskCreator,
 	}

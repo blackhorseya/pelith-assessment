@@ -13,6 +13,7 @@ message StartCampaignRequest {
   string description = 2;
   google.protobuf.Timestamp start_time = 3;
   repeated entity.domain.core.model.Task tasks = 4;
+  entity.domain.core.model.CampaignMode mode = 5;
 }
 
 // StartCampaignResponse is the response for start campaign
