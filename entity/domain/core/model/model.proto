@@ -9,21 +9,27 @@ option go_package = "github.com/blackhorseya/pelith-assessment/entity/domain/cor
 // Task entity
 message Task {
   // Unique identifier for the task
+  // @gotags: db:"id"
   string id = 1;
 
   // Task name (e.g., "Onboarding Task")
+  // @gotags: db:"name"
   string name = 2;
 
   // Detailed description of the task
+  // @gotags: db:"description"
   string description = 3;
 
   // Enum for task type (e.g., Onboarding, SharePool)
+  // @gotags: db:"type"
   TaskType type = 4;
 
   // Rules or thresholds for task completion
+  // @gotags: db:"criteria"
   TaskCriteria criteria = 5;
 
   // Enum for task status (Active, Inactive)
+  // @gotags: db:"status"
   TaskStatus status = 6;
 }
 
@@ -78,27 +84,35 @@ message TaskResult {
 // Campaign entity
 message Campaign {
   // Unique identifier for the campaign
+  // @gotags: db:"id"
   string id = 1;
 
   // Campaign name
+  // @gotags: db:"name"
   string name = 2;
 
   // Campaign description
+  // @gotags: db:"description"
   string description = 3;
 
   // ISO8601 timestamp for campaign start
+  // @gotags: db:"start_time"
   google.protobuf.Timestamp start_time = 4;
 
   // ISO8601 timestamp for campaign end (optional)
+  // @gotags: db:"end_time"
   google.protobuf.Timestamp end_time = 5;
 
   // List of associated task IDs
+  // @gotags: db:"tasks"
   repeated string tasks = 6;
 
   // Enum for campaign mode (Real-time or Backtest)
+  // @gotags: db:"mode"
   CampaignMode mode = 7;
 
   // Enum for campaign status
+  // @gotags: db:"status"
   CampaignStatus status = 8;
 }
 

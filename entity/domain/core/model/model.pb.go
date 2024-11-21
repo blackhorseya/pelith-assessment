@@ -244,17 +244,23 @@ type Task struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Unique identifier for the task
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// @gotags: db:"id"
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" db:"id"`
 	// Task name (e.g., "Onboarding Task")
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// @gotags: db:"name"
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" db:"name"`
 	// Detailed description of the task
-	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// @gotags: db:"description"
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" db:"description"`
 	// Enum for task type (e.g., Onboarding, SharePool)
-	Type TaskType `protobuf:"varint,4,opt,name=type,proto3,enum=entity.domain.core.model.TaskType" json:"type,omitempty"`
+	// @gotags: db:"type"
+	Type TaskType `protobuf:"varint,4,opt,name=type,proto3,enum=entity.domain.core.model.TaskType" json:"type,omitempty" db:"type"`
 	// Rules or thresholds for task completion
-	Criteria *TaskCriteria `protobuf:"bytes,5,opt,name=criteria,proto3" json:"criteria,omitempty"`
+	// @gotags: db:"criteria"
+	Criteria *TaskCriteria `protobuf:"bytes,5,opt,name=criteria,proto3" json:"criteria,omitempty" db:"criteria"`
 	// Enum for task status (Active, Inactive)
-	Status TaskStatus `protobuf:"varint,6,opt,name=status,proto3,enum=entity.domain.core.model.TaskStatus" json:"status,omitempty"`
+	// @gotags: db:"status"
+	Status TaskStatus `protobuf:"varint,6,opt,name=status,proto3,enum=entity.domain.core.model.TaskStatus" json:"status,omitempty" db:"status"`
 }
 
 func (x *Task) Reset() {
@@ -466,21 +472,29 @@ type Campaign struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Unique identifier for the campaign
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// @gotags: db:"id"
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" db:"id"`
 	// Campaign name
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// @gotags: db:"name"
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" db:"name"`
 	// Campaign description
-	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	// @gotags: db:"description"
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" db:"description"`
 	// ISO8601 timestamp for campaign start
-	StartTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// @gotags: db:"start_time"
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty" db:"start_time"`
 	// ISO8601 timestamp for campaign end (optional)
-	EndTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// @gotags: db:"end_time"
+	EndTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty" db:"end_time"`
 	// List of associated task IDs
-	Tasks []string `protobuf:"bytes,6,rep,name=tasks,proto3" json:"tasks,omitempty"`
+	// @gotags: db:"tasks"
+	Tasks []string `protobuf:"bytes,6,rep,name=tasks,proto3" json:"tasks,omitempty" db:"tasks"`
 	// Enum for campaign mode (Real-time or Backtest)
-	Mode CampaignMode `protobuf:"varint,7,opt,name=mode,proto3,enum=entity.domain.core.model.CampaignMode" json:"mode,omitempty"`
+	// @gotags: db:"mode"
+	Mode CampaignMode `protobuf:"varint,7,opt,name=mode,proto3,enum=entity.domain.core.model.CampaignMode" json:"mode,omitempty" db:"mode"`
 	// Enum for campaign status
-	Status CampaignStatus `protobuf:"varint,8,opt,name=status,proto3,enum=entity.domain.core.model.CampaignStatus" json:"status,omitempty"`
+	// @gotags: db:"status"
+	Status CampaignStatus `protobuf:"varint,8,opt,name=status,proto3,enum=entity.domain.core.model.CampaignStatus" json:"status,omitempty" db:"status"`
 }
 
 func (x *Campaign) Reset() {
