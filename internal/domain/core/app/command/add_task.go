@@ -17,28 +17,18 @@ type (
 	}
 )
 
-// TaskCommand 用於描述 Task 的輸入參數
-type TaskCommand struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Type        int     `json:"type"`
-	MinAmount   float64 `json:"min_amount"`
-	PoolID      string  `json:"pool_id"`
-}
-
-// AddTaskCommand 用於新增 Tasks 至指定 Campaign
-type AddTaskCommand struct {
-	CampaignID string        `json:"campaign_id"`
-	Tasks      []TaskCommand `json:"tasks"`
-}
-
-// TaskCommandHandler 用於處理 Task 相關的 Command
-type TaskCommandHandler struct {
+// AddTaskHandler 用於處理 Task 相關的 Command
+type AddTaskHandler struct {
 	service     biz.CampaignService
 	taskCreator TaskCreator
 }
 
-func (h *TaskCommandHandler) Handle(c context.Context, msg usecase.Message) (string, error) {
+// NewAddTaskHandler 用於建立 AddTaskHandler
+func NewAddTaskHandler(service biz.CampaignService, taskCreator TaskCreator) *AddTaskHandler {
+	return &AddTaskHandler{service: service, taskCreator: taskCreator}
+}
+
+func (h *AddTaskHandler) Handle(c context.Context, msg usecase.Message) (string, error) {
 	// TODO: 2024/11/21|sean|處理新增 Task 的邏輯
 	panic("implement me")
 }

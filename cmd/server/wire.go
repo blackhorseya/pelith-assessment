@@ -44,6 +44,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 
 		// app layer
 		command.NewCreateCampaignHandler,
+		command.NewAddTaskHandler,
 
 		// entity layer
 		biz.NewCampaignService,
@@ -52,6 +53,8 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		pg.NewCampaignRepo,
 		pg.NewCampaignCreator,
 		pg.NewCampaignGetter,
+		pg.NewTaskRepo,
+		pg.NewTaskCreator,
 
 		// infra
 		httpx.NewGinServer,

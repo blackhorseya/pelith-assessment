@@ -54,11 +54,14 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
+	taskRepoImpl := pg.NewTaskRepo(db)
+	taskCreator := pg.NewTaskCreator(taskRepoImpl)
+	addTaskHandler := command.NewAddTaskHandler(campaignService, taskCreator)
 	campaignGetter, err := pg.NewCampaignGetter(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
-	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, campaignGetter)
+	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, addTaskHandler, campaignGetter)
 	initServers := grpc.NewInitServersFn(campaignServiceServer)
 	healthServer := grpc.NewHealthServer()
 	server, err := grpcx.NewServer(application, initServers, healthServer)

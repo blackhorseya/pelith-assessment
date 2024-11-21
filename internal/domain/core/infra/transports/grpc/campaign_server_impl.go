@@ -11,16 +11,20 @@ import (
 
 type campaignServerImpl struct {
 	createCampaignHandler *command.CreateCampaignHandler
-	campaignGetter        query.CampaignGetter
+	addTaskHandler        *command.AddTaskHandler
+
+	campaignGetter query.CampaignGetter
 }
 
 // NewCampaignServer is used to create a new campaign server.
 func NewCampaignServer(
 	createCampaignHandler *command.CreateCampaignHandler,
+	addTaskHandler *command.AddTaskHandler,
 	campaignGetter query.CampaignGetter,
 ) core.CampaignServiceServer {
 	return &campaignServerImpl{
 		createCampaignHandler: createCampaignHandler,
+		addTaskHandler:        addTaskHandler,
 		campaignGetter:        campaignGetter,
 	}
 }
@@ -66,6 +70,24 @@ func (i *campaignServerImpl) AddTasksForCampaign(
 	c context.Context,
 	req *core.AddTasksForCampaignRequest,
 ) (*core.AddTasksForCampaignResponse, error) {
-	// TODO: 2024/11/21|sean|add tasks for campaign
-	panic("implement me")
+	tasks := make([]command.TaskCommand, 0, len(req.Tasks))
+	for _, task := range req.Tasks {
+		tasks = append(tasks, command.TaskCommand{
+			Name:        task.Name,
+			Description: task.Description,
+			Type:        int32(task.Type),
+			MinAmount:   task.Criteria.MinTransactionAmount,
+			PoolID:      task.Criteria.PoolId,
+		})
+	}
+
+	_, err := i.addTaskHandler.Handle(c, command.AddTaskCommand{
+		CampaignID: req.CampaignId,
+		Tasks:      tasks,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &core.AddTasksForCampaignResponse{}, nil
 }
