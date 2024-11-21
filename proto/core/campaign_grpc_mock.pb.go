@@ -34,6 +34,26 @@ func (m *MockCampaignServiceClient) EXPECT() *MockCampaignServiceClientMockRecor
 	return m.recorder
 }
 
+// AddTasksForCampaign mocks base method.
+func (m *MockCampaignServiceClient) AddTasksForCampaign(ctx context.Context, in *AddTasksForCampaignRequest, opts ...grpc.CallOption) (*AddTasksForCampaignResponse, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "AddTasksForCampaign", varargs...)
+	ret0, _ := ret[0].(*AddTasksForCampaignResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddTasksForCampaign indicates an expected call of AddTasksForCampaign.
+func (mr *MockCampaignServiceClientMockRecorder) AddTasksForCampaign(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTasksForCampaign", reflect.TypeOf((*MockCampaignServiceClient)(nil).AddTasksForCampaign), varargs...)
+}
+
 // GetCampaign mocks base method.
 func (m *MockCampaignServiceClient) GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error) {
 	m.ctrl.T.Helper()
@@ -95,6 +115,21 @@ func NewMockCampaignServiceServer(ctrl *gomock.Controller) *MockCampaignServiceS
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCampaignServiceServer) EXPECT() *MockCampaignServiceServerMockRecorder {
 	return m.recorder
+}
+
+// AddTasksForCampaign mocks base method.
+func (m *MockCampaignServiceServer) AddTasksForCampaign(ctx context.Context, in *AddTasksForCampaignRequest) (*AddTasksForCampaignResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddTasksForCampaign", ctx, in)
+	ret0, _ := ret[0].(*AddTasksForCampaignResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddTasksForCampaign indicates an expected call of AddTasksForCampaign.
+func (mr *MockCampaignServiceServerMockRecorder) AddTasksForCampaign(ctx, in interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddTasksForCampaign", reflect.TypeOf((*MockCampaignServiceServer)(nil).AddTasksForCampaign), ctx, in)
 }
 
 // GetCampaign mocks base method.

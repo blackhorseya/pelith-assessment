@@ -61,3 +61,11 @@ func (i *campaignServerImpl) GetCampaign(
 		Tasks:    tasks,
 	}, nil
 }
+
+func (i *campaignServerImpl) AddTasksForCampaign(
+	c context.Context,
+	req *core.AddTasksForCampaignRequest,
+) (*core.AddTasksForCampaignResponse, error) {
+	// TODO: 2024/11/21|sean|add tasks for campaign
+	panic("implement me")
+}

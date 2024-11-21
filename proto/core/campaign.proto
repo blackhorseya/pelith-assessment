@@ -31,8 +31,19 @@ message GetCampaignResponse {
   repeated entity.domain.core.model.Task tasks = 2;
 }
 
+// AddTasksForCampaignRequest is the request for add tasks for campaign
+message AddTasksForCampaignRequest {
+  string campaign_id = 1;
+  repeated entity.domain.core.model.Task tasks = 2;
+}
+
+// AddTasksForCampaignResponse is the response for add tasks for campaign
+message AddTasksForCampaignResponse {
+}
+
 // CampaignService is the service for campaign
 service CampaignService {
   rpc StartCampaign(StartCampaignRequest) returns (StartCampaignResponse) {}
   rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse) {}
+  rpc AddTasksForCampaign(AddTasksForCampaignRequest) returns (AddTasksForCampaignResponse) {}
 }
