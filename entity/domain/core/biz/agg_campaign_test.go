@@ -1,7 +1,6 @@
 package biz
 
 import (
-	"reflect"
 	"testing"
 	"time"
 
@@ -9,28 +8,50 @@ import (
 )
 
 func TestCampaign_AddTask(t *testing.T) {
-	type fields struct {
-		Campaign model.Campaign
-		Tasks    []*Task
+	task := &Task{
+		Task: model.Task{
+			Name:        "Sample Task",
+			Description: "A task for testing",
+			Type:        model.TaskType_TASK_TYPE_ONBOARDING,
+			Criteria:    &model.TaskCriteria{},
+			Status:      model.TaskStatus_TASK_STATUS_ACTIVE,
+		},
 	}
-	type args struct {
-		task *Task
-	}
+
 	tests := []struct {
 		name    string
-		fields  fields
-		args    args
+		fields  *Campaign
+		args    *Task
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Add task to pending campaign",
+			fields: &Campaign{
+				Campaign: model.Campaign{
+					Status: model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
+				},
+				Tasks: []*Task{},
+			},
+			args:    task,
+			wantErr: false,
+		},
+		{
+			name: "Add task to active campaign (error)",
+			fields: &Campaign{
+				Campaign: model.Campaign{
+					Status: model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE,
+				},
+				Tasks: []*Task{},
+			},
+			args:    task,
+			wantErr: true,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Campaign{
-				Campaign: tt.fields.Campaign,
-				Tasks:    tt.fields.Tasks,
-			}
-			if err := c.AddTask(tt.args.task); (err != nil) != tt.wantErr {
+			err := tt.fields.AddTask(tt.args)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("AddTask() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -38,24 +59,35 @@ func TestCampaign_AddTask(t *testing.T) {
 }
 
 func TestCampaign_Complete(t *testing.T) {
-	type fields struct {
-		Campaign model.Campaign
-		Tasks    []*Task
-	}
 	tests := []struct {
 		name    string
-		fields  fields
+		fields  *Campaign
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Complete active campaign",
+			fields: &Campaign{
+				Campaign: model.Campaign{
+					Status: model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Complete pending campaign (error)",
+			fields: &Campaign{
+				Campaign: model.Campaign{
+					Status: model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
+				},
+			},
+			wantErr: true,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Campaign{
-				Campaign: tt.fields.Campaign,
-				Tasks:    tt.fields.Tasks,
-			}
-			if err := c.Complete(); (err != nil) != tt.wantErr {
+			err := tt.fields.Complete()
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Complete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -63,24 +95,35 @@ func TestCampaign_Complete(t *testing.T) {
 }
 
 func TestCampaign_Start(t *testing.T) {
-	type fields struct {
-		Campaign model.Campaign
-		Tasks    []*Task
-	}
 	tests := []struct {
 		name    string
-		fields  fields
+		fields  *Campaign
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Start pending campaign",
+			fields: &Campaign{
+				Campaign: model.Campaign{
+					Status: model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Start active campaign (error)",
+			fields: &Campaign{
+				Campaign: model.Campaign{
+					Status: model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE,
+				},
+			},
+			wantErr: true,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &Campaign{
-				Campaign: tt.fields.Campaign,
-				Tasks:    tt.fields.Tasks,
-			}
-			if err := c.Start(); (err != nil) != tt.wantErr {
+			err := tt.fields.Start()
+			if (err != nil) != tt.wantErr {
 				t.Errorf("Start() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -88,27 +131,33 @@ func TestCampaign_Start(t *testing.T) {
 }
 
 func TestNewCampaign(t *testing.T) {
-	type args struct {
-		name    string
-		startAt time.Time
-	}
+	now := time.Now()
+
 	tests := []struct {
 		name    string
-		args    args
-		want    *Campaign
+		args    string
+		startAt time.Time
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "Valid campaign",
+			args:    "Test Campaign",
+			startAt: now,
+			wantErr: false,
+		},
+		{
+			name:    "Empty name (error)",
+			args:    "",
+			startAt: now,
+			wantErr: true,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewCampaign(tt.args.name, tt.args.startAt)
+			_, err := NewCampaign(tt.args, tt.startAt)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewCampaign() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewCampaign() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
