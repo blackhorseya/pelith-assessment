@@ -2,9 +2,7 @@ package pg
 
 import (
 	"context"
-	"encoding/json"
 	"sync"
-	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
@@ -43,7 +41,6 @@ func NewCampaignGetter(impl *CampaignRepoImpl) (query.CampaignGetter, error) {
 	return impl, nil
 }
 
-//nolint:funlen // it's okay
 func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) error {
 	ctx := contextx.WithContext(c)
 
@@ -74,24 +71,7 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 		RETURNING id
 	`
 
-	type CampaignParams struct {
-		Name        string    `db:"name"`
-		Description string    `db:"description"`
-		StartTime   time.Time `db:"start_time"`
-		EndTime     time.Time `db:"end_time"`
-		Mode        int       `db:"mode"`
-		Status      int       `db:"status"`
-	}
-
-	campaignParams := CampaignParams{
-		Name:        campaign.Name,
-		Description: campaign.Description,
-		StartTime:   campaign.StartTime.AsTime(),
-		EndTime:     campaign.EndTime.AsTime(),
-		Mode:        int(campaign.Mode),
-		Status:      int(campaign.Status),
-	}
-
+	campaignParams := FromBizModelToDAO(campaign)
 	var campaignID string
 	stmt, err := tx.PrepareNamedContext(timeout, campaignQuery)
 	if err != nil {
@@ -116,15 +96,6 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 		RETURNING id
 	`
 
-	type TaskParams struct {
-		CampaignID  string `db:"campaign_id"`
-		Name        string `db:"name"`
-		Description string `db:"description"`
-		Type        int    `db:"type"`
-		Criteria    string `db:"criteria"`
-		Status      int    `db:"status"`
-	}
-
 	taskStmt, err := tx.PrepareNamedContext(timeout, taskQuery)
 	if err != nil {
 		ctx.Error("failed to prepare named statement for tasks", zap.Error(err))
@@ -133,26 +104,17 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 	defer taskStmt.Close()
 
 	for _, task := range campaign.Tasks {
-		criteria, err2 := json.Marshal(task.Criteria)
+		taskParams, err2 := FromBizTaskToDAO(task, campaignID)
 		if err2 != nil {
-			ctx.Error("failed to marshal task criteria", zap.Error(err2))
+			ctx.Error("failed to convert task to DAO", zap.Error(err2))
 			return err2
 		}
 
-		taskParams := TaskParams{
-			CampaignID:  campaignID,
-			Name:        task.Name,
-			Description: task.Description,
-			Type:        int(task.Type),
-			Criteria:    string(criteria),
-			Status:      int(task.Status),
-		}
-
 		var taskID string
-		err = taskStmt.QueryRowxContext(timeout, taskParams).Scan(&taskID)
-		if err != nil {
-			ctx.Error("failed to insert task", zap.Error(err))
-			return err
+		err2 = taskStmt.QueryRowxContext(timeout, taskParams).Scan(&taskID)
+		if err2 != nil {
+			ctx.Error("failed to insert task", zap.Error(err2))
+			return err2
 		}
 
 		// 更新 Task 的 ID

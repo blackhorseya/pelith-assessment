@@ -16,8 +16,8 @@ type CampaignDAO struct {
 	Description string    `db:"description"`
 	StartTime   time.Time `db:"start_time"`
 	EndTime     time.Time `db:"end_time"`
-	Mode        int       `db:"mode"`
-	Status      int       `db:"status"`
+	Mode        int32     `db:"mode"`
+	Status      int32     `db:"status"`
 }
 
 // ToBizModel 將 DAO 轉換為 biz.Campaign
@@ -44,8 +44,8 @@ func FromBizModelToDAO(campaign *biz.Campaign) *CampaignDAO {
 		Description: campaign.Description,
 		StartTime:   campaign.StartTime.AsTime(),
 		EndTime:     campaign.EndTime.AsTime(),
-		Mode:        int(campaign.Mode),
-		Status:      int(campaign.Status),
+		Mode:        int32(campaign.Mode),
+		Status:      int32(campaign.Status),
 	}
 }
 
@@ -55,9 +55,9 @@ type TaskDAO struct {
 	CampaignID  string `db:"campaign_id"`
 	Name        string `db:"name"`
 	Description string `db:"description"`
-	Type        int    `db:"type"`
+	Type        int32  `db:"type"`
 	Criteria    string `db:"criteria"` // JSON 格式存儲的 criteria
-	Status      int    `db:"status"`
+	Status      int32  `db:"status"`
 }
 
 // ToBizModel 將 DAO 轉換為 biz.Task
@@ -91,8 +91,8 @@ func FromBizTaskToDAO(task *biz.Task, campaignID string) (*TaskDAO, error) {
 		CampaignID:  campaignID,
 		Name:        task.Name,
 		Description: task.Description,
-		Type:        int(task.Type),
+		Type:        int32(task.Type),
 		Criteria:    string(criteriaBytes),
-		Status:      int(task.Status),
+		Status:      int32(task.Status),
 	}, nil
 }
