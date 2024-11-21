@@ -25,7 +25,7 @@ func NewTaskCreator(impl *TaskRepoImpl) command.TaskCreator {
 	return impl
 }
 
-func (i *TaskRepoImpl) Create(c context.Context, task *biz.Task, campaignID string) error {
+func (i *TaskRepoImpl) Create(c context.Context, task *biz.Task) error {
 	ctx := contextx.WithContext(c)
 
 	timeout, cancelFunc := context.WithTimeout(ctx, defaultTimeout)
@@ -55,7 +55,7 @@ func (i *TaskRepoImpl) Create(c context.Context, task *biz.Task, campaignID stri
 	}()
 
 	// 將 Task 轉換為 TaskDAO
-	taskDAO, err := FromBizTaskToDAO(task, campaignID)
+	taskDAO, err := FromBizTaskToDAO(task)
 	if err != nil {
 		ctx.Error("failed to convert task to DAO", zap.Error(err))
 		return err

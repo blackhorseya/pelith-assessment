@@ -80,7 +80,7 @@ func (dao *TaskDAO) ToBizModel() (*biz.Task, error) {
 }
 
 // FromBizTaskToDAO 將 biz.Task 轉換為 DAO
-func FromBizTaskToDAO(task *biz.Task, campaignID string) (*TaskDAO, error) {
+func FromBizTaskToDAO(task *biz.Task) (*TaskDAO, error) {
 	criteriaBytes, err := json.Marshal(task.Criteria)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func FromBizTaskToDAO(task *biz.Task, campaignID string) (*TaskDAO, error) {
 
 	return &TaskDAO{
 		ID:          task.Id,
-		CampaignID:  campaignID,
+		CampaignID:  task.CampaignID,
 		Name:        task.Name,
 		Description: task.Description,
 		Type:        int32(task.Type),
