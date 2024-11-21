@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	model "github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	biz "github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -41,10 +41,10 @@ func (m *MockCampaignGetter) EXPECT() *MockCampaignGetterMockRecorder {
 }
 
 // GetByID mocks base method.
-func (m *MockCampaignGetter) GetByID(c context.Context, id string) (*model.Campaign, error) {
+func (m *MockCampaignGetter) GetByID(c context.Context, id string) (*biz.Campaign, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetByID", c, id)
-	ret0, _ := ret[0].(*model.Campaign)
+	ret0, _ := ret[0].(*biz.Campaign)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -56,10 +56,10 @@ func (mr *MockCampaignGetterMockRecorder) GetByID(c, id any) *gomock.Call {
 }
 
 // List mocks base method.
-func (m *MockCampaignGetter) List(c context.Context, cond ListCampaignCondition) ([]*model.Campaign, int, error) {
+func (m *MockCampaignGetter) List(c context.Context, cond ListCampaignCondition) ([]*biz.Campaign, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "List", c, cond)
-	ret0, _ := ret[0].([]*model.Campaign)
+	ret0, _ := ret[0].([]*biz.Campaign)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2

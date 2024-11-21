@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
-	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
@@ -162,54 +161,15 @@ func (i *campaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 	return nil
 }
 
-func (i *campaignRepoImpl) GetByID(c context.Context, id string) (*model.Campaign, error) {
-	ctx := contextx.WithContext(c)
-
-	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
-	defer cancelFunc()
-
-	// Query to fetch the campaign by ID
-	campaignQuery := `
-		SELECT id, name, description, start_time, end_time, mode, status
-		FROM campaigns
-		WHERE id = $1
-	`
-
-	var campaign model.Campaign
-
-	err := i.rw.GetContext(timeout, &campaign, campaignQuery, id)
-	if err != nil {
-		ctx.Error("failed to fetch campaign by id", zap.Error(err))
-		return nil, err
-	}
-
-	// Query to fetch tasks associated with the campaign
-	taskQuery := `
-		SELECT id, name, description, type, criteria, status
-		FROM tasks
-		WHERE campaign_id = $1
-	`
-
-	var tasks []*model.Task
-
-	err = i.rw.SelectContext(timeout, &tasks, taskQuery, id)
-	if err != nil {
-		ctx.Error("failed to fetch tasks for campaign", zap.Error(err))
-		return nil, err
-	}
-
-	campaign.Tasks = make([]string, len(tasks))
-	for idx, task := range tasks {
-		campaign.Tasks[idx] = task.Id
-	}
-
-	return &campaign, nil
+func (i *campaignRepoImpl) GetByID(c context.Context, id string) (*biz.Campaign, error) {
+	// TODO: 2024/11/21|sean|implement me
+	panic("implement me")
 }
 
 func (i *campaignRepoImpl) List(
 	c context.Context,
 	cond query.ListCampaignCondition,
-) (items []*model.Campaign, total int, err error) {
+) (items []*biz.Campaign, total int, err error) {
 	// TODO: 2024/11/21|sean|implement me
 	panic("implement me")
 }
