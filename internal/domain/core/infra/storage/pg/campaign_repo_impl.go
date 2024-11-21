@@ -2,13 +2,17 @@ package pg
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
+	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 type campaignRepoImpl struct {
@@ -37,21 +41,27 @@ func NewCampaignRepo(rw *sqlx.DB) (command.CampaignCreator, error) {
 	}, nil
 }
 
+//nolint:funlen // it's okay
 func (i *campaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) error {
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
+	defer cancelFunc()
+
 	// 開啟事務
-	tx, err := i.rw.BeginTxx(c, nil)
+	tx, err := i.rw.BeginTxx(timeout, nil)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
 		if p := recover(); p != nil {
-			_ = tx.Rollback() // 回滾事務
-			panic(p)          // 重拋 panic
+			_ = tx.Rollback()
+			panic(p)
 		} else if err != nil {
-			_ = tx.Rollback() // 回滾事務
+			_ = tx.Rollback()
 		} else {
-			err = tx.Commit() // 提交事務
+			err = tx.Commit()
 		}
 	}()
 
@@ -62,18 +72,35 @@ func (i *campaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 		RETURNING id
 	`
 
-	campaignParams := map[string]interface{}{
-		"name":        campaign.Name,
-		"description": campaign.Description,
-		"start_time":  campaign.StartTime,
-		"end_time":    campaign.EndTime,
-		"mode":        campaign.Mode,
-		"status":      campaign.Status,
+	type CampaignParams struct {
+		Name        string    `db:"name"`
+		Description string    `db:"description"`
+		StartTime   time.Time `db:"start_time"`
+		EndTime     time.Time `db:"end_time"`
+		Mode        int       `db:"mode"`
+		Status      int       `db:"status"`
+	}
+
+	campaignParams := CampaignParams{
+		Name:        campaign.Name,
+		Description: campaign.Description,
+		StartTime:   campaign.StartTime.AsTime(),
+		EndTime:     campaign.EndTime.AsTime(),
+		Mode:        int(campaign.Mode),
+		Status:      int(campaign.Status),
 	}
 
 	var campaignID string
-	err = tx.QueryRowxContext(c, campaignQuery, campaignParams).Scan(&campaignID)
+	stmt, err := tx.PrepareNamedContext(timeout, campaignQuery)
 	if err != nil {
+		ctx.Error("failed to prepare named statement", zap.Error(err))
+		return err
+	}
+	defer stmt.Close()
+
+	err = stmt.QueryRowxContext(timeout, campaignParams).Scan(&campaignID)
+	if err != nil {
+		ctx.Error("failed to insert campaign", zap.Error(err))
 		return err
 	}
 
@@ -87,19 +114,42 @@ func (i *campaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 		RETURNING id
 	`
 
+	type TaskParams struct {
+		CampaignID  string `db:"campaign_id"`
+		Name        string `db:"name"`
+		Description string `db:"description"`
+		Type        int    `db:"type"`
+		Criteria    string `db:"criteria"`
+		Status      int    `db:"status"`
+	}
+
+	taskStmt, err := tx.PrepareNamedContext(timeout, taskQuery)
+	if err != nil {
+		ctx.Error("failed to prepare named statement for tasks", zap.Error(err))
+		return err
+	}
+	defer taskStmt.Close()
+
 	for _, task := range campaign.Tasks {
-		taskParams := map[string]interface{}{
-			"campaign_id": campaignID,
-			"name":        task.Name,
-			"description": task.Description,
-			"type":        task.Type,
-			"criteria":    task.Criteria, // 假設是 JSONB 對象
-			"status":      task.Status,
+		criteria, err2 := json.Marshal(task.Criteria)
+		if err2 != nil {
+			ctx.Error("failed to marshal task criteria", zap.Error(err2))
+			return err2
+		}
+
+		taskParams := TaskParams{
+			CampaignID:  campaignID,
+			Name:        task.Name,
+			Description: task.Description,
+			Type:        int(task.Type),
+			Criteria:    string(criteria),
+			Status:      int(task.Status),
 		}
 
 		var taskID string
-		err = tx.QueryRowxContext(c, taskQuery, taskParams).Scan(&taskID)
+		err = taskStmt.QueryRowxContext(timeout, taskParams).Scan(&taskID)
 		if err != nil {
+			ctx.Error("failed to insert task", zap.Error(err))
 			return err
 		}
 

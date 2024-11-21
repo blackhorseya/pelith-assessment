@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package core;
 
+import "entity/domain/core/model/model.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/blackhorseya/pelith-assessment/proto/core";
@@ -11,6 +12,7 @@ message StartCampaignRequest {
   string name = 1;
   string description = 2;
   google.protobuf.Timestamp start_time = 3;
+  repeated entity.domain.core.model.Task tasks = 4;
 }
 
 // StartCampaignResponse is the response for start campaign
