@@ -43,8 +43,3 @@ func (i *campaignServiceImpl) StartCampaign(
 
 	return campaign, nil
 }
-
-func (i *campaignServiceImpl) AddTasks(c context.Context, campaignID string, tasks []*biz.Task) error {
-	// TODO: 2024/11/21|sean|implement me
-	panic("implement me")
-}

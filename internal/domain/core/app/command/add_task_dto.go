@@ -18,3 +18,8 @@ type AddTaskCommand struct {
 func (cmd AddTaskCommand) Key() int {
 	return addTaskCommandKey
 }
+
+func (cmd AddTaskCommand) Validate() error {
+	// TODO: 2024/11/21|sean|implement me
+	return nil
+}
