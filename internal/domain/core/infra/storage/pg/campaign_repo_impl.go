@@ -163,8 +163,50 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 }
 
 func (i *CampaignRepoImpl) GetByID(c context.Context, id string) (*biz.Campaign, error) {
-	// TODO: 2024/11/21|sean|implement me
-	panic("implement me")
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
+	defer cancelFunc()
+
+	// 查詢 Campaign 資料
+	var campaignDAO CampaignDAO
+	campaignQuery := `
+		SELECT id, name, description, start_time, end_time, mode, status
+		FROM campaigns
+		WHERE id = $1
+	`
+	err := i.rw.GetContext(timeout, &campaignDAO, campaignQuery, id)
+	if err != nil {
+		ctx.Error("failed to fetch campaign", zap.Error(err))
+		return nil, err
+	}
+
+	// 查詢 Tasks 資料
+	var taskDAOs []TaskDAO
+	taskQuery := `
+		SELECT id, campaign_id, name, description, type, criteria, status
+		FROM tasks
+		WHERE campaign_id = $1
+	`
+	err = i.rw.SelectContext(timeout, &taskDAOs, taskQuery, id)
+	if err != nil {
+		ctx.Error("failed to fetch tasks", zap.Error(err))
+		return nil, err
+	}
+
+	// 將 Tasks 轉換為 biz.Task
+	var tasks []*biz.Task
+	for _, taskDAO := range taskDAOs {
+		task, err2 := taskDAO.ToBizModel()
+		if err2 != nil {
+			ctx.Error("failed to convert task DAO to biz model", zap.Error(err2))
+			return nil, err2
+		}
+		tasks = append(tasks, task)
+	}
+
+	// 將 CampaignDAO 轉換為 biz.Campaign
+	return campaignDAO.ToBizModel(tasks), nil
 }
 
 func (i *CampaignRepoImpl) List(
