@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
 )
 
@@ -25,9 +26,10 @@ type (
 
 // AddTaskHandler 用於處理 Task 相關的 Command
 type AddTaskHandler struct {
-	service     biz.CampaignService
-	taskService biz.TaskService
-	taskCreator TaskCreator
+	campaignService biz.CampaignService
+	campaignGetter  query.CampaignGetter
+	taskService     biz.TaskService
+	taskCreator     TaskCreator
 }
 
 // NewAddTaskHandler 用於建立 AddTaskHandler
@@ -37,9 +39,9 @@ func NewAddTaskHandler(
 	taskCreator TaskCreator,
 ) *AddTaskHandler {
 	return &AddTaskHandler{
-		service:     service,
-		taskService: taskService,
-		taskCreator: taskCreator,
+		campaignService: service,
+		taskService:     taskService,
+		taskCreator:     taskCreator,
 	}
 }
 
@@ -54,10 +56,6 @@ func (h *AddTaskHandler) Handle(c context.Context, msg usecase.Message) (string,
 		return "", err
 	}
 
-	// TODO: 2024/11/21|sean|實作 AddTaskHandler
-	// 1. 透過 service 取得 campaign
-	// 2. 透過 taskService 取得 task
-	// 3. 透過 taskCreator 建立 task
-	// 4. 回傳 taskID
-	return "", nil
+	// TODO: 2024/11/21|sean|implement me
+	return "", errors.New("implement me")
 }

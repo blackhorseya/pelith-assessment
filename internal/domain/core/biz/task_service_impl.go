@@ -16,6 +16,5 @@ func NewTaskService() biz.TaskService {
 }
 
 func (i *taskServiceImpl) CreateTask(c context.Context, campaignID string, task *model.Task) (*biz.Task, error) {
-	// TODO: 2024/11/21|sean|implement me
-	panic("implement me")
+	return biz.NewTask(campaignID, task.Name, task.Description, task.Type, task.Criteria)
 }
