@@ -28,6 +28,7 @@ func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
 			StartTime:   timestamppb.New(startAt),
 			EndTime:     timestamppb.New(startAt.Add(4 * 7 * 24 * time.Hour)),
 			Status:      model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
+			Mode:        model.CampaignMode_CAMPAIGN_MODE_BACKTEST,
 		},
 		Tasks: make([]*Task, 0),
 	}, nil

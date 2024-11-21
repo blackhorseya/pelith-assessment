@@ -40,6 +40,13 @@ test: ## Run all tests
 	@echo "Running tests..."
 	$(GO) test -v $(GO_TESTS)
 
+# Calculate code coverage
+.PHONY: coverage
+coverage: ## Generate code coverage report
+	@echo "Calculating code coverage..."
+	$(GO) test -coverprofile=coverage.out $(GO_TESTS)
+	$(GO) tool cover -func=coverage.out
+
 # Run lint
 .PHONY: lint
 lint: ## Run lint checks
@@ -50,7 +57,7 @@ lint: ## Run lint checks
 .PHONY: clean
 clean: ## Remove build artifacts
 	@echo "Cleaning up..."
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) coverage.out
 
 # Format code
 .PHONY: fmt
