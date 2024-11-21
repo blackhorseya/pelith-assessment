@@ -23,6 +23,7 @@ type CampaignService interface {
 	// StartCampaign initializes a new campaign.
 	StartCampaign(c context.Context, name string, startAt time.Time, tasks []*Task) (*Campaign, error)
 
+	// AddTasks appends tasks to an existing campaign.
 	AddTasks(c context.Context, campaignID string, tasks []*Task) error
 }
 
