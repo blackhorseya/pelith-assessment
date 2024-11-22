@@ -47,7 +47,7 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 	// 從 CampaignGetter 查詢 campaign
 	campaign, err := s.campaignGetter.GetByID(ctx, campaignID)
 	if err != nil || campaign == nil {
-		ctx.Error("failed to fetch campaign", zap.Error(err))
+		ctx.Error("failed to fetch campaign", zap.Error(err), zap.String("campaign_id", campaignID))
 		return 0, err
 	}
 

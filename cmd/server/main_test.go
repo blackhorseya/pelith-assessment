@@ -13,7 +13,7 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	viper.Set("config", "../../deployments/example/config.yaml")
+	viper.Set("config", "../../deployments/dev/config.yaml")
 	server, clean, err := NewCmd(viper.GetViper())
 	if err != nil {
 		t.Error(err)

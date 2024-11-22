@@ -50,7 +50,7 @@ func (s *TaskQueryService) GetTaskStatus(
 
 	// for loop tasks and calculate progress
 	for _, task := range tasks {
-		txAmount, err2 := s.txQueryService.GetTotalSwapAmount(c, address, task.CampaignID)
+		txAmount, err2 := s.txQueryService.GetTotalSwapAmount(c, address, campaignID)
 		if err2 != nil {
 			return nil, err2
 		}
