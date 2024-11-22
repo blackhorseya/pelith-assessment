@@ -4,7 +4,6 @@ package query
 
 import (
 	"context"
-	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 )
@@ -29,10 +28,15 @@ func NewTaskQueryService(taskGetter TaskGetter) *TaskQueryService {
 
 // GetTaskStatus is used to get the task status.
 func (s *TaskQueryService) GetTaskStatus(c context.Context, address string) ([]*biz.Task, error) {
+	// TODO: 2024/11/22|sean|fetch tasks by address
 	// fetch tasks by address
+	var tasks []*biz.Task
 
 	// for loop tasks and calculate progress
+	for _, task := range tasks {
+		// TODO: 2024/11/22|sean|pass the correct amount
+		task.Progress = task.CalculateProgress(0)
+	}
 
-	// TODO: 2024/11/22|sean|implement the logic
-	return nil, errors.New("not implemented")
+	return tasks, nil
 }

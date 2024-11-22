@@ -11,6 +11,7 @@ type Task struct {
 	model.Task
 
 	CampaignID string
+	Progress   int
 }
 
 // NewTask creates a new Task aggregate.
