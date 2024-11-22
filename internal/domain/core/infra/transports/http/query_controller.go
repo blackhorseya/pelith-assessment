@@ -1,6 +1,8 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/gin-gonic/gin"
 )
@@ -35,11 +37,11 @@ type GetTasksStatusQuery struct {
 func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
 	tasks, err := ctrl.taskQuery.GetTaskStatus(c.Request.Context(), c.Param("address"))
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"tasks": tasks})
+	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
 }
 
 // GetPointsHistoryQuery is the query to get points history
