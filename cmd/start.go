@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"github.com/blackhorseya/pelith-assessment/cmd/server"
-	"github.com/blackhorseya/pelith-assessment/pkg/cmdx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/cmdx"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
