@@ -14,8 +14,9 @@ import (
 
 // ListTransactionCondition is the condition for list transaction.
 type ListTransactionCondition struct {
-	StartTime time.Time
-	EndTime   time.Time
+	ContractAddress string
+	StartTime       time.Time
+	EndTime         time.Time
 }
 
 // TransactionGetter is used to get the transaction.
@@ -54,8 +55,10 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 
 	// 從 TransactionGetter 查詢交易數據
 	transactions, _, err := s.txGetter.ListByAddress(ctx, address, ListTransactionCondition{
-		StartTime: campaign.StartTime.AsTime(),
-		EndTime:   campaign.EndTime.AsTime(),
+		// TODO: 2024/11/22|sean|hard code contract address
+		ContractAddress: "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc",
+		StartTime:       campaign.StartTime.AsTime(),
+		EndTime:         campaign.EndTime.AsTime(),
 	})
 	if err != nil {
 		ctx.Error("failed to fetch transactions", zap.Error(err))
