@@ -10,8 +10,9 @@ import (
 type User struct {
 	model.User
 
-	Tasks   []*Task
-	Rewards []*model.Reward
+	Tasks        []*Task
+	Rewards      []*model.Reward
+	Transactions []*Transaction
 }
 
 // NewUser creates a new User aggregate.
