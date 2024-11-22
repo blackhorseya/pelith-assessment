@@ -51,13 +51,15 @@ func FromBizModelToDAO(campaign *biz.Campaign) *CampaignDAO {
 
 // TaskDAO 定義 tasks 表對應的結構
 type TaskDAO struct {
-	ID          string `db:"id"`
-	CampaignID  string `db:"campaign_id"`
-	Name        string `db:"name"`
-	Description string `db:"description"`
-	Type        int32  `db:"type"`
-	Criteria    string `db:"criteria"` // JSON 格式存儲的 criteria
-	Status      int32  `db:"status"`
+	ID          string    `db:"id"`
+	CampaignID  string    `db:"campaign_id"`
+	Name        string    `db:"name"`
+	Description string    `db:"description"`
+	Type        int32     `db:"type"`
+	Criteria    string    `db:"criteria"` // JSON 格式存儲的 criteria
+	Status      int32     `db:"status"`
+	CreatedAt   time.Time `db:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at"`
 }
 
 // ToBizModel 將 DAO 轉換為 biz.Task

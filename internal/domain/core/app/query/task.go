@@ -6,11 +6,13 @@ import (
 	"context"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 )
 
 // ListTaskCondition is the condition to list the task.
 type ListTaskCondition struct {
 	CampaignID string
+	Status     model.TaskStatus
 }
 
 // TaskGetter is used to get the task.
@@ -47,8 +49,12 @@ func (s *TaskQueryService) GetTaskStatus(
 
 	// for loop tasks and calculate progress
 	for _, task := range tasks {
-		// TODO: 2024/11/22|sean|pass the correct amount
-		task.Progress = task.CalculateProgress(0)
+		txAmount, err2 := s.txQueryService.GetTotalSwapUSDC(c, address, task.CampaignID)
+		if err2 != nil {
+			return nil, err2
+		}
+
+		task.Progress = task.CalculateProgress(txAmount)
 	}
 
 	return tasks, nil

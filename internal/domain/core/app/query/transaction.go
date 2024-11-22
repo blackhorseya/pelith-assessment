@@ -29,23 +29,33 @@ type TransactionGetter interface {
 
 // TransactionQueryService is the service for transaction query.
 type TransactionQueryService struct {
-	txGetter TransactionGetter
+	txGetter       TransactionGetter
+	campaignGetter CampaignGetter
 }
 
 // NewTransactionQueryService is used to create a new TransactionQueryService.
-func NewTransactionQueryService(txGetter TransactionGetter) *TransactionQueryService {
-	return &TransactionQueryService{txGetter: txGetter}
+func NewTransactionQueryService(txGetter TransactionGetter, campaignGetter CampaignGetter) *TransactionQueryService {
+	return &TransactionQueryService{
+		txGetter:       txGetter,
+		campaignGetter: campaignGetter,
+	}
 }
 
 // GetTotalSwapUSDC 計算指定 address 和 campaignID 的 USDC 交易總數
 func (s *TransactionQueryService) GetTotalSwapUSDC(c context.Context, address, campaignID string) (float64, error) {
 	ctx := contextx.WithContext(c)
 
+	// 從 CampaignGetter 查詢 campaign
+	campaign, err := s.campaignGetter.GetByID(ctx, campaignID)
+	if err != nil || campaign == nil {
+		ctx.Error("failed to fetch campaign", zap.Error(err))
+		return 0, err
+	}
+
 	// 從 TransactionGetter 查詢交易數據
 	transactions, _, err := s.txGetter.ListByAddress(ctx, address, ListTransactionCondition{
-		// TODO: 2024/11/22|sean|這裡要改成從 campaignID 取得對應的 StartTime 和 EndTime
-		StartTime: time.Time{},
-		EndTime:   time.Time{},
+		StartTime: campaign.StartTime.AsTime(),
+		EndTime:   campaign.EndTime.AsTime(),
 	})
 	if err != nil {
 		ctx.Error("failed to fetch transactions", zap.Error(err))
