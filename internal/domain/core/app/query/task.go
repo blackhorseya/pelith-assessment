@@ -20,12 +20,16 @@ type TaskGetter interface {
 
 // TaskQueryService is the service for task query.
 type TaskQueryService struct {
-	taskGetter TaskGetter
+	txQueryService *TransactionQueryService
+	taskGetter     TaskGetter
 }
 
 // NewTaskQueryService is used to create a new TaskQueryService.
-func NewTaskQueryService(taskGetter TaskGetter) *TaskQueryService {
-	return &TaskQueryService{taskGetter: taskGetter}
+func NewTaskQueryService(taskGetter TaskGetter, txQueryService *TransactionQueryService) *TaskQueryService {
+	return &TaskQueryService{
+		taskGetter:     taskGetter,
+		txQueryService: txQueryService,
+	}
 }
 
 // GetTaskStatus is used to get the task status.

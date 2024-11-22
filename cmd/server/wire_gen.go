@@ -10,6 +10,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/etherscan"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
@@ -42,7 +43,10 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	}
 	taskRepoImpl := pg.NewTaskRepo(db)
 	taskGetter := pg.NewTaskGetter(taskRepoImpl)
-	taskQueryService := query.NewTaskQueryService(taskGetter)
+	transactionRepoImpl := etherscan.NewTransactionRepoImpl()
+	transactionGetter := etherscan.NewTransactionGetter(transactionRepoImpl)
+	transactionQueryService := query.NewTransactionQueryService(transactionGetter)
+	taskQueryService := query.NewTaskQueryService(taskGetter, transactionQueryService)
 	queryController := http.NewQueryController(taskQueryService)
 	initRoutes := http.NewInitUserRoutesFn(queryController)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)

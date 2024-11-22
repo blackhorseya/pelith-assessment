@@ -8,6 +8,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/etherscan"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
@@ -48,6 +49,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		command.NewCreateCampaignHandler,
 		command.NewAddTaskHandler,
 		query.NewTaskQueryService,
+		query.NewTransactionQueryService,
 
 		// entity layer
 		biz.NewCampaignService,
@@ -60,6 +62,8 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		pg.NewTaskRepo,
 		pg.NewTaskCreator,
 		pg.NewTaskGetter,
+		etherscan.NewTransactionRepoImpl,
+		etherscan.NewTransactionGetter,
 
 		// infra
 		httpx.NewGinServer,
