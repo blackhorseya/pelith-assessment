@@ -66,7 +66,7 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 	var totalAmount float64
 	for _, tx := range transactions {
 		for _, task := range campaign.Tasks {
-			if strings.ToLower(task.Criteria.PoolId) == strings.ToLower(tx.ToAddress) {
+			if strings.EqualFold(task.Criteria.PoolId, tx.ToAddress) {
 				totalAmount += float64(tx.Amount)
 			}
 		}
