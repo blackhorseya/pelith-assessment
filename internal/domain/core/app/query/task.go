@@ -10,6 +10,7 @@ import (
 
 // ListTaskCondition is the condition to list the task.
 type ListTaskCondition struct {
+	CampaignID string
 }
 
 // TaskGetter is used to get the task.
@@ -33,9 +34,12 @@ func (s *TaskQueryService) GetTaskStatus(
 	address string,
 	campaignID string,
 ) ([]*biz.Task, error) {
-	// TODO: 2024/11/22|sean|fetch tasks by address
-	// fetch tasks by address
-	var tasks []*biz.Task
+	tasks, _, err := s.taskGetter.ListTask(c, ListTaskCondition{
+		CampaignID: campaignID,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	// for loop tasks and calculate progress
 	for _, task := range tasks {
