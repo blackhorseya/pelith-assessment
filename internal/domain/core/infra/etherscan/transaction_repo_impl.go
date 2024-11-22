@@ -64,8 +64,6 @@ func (i *TransactionRepoImpl) ListByAddress(
 
 	var res biz.TransactionList
 	for _, tx := range txs {
-		ctx.Debug("tx", zap.Any("tx", &tx))
-
 		res = append(res, &biz.Transaction{
 			Transaction: model.Transaction{
 				TxHash:      tx.Hash,
