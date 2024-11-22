@@ -14,6 +14,7 @@ type ListTaskCondition struct {
 
 // TaskGetter is used to get the task.
 type TaskGetter interface {
+	ListTask(c context.Context, cond ListTaskCondition) (items []*biz.Task, total int, err error)
 }
 
 // TaskQueryService is the service for task query.
@@ -27,7 +28,11 @@ func NewTaskQueryService(taskGetter TaskGetter) *TaskQueryService {
 }
 
 // GetTaskStatus is used to get the task status.
-func (s *TaskQueryService) GetTaskStatus(c context.Context, address string) ([]*biz.Task, error) {
+func (s *TaskQueryService) GetTaskStatus(
+	c context.Context,
+	address string,
+	campaignID string,
+) ([]*biz.Task, error) {
 	// TODO: 2024/11/22|sean|fetch tasks by address
 	// fetch tasks by address
 	var tasks []*biz.Task

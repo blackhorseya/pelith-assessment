@@ -40,33 +40,18 @@ func (m *MockTaskGetter) EXPECT() *MockTaskGetterMockRecorder {
 	return m.recorder
 }
 
-// GetByID mocks base method.
-func (m *MockTaskGetter) GetByID(c context.Context, id string) (*biz.Task, error) {
+// ListTask mocks base method.
+func (m *MockTaskGetter) ListTask(c context.Context, cond ListTaskCondition) ([]*biz.Task, int, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByID", c, id)
-	ret0, _ := ret[0].(*biz.Task)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetByID indicates an expected call of GetByID.
-func (mr *MockTaskGetterMockRecorder) GetByID(c, id any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockTaskGetter)(nil).GetByID), c, id)
-}
-
-// List mocks base method.
-func (m *MockTaskGetter) List(c context.Context, cond ListTaskCondition) ([]*biz.Task, int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", c, cond)
+	ret := m.ctrl.Call(m, "ListTask", c, cond)
 	ret0, _ := ret[0].([]*biz.Task)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2
 }
 
-// List indicates an expected call of List.
-func (mr *MockTaskGetterMockRecorder) List(c, cond any) *gomock.Call {
+// ListTask indicates an expected call of ListTask.
+func (mr *MockTaskGetterMockRecorder) ListTask(c, cond any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockTaskGetter)(nil).List), c, cond)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListTask", reflect.TypeOf((*MockTaskGetter)(nil).ListTask), c, cond)
 }

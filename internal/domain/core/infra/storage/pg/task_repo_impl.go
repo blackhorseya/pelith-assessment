@@ -93,3 +93,11 @@ func (i *TaskRepoImpl) Create(c context.Context, task *biz.Task) error {
 
 	return nil
 }
+
+func (i *TaskRepoImpl) ListTask(
+	c context.Context,
+	cond query.ListTaskCondition,
+) (items []*biz.Task, total int, err error) {
+	// TODO: 2024/11/22|sean|implement me
+	panic("implement me")
+}
