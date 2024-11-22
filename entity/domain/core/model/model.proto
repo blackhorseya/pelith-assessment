@@ -246,7 +246,7 @@ message Transaction {
 
   // 交易金額
   // @gotags: db:"amount"
-  double amount = 4;
+  int64 amount = 4;
 
   // 區塊鏈上交易的時間戳
   // @gotags: db:"timestamp"
