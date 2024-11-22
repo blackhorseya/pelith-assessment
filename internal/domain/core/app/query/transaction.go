@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
-	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"go.uber.org/zap"
 )
@@ -41,8 +40,8 @@ func NewTransactionQueryService(txGetter TransactionGetter, campaignGetter Campa
 	}
 }
 
-// GetTotalSwapUSDC 計算指定 address 和 campaignID 的 USDC 交易總數
-func (s *TransactionQueryService) GetTotalSwapUSDC(c context.Context, address, campaignID string) (float64, error) {
+// GetTotalSwapAmount is used to get the total swap amount.
+func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address, campaignID string) (float64, error) {
 	ctx := contextx.WithContext(c)
 
 	// 從 CampaignGetter 查詢 campaign
@@ -63,12 +62,14 @@ func (s *TransactionQueryService) GetTotalSwapUSDC(c context.Context, address, c
 	}
 
 	// 計算總數量
-	var totalUSDC float64
+	var totalAmount float64
 	for _, tx := range transactions {
-		if tx.Type == model.TransactionType_TRANSACTION_TYPE_SWAP && tx.SwapDetails != nil {
-			// TODO: 2024/11/22|sean|這裡要改成從 campaignID 取得對應的 USDC address
+		for _, task := range campaign.Tasks {
+			if task.Criteria.PoolId == tx.ToAddress {
+				totalAmount += tx.Amount
+			}
 		}
 	}
 
-	return totalUSDC, nil
+	return totalAmount, nil
 }
