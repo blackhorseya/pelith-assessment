@@ -42,6 +42,7 @@ func (s *TaskQueryService) GetTaskStatus(
 ) ([]*biz.Task, error) {
 	tasks, _, err := s.taskGetter.ListTask(c, ListTaskCondition{
 		CampaignID: campaignID,
+		Status:     model.TaskStatus_TASK_STATUS_ACTIVE,
 	})
 	if err != nil {
 		return nil, err
