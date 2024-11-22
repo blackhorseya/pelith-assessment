@@ -21,8 +21,9 @@ func NewQueryController(taskQuery *query.TaskQueryService) *QueryController {
 
 // GetTasksStatusQuery is the query to get tasks status
 type GetTasksStatusQuery struct {
-	Page int64 `form:"page" default:"1" minimum:"1"`
-	Size int64 `form:"size" default:"10" minimum:"1" maximum:"100"`
+	CampaignID string `form:"campaignID"`
+	Page       int64  `form:"page" default:"1" minimum:"1"`
+	Size       int64  `form:"size" default:"10" minimum:"1" maximum:"100"`
 }
 
 // GetTasksStatus is the handler to get tasks status
@@ -35,7 +36,7 @@ type GetTasksStatusQuery struct {
 // @Param query query GetTasksStatusQuery false "query string"
 // @Router /api/v1/users/{address}/tasks/status [get]
 func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
-	tasks, err := ctrl.taskQuery.GetTaskStatus(c.Request.Context(), c.Param("address"))
+	tasks, err := ctrl.taskQuery.GetTaskStatus(c.Request.Context(), c.Param("address"), c.Query("campaignID"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
