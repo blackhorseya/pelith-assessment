@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
@@ -17,6 +18,8 @@ type impl struct {
 }
 
 func newImpl(injector *Injector, ginServer *httpx.GinServer, grpcserver *grpcx.Server) adapterx.Server {
+	fmt.Println("etherscan api key: " + injector.A.Etherscan.APIKey)
+
 	return &impl{
 		injector:   injector,
 		ginServer:  ginServer,
