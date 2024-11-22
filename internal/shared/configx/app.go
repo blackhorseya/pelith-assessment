@@ -18,7 +18,7 @@ type Application struct {
 	} `json:"storage" yaml:"storage" mapstructure:"storage"`
 
 	Etherscan struct {
-		APIKey string `json:"api_key" yaml:"apiKey" mapstructure:"api_key"`
+		APIKey string `json:"api_key" yaml:"apiKey" mapstructure:"apiKey"`
 	} `json:"etherscan" yaml:"etherscan" mapstructure:"etherscan"`
 }
 
