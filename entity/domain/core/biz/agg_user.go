@@ -10,6 +10,7 @@ import (
 type User struct {
 	model.User
 
+	Tasks   []*Task
 	Rewards []*model.Reward
 }
 
@@ -28,6 +29,7 @@ func NewUser(username, address string) (*User, error) {
 			Points:         0,
 			TransactionIds: make([]string, 0),
 		},
+		Tasks:   make([]*Task, 0),
 		Rewards: make([]*model.Reward, 0),
 	}, nil
 }
