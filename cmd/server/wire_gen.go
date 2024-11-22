@@ -45,7 +45,15 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	taskGetter := pg.NewTaskGetter(taskRepoImpl)
 	transactionRepoImpl := etherscan.NewTransactionRepoImpl()
 	transactionGetter := etherscan.NewTransactionGetter(transactionRepoImpl)
-	transactionQueryService := query.NewTransactionQueryService(transactionGetter)
+	campaignRepoImpl, err := pg.NewCampaignRepo(db)
+	if err != nil {
+		return nil, nil, err
+	}
+	campaignGetter, err := pg.NewCampaignGetter(campaignRepoImpl)
+	if err != nil {
+		return nil, nil, err
+	}
+	transactionQueryService := query.NewTransactionQueryService(transactionGetter, campaignGetter)
 	taskQueryService := query.NewTaskQueryService(taskGetter, transactionQueryService)
 	queryController := http.NewQueryController(taskQueryService)
 	initRoutes := http.NewInitUserRoutesFn(queryController)
@@ -54,19 +62,11 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	campaignService := biz.NewCampaignService()
-	campaignRepoImpl, err := pg.NewCampaignRepo(db)
-	if err != nil {
-		return nil, nil, err
-	}
 	campaignCreator, err := pg.NewCampaignCreator(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
 	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
-	campaignGetter, err := pg.NewCampaignGetter(campaignRepoImpl)
-	if err != nil {
-		return nil, nil, err
-	}
 	taskService := biz.NewTaskService()
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
 	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)

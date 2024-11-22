@@ -29,12 +29,16 @@ type TransactionGetter interface {
 
 // TransactionQueryService is the service for transaction query.
 type TransactionQueryService struct {
-	txGetter TransactionGetter
+	txGetter       TransactionGetter
+	campaignGetter CampaignGetter
 }
 
 // NewTransactionQueryService is used to create a new TransactionQueryService.
-func NewTransactionQueryService(txGetter TransactionGetter) *TransactionQueryService {
-	return &TransactionQueryService{txGetter: txGetter}
+func NewTransactionQueryService(txGetter TransactionGetter, campaignGetter CampaignGetter) *TransactionQueryService {
+	return &TransactionQueryService{
+		txGetter:       txGetter,
+		campaignGetter: campaignGetter,
+	}
 }
 
 // GetTotalSwapUSDC 計算指定 address 和 campaignID 的 USDC 交易總數
