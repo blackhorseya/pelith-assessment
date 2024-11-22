@@ -18,7 +18,7 @@ func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 					{
 						// TODO: 2024/11/20|sean|implement the handler
 						user.GET("/tasks/status", queryCtrl.GetTasksStatus)
-						user.GET("/points/history")
+						user.GET("/points/history", queryCtrl.GetPointsHistory)
 					}
 				}
 			}
