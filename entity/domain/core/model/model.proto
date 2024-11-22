@@ -197,39 +197,79 @@ message Reward {
   google.protobuf.Timestamp redeemed_at = 5;
 }
 
-// Transaction entity
+// 定義交易類型的列舉
+enum TransactionType {
+  // 未指定的交易類型
+  TRANSACTION_TYPE_UNSPECIFIED = 0;
+
+  // 轉帳交易
+  TRANSACTION_TYPE_TRANSFER = 1;
+
+  // Swap 交易
+  TRANSACTION_TYPE_SWAP = 2;
+
+  // 其他類型的交易
+  TRANSACTION_TYPE_OTHER = 3;
+}
+
+// Swap transaction details
+message SwapDetails {
+  // Address of the token being swapped from
+  string from_token_address = 1;
+
+  // Address of the token being swapped to
+  string to_token_address = 2;
+
+  // Amount of the from_token being swapped
+  double from_token_amount = 3;
+
+  // Amount of the to_token received
+  double to_token_amount = 4;
+
+  // Optional: Address of the liquidity pool used for the swap
+  string pool_address = 5;
+}
+
+// 交易實體
 message Transaction {
-  // Unique identifier for the transaction (blockchain hash)
+  // 交易的唯一識別碼（區塊鏈哈希）
   // @gotags: db:"tx_hash"
-  bytes tx_hash = 1;
+  string tx_hash = 1;
 
-  // Blockchain sender address
+  // 區塊鏈發送者地址
   // @gotags: db:"from_address"
-  bytes from_address = 2;
+  string from_address = 2;
 
-  // Blockchain receiver address
+  // 區塊鏈接收者地址
   // @gotags: db:"to_address"
-  bytes to_address = 3;
+  string to_address = 3;
 
-  // Transaction amount
+  // 交易金額
   // @gotags: db:"amount"
   double amount = 4;
 
-  // Timestamp of the transaction on the blockchain
+  // 區塊鏈上交易的時間戳
   // @gotags: db:"timestamp"
   google.protobuf.Timestamp timestamp = 5;
 
-  // Associated task ID (optional for task tracking)
+  // 關聯的任務 ID（可選，用於任務追蹤）
   // @gotags: db:"task_id"
   optional string task_id = 6;
 
-  // Associated campaign ID (optional for campaign tracking)
+  // 關聯的活動 ID（可選，用於活動追蹤）
   // @gotags: db:"campaign_id"
   optional string campaign_id = 7;
 
-  // Status of the transaction
+  // 交易的狀態
   // @gotags: db:"status"
   TransactionStatus status = 8;
+
+  // 交易的類型
+  // @gotags: db:"type"
+  TransactionType type = 9;
+
+  // Swap details for swap transactions
+  optional SwapDetails swap_details = 10;
 }
 
 // Enum for transaction status
