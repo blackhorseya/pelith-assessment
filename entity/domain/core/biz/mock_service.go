@@ -235,3 +235,40 @@ func (mr *MockBacktestServiceMockRecorder) RunBacktest(c, campaignID, startTime,
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunBacktest", reflect.TypeOf((*MockBacktestService)(nil).RunBacktest), c, campaignID, startTime, endTime)
 }
+
+// MockTransactionService is a mock of TransactionService interface.
+type MockTransactionService struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionServiceMockRecorder
+}
+
+// MockTransactionServiceMockRecorder is the mock recorder for MockTransactionService.
+type MockTransactionServiceMockRecorder struct {
+	mock *MockTransactionService
+}
+
+// NewMockTransactionService creates a new mock instance.
+func NewMockTransactionService(ctrl *gomock.Controller) *MockTransactionService {
+	mock := &MockTransactionService{ctrl: ctrl}
+	mock.recorder = &MockTransactionServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransactionService) EXPECT() *MockTransactionServiceMockRecorder {
+	return m.recorder
+}
+
+// ProcessTransaction mocks base method.
+func (m *MockTransactionService) ProcessTransaction(ctx context.Context, transaction *Transaction, user *User, task *Task) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ProcessTransaction", ctx, transaction, user, task)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ProcessTransaction indicates an expected call of ProcessTransaction.
+func (mr *MockTransactionServiceMockRecorder) ProcessTransaction(ctx, transaction, user, task any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessTransaction", reflect.TypeOf((*MockTransactionService)(nil).ProcessTransaction), ctx, transaction, user, task)
+}

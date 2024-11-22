@@ -54,3 +54,9 @@ type BacktestService interface {
 	// RunBacktest executes a backtest for a campaign within a specified time range.
 	RunBacktest(c context.Context, campaignID string, startTime time.Time, endTime time.Time) error
 }
+
+// TransactionService defines the domain logic for processing transactions.
+type TransactionService interface {
+	// ProcessTransaction processes a transaction and updates the user's progress.
+	ProcessTransaction(ctx context.Context, transaction *Transaction, user *User, task *Task) error
+}
