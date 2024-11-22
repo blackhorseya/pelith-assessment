@@ -29,6 +29,10 @@ func NewTaskQueryService(taskGetter TaskGetter) *TaskQueryService {
 
 // GetTaskStatus is used to get the task status.
 func (s *TaskQueryService) GetTaskStatus(c context.Context, address string) ([]*biz.Task, error) {
+	// fetch tasks by address
+
+	// for loop tasks and calculate progress
+
 	// TODO: 2024/11/22|sean|implement the logic
 	return nil, errors.New("not implemented")
 }

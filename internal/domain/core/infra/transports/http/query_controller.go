@@ -33,7 +33,13 @@ type GetTasksStatusQuery struct {
 // @Param query query GetTasksStatusQuery false "query string"
 // @Router /api/v1/users/{address}/tasks/status [get]
 func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
-	// TODO: 2024/11/22|sean|implement the handler
+	tasks, err := ctrl.taskQuery.GetTaskStatus(c.Request.Context(), c.Param("address"))
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"tasks": tasks})
 }
 
 // GetPointsHistoryQuery is the query to get points history
