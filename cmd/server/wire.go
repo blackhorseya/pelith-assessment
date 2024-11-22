@@ -6,6 +6,7 @@ package server
 
 import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
@@ -38,6 +39,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 
 		// adapter
 		http.NewInitUserRoutesFn,
+		http.NewQueryController,
 		grpc.NewInitServersFn,
 		grpc.NewHealthServer,
 		grpc.NewCampaignServer,
@@ -45,6 +47,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		// app layer
 		command.NewCreateCampaignHandler,
 		command.NewAddTaskHandler,
+		query.NewTaskQueryService,
 
 		// entity layer
 		biz.NewCampaignService,
@@ -56,6 +59,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		pg.NewCampaignGetter,
 		pg.NewTaskRepo,
 		pg.NewTaskCreator,
+		pg.NewTaskGetter,
 
 		// infra
 		httpx.NewGinServer,

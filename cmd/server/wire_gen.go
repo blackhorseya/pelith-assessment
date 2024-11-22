@@ -8,6 +8,7 @@ package server
 
 import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
@@ -35,16 +36,20 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		C: configx,
 		A: application,
 	}
-	initRoutes := http.NewInitUserRoutesFn()
+	db, err := pgx.NewClient(application)
+	if err != nil {
+		return nil, nil, err
+	}
+	taskRepoImpl := pg.NewTaskRepo(db)
+	taskGetter := pg.NewTaskGetter(taskRepoImpl)
+	taskQueryService := query.NewTaskQueryService(taskGetter)
+	queryController := http.NewQueryController(taskQueryService)
+	initRoutes := http.NewInitUserRoutesFn(queryController)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)
 	if err != nil {
 		return nil, nil, err
 	}
 	campaignService := biz.NewCampaignService()
-	db, err := pgx.NewClient(application)
-	if err != nil {
-		return nil, nil, err
-	}
 	campaignRepoImpl, err := pg.NewCampaignRepo(db)
 	if err != nil {
 		return nil, nil, err
@@ -59,7 +64,6 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	taskService := biz.NewTaskService()
-	taskRepoImpl := pg.NewTaskRepo(db)
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
 	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
 	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, addTaskHandler, campaignGetter)

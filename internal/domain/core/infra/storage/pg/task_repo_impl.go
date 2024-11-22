@@ -5,6 +5,7 @@ import (
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
@@ -22,6 +23,11 @@ func NewTaskRepo(rw *sqlx.DB) *TaskRepoImpl {
 
 // NewTaskCreator creates a new TaskCreator
 func NewTaskCreator(impl *TaskRepoImpl) command.TaskCreator {
+	return impl
+}
+
+// NewTaskGetter creates a new TaskGetter
+func NewTaskGetter(impl *TaskRepoImpl) query.TaskGetter {
 	return impl
 }
 

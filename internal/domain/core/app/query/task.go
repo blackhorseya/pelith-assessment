@@ -4,6 +4,7 @@ package query
 
 import (
 	"context"
+	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 )
@@ -14,9 +15,20 @@ type ListTaskCondition struct {
 
 // TaskGetter is used to get the task.
 type TaskGetter interface {
-	// GetByID is used to get a task by id.
-	GetByID(c context.Context, id string) (*biz.Task, error)
+}
 
-	// List is used to list the task.
-	List(c context.Context, cond ListTaskCondition) (items []*biz.Task, total int, err error)
+// TaskQueryService is the service for task query.
+type TaskQueryService struct {
+	taskGetter TaskGetter
+}
+
+// NewTaskQueryService is used to create a new TaskQueryService.
+func NewTaskQueryService(taskGetter TaskGetter) *TaskQueryService {
+	return &TaskQueryService{taskGetter: taskGetter}
+}
+
+// GetTaskStatus is used to get the task status.
+func (s *TaskQueryService) GetTaskStatus(c context.Context, address string) ([]*biz.Task, error) {
+	// TODO: 2024/11/22|sean|implement the logic
+	return nil, errors.New("not implemented")
 }

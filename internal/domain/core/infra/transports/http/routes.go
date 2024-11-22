@@ -6,7 +6,7 @@ import (
 )
 
 // NewInitUserRoutesFn is the function to init user routes
-func NewInitUserRoutesFn() httpx.InitRoutes {
+func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 	return func(router *gin.Engine) {
 		api := router.Group("/api")
 		{
@@ -17,7 +17,7 @@ func NewInitUserRoutesFn() httpx.InitRoutes {
 					user := users.Group("/:address")
 					{
 						// TODO: 2024/11/20|sean|implement the handler
-						user.GET("/tasks/status")
+						user.GET("/tasks/status", queryCtrl.GetTasksStatus)
 						user.GET("/points/history")
 					}
 				}
