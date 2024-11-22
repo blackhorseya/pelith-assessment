@@ -16,6 +16,10 @@ type Application struct {
 	Storage struct {
 		DSN string `json:"dsn" yaml:"dsn" mapstructure:"dsn"`
 	} `json:"storage" yaml:"storage" mapstructure:"storage"`
+
+	Etherscan struct {
+		APIKey string `json:"api_key" yaml:"APIKey" mapstructure:"api_key"`
+	} `json:"etherscan" yaml:"etherscan" mapstructure:"etherscan"`
 }
 
 // HTTP defines the http struct.
