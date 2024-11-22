@@ -11,20 +11,17 @@ type Task struct {
 	model.Task
 
 	CampaignID string
-	Progress   int
 }
 
 // NewTask creates a new Task aggregate.
 func NewTask(
 	name, description string,
 	taskType model.TaskType,
-	criteria *model.TaskCriteria,
+	minAmount float64,
+	poolID string,
 ) (*Task, error) {
 	if name == "" {
 		return nil, errors.New("name is required")
-	}
-	if criteria == nil {
-		return nil, errors.New("criteria is required")
 	}
 
 	return &Task{
@@ -33,27 +30,27 @@ func NewTask(
 			Name:        name,
 			Description: description,
 			Type:        taskType,
-			Criteria:    criteria,
-			Status:      model.TaskStatus_TASK_STATUS_ACTIVE,
+			Criteria: &model.TaskCriteria{
+				MinTransactionAmount: minAmount,
+				PoolId:               poolID,
+			},
+			Status: model.TaskStatus_TASK_STATUS_ACTIVE,
 		},
 	}, nil
 }
 
-// Evaluate checks whether a task is completed based on the given inputs.
-func (t *Task) Evaluate(transactionAmount float64, poolID string) (bool, error) {
-	if t.Status != model.TaskStatus_TASK_STATUS_ACTIVE {
-		return false, errors.New("task is not active")
+// CalculateProgress calculates the progress of a task based on the given amount.
+func (t *Task) CalculateProgress(amount float64) int {
+	if t.Criteria == nil {
+		return 0
 	}
 
-	if transactionAmount < t.Criteria.MinTransactionAmount {
-		return false, nil
+	progress := int(amount / t.Criteria.MinTransactionAmount * 100)
+	if progress > 100 {
+		progress = 100
 	}
 
-	if t.Criteria != nil && t.Criteria.PoolId != "" && poolID != t.Criteria.PoolId {
-		return false, nil
-	}
-
-	return true, nil
+	return progress
 }
 
 // Deactivate marks the task as inactive.

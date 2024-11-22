@@ -27,10 +27,7 @@ func (t taskServiceImpl) CreateTask(
 ) (*biz.Task, error) {
 	ctx := contextx.WithContext(c)
 
-	task, err := biz.NewTask(name, description, taskType, &model.TaskCriteria{
-		MinTransactionAmount: minAmount,
-		PoolId:               poolID,
-	})
+	task, err := biz.NewTask(name, description, taskType, minAmount, poolID)
 	if err != nil {
 		ctx.Error("failed to create task", zap.Error(err))
 		return nil, err
