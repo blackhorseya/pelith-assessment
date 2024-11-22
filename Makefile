@@ -78,6 +78,12 @@ gen-pb: ## generate protobuf
 	buf generate
 	protoc-go-inject-tag -input="./entity/domain/*/*/*.pb.go"
 
+# Generate Swagger specification
+.PHONY: gen-swagger
+gen-swagger: ## Generate Swagger specification
+	@echo "Generating Swagger specification..."
+	swag init -g main.go -o ./docs/api
+
 # Docker build
 .PHONY: docker-build
 docker-build: ## Build the Docker image

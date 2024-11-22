@@ -1,0 +1,60 @@
+info:
+  contact: {}
+paths:
+  /api/v1/users/{address}/points/history:
+    get:
+      consumes:
+      - application/json
+      description: Get points history by address
+      parameters:
+      - description: User address
+        in: path
+        name: address
+        required: true
+        type: string
+      - default: 1
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - default: 10
+        in: query
+        maximum: 100
+        minimum: 1
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Get points history
+      tags:
+      - users
+  /api/v1/users/{address}/tasks/status:
+    get:
+      consumes:
+      - application/json
+      description: Get tasks status by address
+      parameters:
+      - description: User address
+        in: path
+        name: address
+        required: true
+        type: string
+      - default: 1
+        in: query
+        minimum: 1
+        name: page
+        type: integer
+      - default: 10
+        in: query
+        maximum: 100
+        minimum: 1
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses: {}
+      summary: Get tasks status
+      tags:
+      - users
+swagger: "2.0"

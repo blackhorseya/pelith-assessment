@@ -17,12 +17,40 @@ func NewQueryController(taskQuery *query.TaskQueryService) *QueryController {
 	}
 }
 
+// GetTasksStatusQuery is the query to get tasks status
+type GetTasksStatusQuery struct {
+	Page int64 `form:"page" default:"1" minimum:"1"`
+	Size int64 `form:"size" default:"10" minimum:"1" maximum:"100"`
+}
+
 // GetTasksStatus is the handler to get tasks status
+// @Summary Get tasks status
+// @Description Get tasks status by address
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param address path string true "User address"
+// @Param query query GetTasksStatusQuery false "query string"
+// @Router /api/v1/users/{address}/tasks/status [get]
 func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
 	// TODO: 2024/11/22|sean|implement the handler
 }
 
+// GetPointsHistoryQuery is the query to get points history
+type GetPointsHistoryQuery struct {
+	Page int64 `form:"page" default:"1" minimum:"1"`
+	Size int64 `form:"size" default:"10" minimum:"1" maximum:"100"`
+}
+
 // GetPointsHistory is the handler to get points history
+// @Summary Get points history
+// @Description Get points history by address
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param address path string true "User address"
+// @Param query query GetPointsHistoryQuery false "query string"
+// @Router /api/v1/users/{address}/points/history [get]
 func (ctrl *QueryController) GetPointsHistory(c *gin.Context) {
 	// TODO: 2024/11/22|sean|implement the handler
 }
