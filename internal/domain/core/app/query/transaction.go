@@ -4,6 +4,8 @@ package query
 
 import (
 	"context"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
@@ -43,7 +45,7 @@ func NewTransactionQueryService(txGetter TransactionGetter, campaignGetter Campa
 }
 
 // GetTotalSwapAmount is used to get the total swap amount.
-func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address, campaignID string) (int64, error) {
+func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address, campaignID string) (float64, error) {
 	ctx := contextx.WithContext(c)
 
 	// 從 CampaignGetter 查詢 campaign
@@ -71,10 +73,26 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 
 	// 計算總數量
 	const usdcAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-	var totalAmount int64
+	var totalAmount float64
 	for _, tx := range transactions {
 		if tx.Type == model.TransactionType_TRANSACTION_TYPE_SWAP {
-			ctx.Debug("swap transaction", zap.Any("tx", &tx))
+			for _, detail := range tx.SwapDetails {
+				if strings.EqualFold(detail.FromTokenAddress, usdcAddress) {
+					value, err2 := strconv.ParseFloat(detail.FromTokenAmount, 64)
+					if err2 != nil {
+						ctx.Error("failed to parse float", zap.Error(err2))
+						return 0, err2
+					}
+					totalAmount += value
+				} else if strings.EqualFold(detail.ToTokenAddress, usdcAddress) {
+					value, err2 := strconv.ParseFloat(detail.ToTokenAmount, 64)
+					if err2 != nil {
+						ctx.Error("failed to parse float", zap.Error(err2))
+						return 0, err2
+					}
+					totalAmount += value
+				}
+			}
 		}
 	}
 

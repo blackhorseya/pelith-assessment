@@ -231,6 +231,8 @@ func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
 }
 
 // getTokenDetails 获取 ERC20 Token 的 symbol 和 decimals
+//
+//nolint:unparam // it's a placeholder for future use
 func (i *TransactionRepoImpl) getTokenDetails(tokenAddress common.Address) (string, int, error) {
 	// ERC20 ABI，仅包含 symbol 和 decimals 方法
 	const erc20ABI = `[{
@@ -250,7 +252,7 @@ func (i *TransactionRepoImpl) getTokenDetails(tokenAddress common.Address) (stri
 	// 解析 ERC20 ABI
 	parsedABI, err := abi.JSON(strings.NewReader(erc20ABI))
 	if err != nil {
-		return "", 0, fmt.Errorf("解析 ERC20 ABI 失败: %v", err)
+		return "", 0, fmt.Errorf("解析 ERC20 ABI 失败: %w", err)
 	}
 
 	// 绑定 ERC20 合约
@@ -270,7 +272,7 @@ func (i *TransactionRepoImpl) getTokenDetails(tokenAddress common.Address) (stri
 	output = []interface{}{&decimals} // 重用切片包装 decimals
 	err = contract.Call(nil, &output, "decimals")
 	if err != nil {
-		return symbol, 0, fmt.Errorf("无法获取 decimals (地址: %s): %v", tokenAddress.Hex(), err)
+		return symbol, 0, fmt.Errorf("无法获取 decimals (地址: %s): %w", tokenAddress.Hex(), err)
 	}
 
 	return symbol, int(decimals), nil

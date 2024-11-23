@@ -125,7 +125,7 @@ func TestTask_CalculateProgress(t1 *testing.T) {
 		poolID    string
 	}
 	type args struct {
-		amount int64
+		amount float64
 	}
 	tests := []struct {
 		name   string
