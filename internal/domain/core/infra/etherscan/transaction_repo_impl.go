@@ -122,6 +122,7 @@ func (i *TransactionRepoImpl) ListByAddress(
 
 			if swapDetail != nil {
 				txType = model.TransactionType_TRANSACTION_TYPE_SWAP
+				swapDetail.PoolAddress = cond.PoolAddress
 				swapDetails = append(swapDetails, swapDetail)
 			}
 		}
@@ -148,7 +149,6 @@ func (i *TransactionRepoImpl) ListByAddress(
 
 func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {
 	var firstLog, lastLog *types.Log
-	var _, _ string
 	var fromDecimals, toDecimals int
 	var fromAmountFloat, toAmountFloat *big.Float
 
@@ -166,10 +166,10 @@ func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash co
 
 		// Set the first valid log if not already set
 		if firstLog == nil {
-			firstLog = logEntry
+			firstLog = logs[0]
 		}
 		// Update the last valid log
-		lastLog = logEntry
+		lastLog = logs[len(logs)-1]
 	}
 
 	// Ensure we found at least one valid log
@@ -198,9 +198,8 @@ func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash co
 	return &model.SwapDetail{
 		FromTokenAddress: fromTokenAddress.Hex(),
 		ToTokenAddress:   toTokenAddress.Hex(),
-		FromTokenAmount:  fromAmountFloat.String(),
-		ToTokenAmount:    toAmountFloat.String(),
-		PoolAddress:      "",
+		FromTokenAmount:  fmt.Sprintf("%.6f", fromAmountFloat),
+		ToTokenAmount:    fmt.Sprintf("%.6f", toAmountFloat),
 	}, nil
 }
 
