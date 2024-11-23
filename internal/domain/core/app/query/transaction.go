@@ -4,6 +4,7 @@ package query
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -44,23 +45,23 @@ func NewTransactionQueryService(txGetter TransactionGetter, campaignGetter Campa
 	}
 }
 
-// GetTotalSwapAmount is used to get the total swap amount.
+// GetTotalSwapAmount calculates the total swap amount for a given address and campaign ID.
 func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address, campaignID string) (float64, error) {
 	ctx := contextx.WithContext(c)
 
-	// 從 CampaignGetter 查詢 campaign
+	// Retrieve the campaign by ID
 	campaign, err := s.campaignGetter.GetByID(ctx, campaignID)
-	if err != nil || campaign == nil {
+	if err != nil {
 		ctx.Error("failed to fetch campaign", zap.Error(err), zap.String("campaign_id", campaignID))
-		return 0, err
+		return 0, fmt.Errorf("failed to fetch campaign: %w", err)
 	}
 
-	if len(campaign.Tasks) == 0 {
-		ctx.Warn("no tasks in campaign", zap.String("campaign_id", campaignID))
+	if campaign == nil || len(campaign.Tasks) == 0 {
+		ctx.Warn("campaign has no tasks", zap.String("campaign_id", campaignID))
 		return 0, nil
 	}
 
-	// 從 TransactionGetter 查詢交易數據
+	// Fetch transactions for the specified address and campaign's criteria
 	transactions, _, err := s.txGetter.ListByAddress(ctx, address, ListTransactionCondition{
 		PoolAddress: campaign.Tasks[0].Criteria.PoolId,
 		StartTime:   campaign.StartTime.AsTime(),
@@ -68,33 +69,56 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 	})
 	if err != nil {
 		ctx.Error("failed to fetch transactions", zap.Error(err))
-		return 0, err
+		return 0, fmt.Errorf("failed to fetch transactions: %w", err)
 	}
 
-	// 計算總數量
+	// Constant for the USDC token address
 	const usdcAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
+	// Compute the total amount of USDC swapped
+	totalAmount, err := calculateTotalUSDC(ctx, transactions, usdcAddress)
+	if err != nil {
+		return 0, fmt.Errorf("error calculating total USDC: %w", err)
+	}
+
+	return totalAmount, nil
+}
+
+// calculateTotalUSDC computes the total amount of USDC from swap transactions.
+func calculateTotalUSDC(ctx contextx.Contextx, transactions []*biz.Transaction, usdcAddress string) (float64, error) {
 	var totalAmount float64
+
 	for _, tx := range transactions {
-		if tx.Type == model.TransactionType_TRANSACTION_TYPE_SWAP {
-			for _, detail := range tx.SwapDetails {
-				if strings.EqualFold(detail.FromTokenAddress, usdcAddress) {
-					value, err2 := strconv.ParseFloat(detail.FromTokenAmount, 64)
-					if err2 != nil {
-						ctx.Error("failed to parse float", zap.Error(err2))
-						return 0, err2
-					}
-					totalAmount += value
-				} else if strings.EqualFold(detail.ToTokenAddress, usdcAddress) {
-					value, err2 := strconv.ParseFloat(detail.ToTokenAmount, 64)
-					if err2 != nil {
-						ctx.Error("failed to parse float", zap.Error(err2))
-						return 0, err2
-					}
-					totalAmount += value
-				}
+		// Skip non-swap transactions
+		if tx.Type != model.TransactionType_TRANSACTION_TYPE_SWAP {
+			continue
+		}
+
+		for _, detail := range tx.SwapDetails {
+			// Process USDC "from" and "to" amounts
+			if amount, err := getUSDCAmount(detail.FromTokenAddress, detail.FromTokenAmount, usdcAddress); err != nil {
+				ctx.Error("failed to parse FromTokenAmount", zap.Error(err))
+				return 0, err
+			} else {
+				totalAmount += amount
+			}
+
+			if amount, err := getUSDCAmount(detail.ToTokenAddress, detail.ToTokenAmount, usdcAddress); err != nil {
+				ctx.Error("failed to parse ToTokenAmount", zap.Error(err))
+				return 0, err
+			} else {
+				totalAmount += amount
 			}
 		}
 	}
 
 	return totalAmount, nil
+}
+
+// getUSDCAmount parses the token amount if the token address matches the USDC address.
+func getUSDCAmount(tokenAddress, tokenAmount, usdcAddress string) (float64, error) {
+	if strings.EqualFold(tokenAddress, usdcAddress) {
+		return strconv.ParseFloat(tokenAmount, 64)
+	}
+	return 0, nil
 }
