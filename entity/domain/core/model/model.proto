@@ -221,10 +221,10 @@ message SwapDetail {
   string to_token_address = 2;
 
   // Amount of the from_token being swapped
-  int64 from_token_amount = 3;
+  string from_token_amount = 3;
 
   // Amount of the to_token received
-  int64 to_token_amount = 4;
+  string to_token_amount = 4;
 
   // Optional: Address of the liquidity pool used for the swap
   string pool_address = 5;

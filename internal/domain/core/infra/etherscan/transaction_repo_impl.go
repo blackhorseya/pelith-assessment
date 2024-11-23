@@ -3,6 +3,7 @@ package etherscan
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/big"
 	"strings"
 	"sync"
@@ -14,7 +15,9 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/nanmu42/etherscan-api"
 	"go.uber.org/zap"
@@ -110,50 +113,16 @@ func (i *TransactionRepoImpl) ListByAddress(
 				return nil, 0, err2
 			}
 
-			// 遍历日志，查找 Swap 事件
-			for _, logEntry := range receipt.Logs {
-				if !strings.EqualFold(logEntry.Address.Hex(), cond.PoolAddress) {
-					continue // 非目标合约的日志
-				}
-				if len(logEntry.Topics) == 0 || logEntry.Topics[0] != swapEventHash {
-					continue // 非 Swap 事件
-				}
-
-				// 提取日志的参数
-				eventData := make(map[string]interface{})
-				err = parsedABI.UnpackIntoMap(eventData, "Swap", logEntry.Data)
-				if err != nil {
-					ctx.Error("failed to unpack event data", zap.Error(err), zap.String("log_address", logEntry.Address.Hex()))
-					continue
-				}
-
-				// 提取事件参数并构造 SwapDetails
-				fromAddress := common.HexToAddress(logEntry.Topics[1].Hex())
-				toAddress := common.HexToAddress(logEntry.Topics[2].Hex())
-
-				fromTokenAmount, ok := eventData["amount0In"].(*big.Int)
-				if !ok {
-					ctx.Warn("missing or invalid amount0In", zap.Any("event_data", eventData))
-					continue
-				}
-				toTokenAmount, ok := eventData["amount1Out"].(*big.Int)
-				if !ok {
-					ctx.Warn("missing or invalid amount1Out", zap.Any("event_data", eventData))
-					continue
-				}
-
-				swapDetails = append(swapDetails, &model.SwapDetail{
-					FromTokenAddress: fromAddress.Hex(),
-					ToTokenAddress:   toAddress.Hex(),
-					FromTokenAmount:  fromTokenAmount.Int64(),
-					ToTokenAmount:    toTokenAmount.Int64(),
-					PoolAddress:      cond.PoolAddress,
-				})
+			// 解析 Swap 日志
+			swapDetail, err2 := i.decodeSwapLogs(receipt.Logs, swapEventHash)
+			if err2 != nil {
+				ctx.Warn("failed to decode swap logs", zap.Error(err2), zap.String("tx_hash", tx.Hash))
+				swapDetail = nil
 			}
 
-			// 如果找到 Swap 日志，标记交易类型
-			if len(swapDetails) > 0 {
+			if swapDetail != nil {
 				txType = model.TransactionType_TRANSACTION_TYPE_SWAP
+				swapDetails = append(swapDetails, swapDetail)
 			}
 		}
 
@@ -175,6 +144,64 @@ func (i *TransactionRepoImpl) ListByAddress(
 	}
 
 	return res, len(res), nil
+}
+
+func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {
+	var firstLog, lastLog *types.Log
+	var _, _ string
+	var fromDecimals, toDecimals int
+	var fromAmountFloat, toAmountFloat *big.Float
+
+	// Iterate over logs to find the first and last valid Swap logs
+	for _, logEntry := range logs {
+		// Skip logs that don't match the criteria
+		if len(logEntry.Topics) < 3 || logEntry.Topics[0] != swapEventHash {
+			continue
+		}
+
+		// Ensure data length is sufficient
+		if len(logEntry.Data) < 64 {
+			return nil, fmt.Errorf("log data length is insufficient: %s", logEntry.Data)
+		}
+
+		// Set the first valid log if not already set
+		if firstLog == nil {
+			firstLog = logEntry
+		}
+		// Update the last valid log
+		lastLog = logEntry
+	}
+
+	// Ensure we found at least one valid log
+	if firstLog == nil || lastLog == nil {
+		return nil, fmt.Errorf("no valid Swap log found")
+	}
+
+	// Parse the first log for "from" token details
+	fromTokenAddress := firstLog.Address
+	fromAmount := new(big.Int).SetBytes(firstLog.Data[:32]) // First 32 bytes represent the amount
+	_, fromDecimals, err := i.getTokenDetails(fromTokenAddress)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get From Token details (address: %s): %w", fromTokenAddress.Hex(), err)
+	}
+	fromAmountFloat = normalizeAmount(fromAmount, fromDecimals)
+
+	// Parse the last log for "to" token details
+	toTokenAddress := lastLog.Address
+	toAmount := new(big.Int).SetBytes(lastLog.Data[:32]) // First 32 bytes represent the amount
+	_, toDecimals, err = i.getTokenDetails(toTokenAddress)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get To Token details (address: %s): %w", toTokenAddress.Hex(), err)
+	}
+	toAmountFloat = normalizeAmount(toAmount, toDecimals)
+
+	return &model.SwapDetail{
+		FromTokenAddress: fromTokenAddress.Hex(),
+		ToTokenAddress:   toTokenAddress.Hex(),
+		FromTokenAmount:  fromAmountFloat.String(),
+		ToTokenAmount:    toAmountFloat.String(),
+		PoolAddress:      "",
+	}, nil
 }
 
 func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
@@ -202,4 +229,61 @@ func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
 	i.abis[contractAddress] = parsedABI
 
 	return parsedABI, nil
+}
+
+// getTokenDetails 获取 ERC20 Token 的 symbol 和 decimals
+func (i *TransactionRepoImpl) getTokenDetails(tokenAddress common.Address) (string, int, error) {
+	// ERC20 ABI，仅包含 symbol 和 decimals 方法
+	const erc20ABI = `[{
+		"constant": true,
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [{"name": "", "type": "string"}],
+		"type": "function"
+	}, {
+		"constant": true,
+		"inputs": [],
+		"name": "decimals",
+		"outputs": [{"name": "", "type": "uint8"}],
+		"type": "function"
+	}]`
+
+	// 解析 ERC20 ABI
+	parsedABI, err := abi.JSON(strings.NewReader(erc20ABI))
+	if err != nil {
+		return "", 0, fmt.Errorf("解析 ERC20 ABI 失败: %v", err)
+	}
+
+	// 绑定 ERC20 合约
+	contract := bind.NewBoundContract(tokenAddress, parsedABI, i.ethclientAPI, i.ethclientAPI, i.ethclientAPI)
+
+	// 调用 symbol 方法
+	var symbol string
+	output := []interface{}{&symbol} // 包装输出为 []interface{}
+	err = contract.Call(nil, &output, "symbol")
+	if err != nil {
+		log.Printf("无法获取 symbol (地址: %s): %v", tokenAddress.Hex(), err)
+		symbol = "UNKNOWN" // 提供默认值
+	}
+
+	// 调用 decimals 方法
+	var decimals uint8
+	output = []interface{}{&decimals} // 重用切片包装 decimals
+	err = contract.Call(nil, &output, "decimals")
+	if err != nil {
+		return symbol, 0, fmt.Errorf("无法获取 decimals (地址: %s): %v", tokenAddress.Hex(), err)
+	}
+
+	return symbol, int(decimals), nil
+}
+
+// 将 Token 金额根据 decimals 归一化为浮点数
+func normalizeAmount(amount *big.Int, decimals int) *big.Float {
+	// 计算 10^decimals
+	decimalsFactor := new(big.Int).Exp(big.NewInt(10), big.NewInt(int64(decimals)), nil)
+
+	// 将整数金额转换为浮点数，并归一化
+	amountFloat := new(big.Float).SetInt(amount)           // 转换为浮点数
+	decimalsFloat := new(big.Float).SetInt(decimalsFactor) // 转换为浮点数
+	return new(big.Float).Quo(amountFloat, decimalsFloat)  // 执行归一化
 }
