@@ -43,7 +43,10 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	}
 	taskRepoImpl := pg.NewTaskRepo(db)
 	taskGetter := pg.NewTaskGetter(taskRepoImpl)
-	transactionRepoImpl := etherscan.NewTransactionRepoImpl(application)
+	transactionRepoImpl, err := etherscan.NewTransactionRepoImpl(application)
+	if err != nil {
+		return nil, nil, err
+	}
 	transactionGetter := etherscan.NewTransactionGetter(transactionRepoImpl)
 	campaignRepoImpl, err := pg.NewCampaignRepo(db)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/nanmu42/etherscan-api"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -16,16 +17,23 @@ import (
 
 // TransactionRepoImpl is the implementation of TransactionRepo.
 type TransactionRepoImpl struct {
-	client *etherscan.Client
+	etherscanAPI *etherscan.Client
+	ethclientAPI *ethclient.Client
 }
 
 // NewTransactionRepoImpl is used to create a new TransactionRepoImpl.
-func NewTransactionRepoImpl(app *configx.Application) *TransactionRepoImpl {
-	client := etherscan.New(etherscan.Mainnet, app.Etherscan.APIKey)
+func NewTransactionRepoImpl(app *configx.Application) (*TransactionRepoImpl, error) {
+	etherscanAPI := etherscan.New(etherscan.Mainnet, app.Etherscan.APIKey)
+
+	ethclientAPI, err := ethclient.Dial("https://mainnet.infura.io/v3/" + app.Infura.ProjectID)
+	if err != nil {
+		return nil, err
+	}
 
 	return &TransactionRepoImpl{
-		client: client,
-	}
+		etherscanAPI: etherscanAPI,
+		ethclientAPI: ethclientAPI,
+	}, nil
 }
 
 // NewTransactionGetter is used to create a new TransactionGetter.
@@ -40,7 +48,7 @@ func (i *TransactionRepoImpl) ListByAddress(
 ) (item biz.TransactionList, total int, err error) {
 	ctx := contextx.WithContext(c)
 
-	startBlock, err := i.client.BlockNumber(cond.StartTime.Unix(), "after")
+	startBlock, err := i.etherscanAPI.BlockNumber(cond.StartTime.Unix(), "after")
 	if err != nil {
 		ctx.Error("failed to fetch start block", zap.Error(err), zap.Time("start_time", cond.StartTime))
 		return nil, 0, err
@@ -50,13 +58,13 @@ func (i *TransactionRepoImpl) ListByAddress(
 	if cond.EndTime.After(time.Now()) {
 		cond.EndTime = time.Now()
 	}
-	endBlock, err := i.client.BlockNumber(cond.EndTime.Unix(), "before")
+	endBlock, err := i.etherscanAPI.BlockNumber(cond.EndTime.Unix(), "before")
 	if err != nil {
 		ctx.Error("failed to fetch end block", zap.Error(err), zap.Time("end_time", cond.EndTime))
 		return nil, 0, err
 	}
 
-	txs, err := i.client.NormalTxByAddress(address, &startBlock, &endBlock, 1, 100, true)
+	txs, err := i.etherscanAPI.NormalTxByAddress(address, &startBlock, &endBlock, 1, 100, true)
 	if err != nil {
 		ctx.Error("failed to fetch transactions", zap.Error(err))
 		return nil, 0, err
