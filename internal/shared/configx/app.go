@@ -20,6 +20,10 @@ type Application struct {
 	Etherscan struct {
 		APIKey string `json:"api_key" yaml:"apiKey" mapstructure:"apiKey"`
 	} `json:"etherscan" yaml:"etherscan" mapstructure:"etherscan"`
+
+	Infura struct {
+		ProjectID string `json:"project_id" yaml:"projectID" mapstructure:"projectID"`
+	} `json:"infura" yaml:"infura" mapstructure:"infura"`
 }
 
 // HTTP defines the http struct.
