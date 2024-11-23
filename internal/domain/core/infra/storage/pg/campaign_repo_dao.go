@@ -78,6 +78,8 @@ func (dao *TaskDAO) ToBizModel() (*biz.Task, error) {
 			Criteria:    &criteria,
 			Status:      model.TaskStatus(dao.Status),
 		},
+		CampaignID: dao.CampaignID,
+		Progress:   0,
 	}, nil
 }
 

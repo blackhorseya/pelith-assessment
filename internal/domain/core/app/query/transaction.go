@@ -4,6 +4,7 @@ package query
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
@@ -65,8 +66,8 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 	var totalAmount float64
 	for _, tx := range transactions {
 		for _, task := range campaign.Tasks {
-			if task.Criteria.PoolId == tx.ToAddress {
-				totalAmount += tx.Amount
+			if strings.EqualFold(task.Criteria.PoolId, tx.ToAddress) {
+				totalAmount += float64(tx.Amount)
 			}
 		}
 	}
