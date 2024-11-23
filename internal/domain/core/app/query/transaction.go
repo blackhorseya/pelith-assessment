@@ -15,6 +15,9 @@ import (
 	"go.uber.org/zap"
 )
 
+// Constant for the USDC token address
+const usdcAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+
 // ListTransactionCondition is the condition for list transaction.
 type ListTransactionCondition struct {
 	PoolAddress string
@@ -71,9 +74,6 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 		ctx.Error("failed to fetch transactions", zap.Error(err))
 		return 0, fmt.Errorf("failed to fetch transactions: %w", err)
 	}
-
-	// Constant for the USDC token address
-	const usdcAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 
 	// Compute the total amount of USDC swapped
 	totalAmount, err := calculateTotalUSDC(ctx, transactions, usdcAddress)
