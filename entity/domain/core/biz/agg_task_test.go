@@ -125,7 +125,7 @@ func TestTask_CalculateProgress(t1 *testing.T) {
 		poolID    string
 	}
 	type args struct {
-		amount float64
+		amount int64
 	}
 	tests := []struct {
 		name   string
@@ -142,7 +142,7 @@ func TestTask_CalculateProgress(t1 *testing.T) {
 				poolID:    "pool-123",
 			},
 			args: args{
-				amount: 50.0,
+				amount: 50,
 			},
 			want: 50, // Progress is partial
 		},
@@ -155,7 +155,7 @@ func TestTask_CalculateProgress(t1 *testing.T) {
 				poolID:    "pool-123",
 			},
 			args: args{
-				amount: 100.0,
+				amount: 100,
 			},
 			want: 100, // Progress is 100% complete
 		},
@@ -168,7 +168,7 @@ func TestTask_CalculateProgress(t1 *testing.T) {
 				poolID:    "pool-123",
 			},
 			args: args{
-				amount: 150.0,
+				amount: 150,
 			},
 			want: 100, // Progress is capped at 100%
 		},
@@ -181,7 +181,7 @@ func TestTask_CalculateProgress(t1 *testing.T) {
 				poolID:    "pool-123",
 			},
 			args: args{
-				amount: 0.0,
+				amount: 0,
 			},
 			want: 0, // No progress made
 		},

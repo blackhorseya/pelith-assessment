@@ -4,18 +4,19 @@ package query
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"go.uber.org/zap"
 )
 
 // ListTransactionCondition is the condition for list transaction.
 type ListTransactionCondition struct {
-	StartTime time.Time
-	EndTime   time.Time
+	PoolAddress string
+	StartTime   time.Time
+	EndTime     time.Time
 }
 
 // TransactionGetter is used to get the transaction.
@@ -42,7 +43,7 @@ func NewTransactionQueryService(txGetter TransactionGetter, campaignGetter Campa
 }
 
 // GetTotalSwapAmount is used to get the total swap amount.
-func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address, campaignID string) (float64, error) {
+func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address, campaignID string) (int64, error) {
 	ctx := contextx.WithContext(c)
 
 	// 從 CampaignGetter 查詢 campaign
@@ -52,10 +53,16 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 		return 0, err
 	}
 
+	if len(campaign.Tasks) == 0 {
+		ctx.Warn("no tasks in campaign", zap.String("campaign_id", campaignID))
+		return 0, nil
+	}
+
 	// 從 TransactionGetter 查詢交易數據
 	transactions, _, err := s.txGetter.ListByAddress(ctx, address, ListTransactionCondition{
-		StartTime: campaign.StartTime.AsTime(),
-		EndTime:   campaign.EndTime.AsTime(),
+		PoolAddress: campaign.Tasks[0].Criteria.PoolId,
+		StartTime:   campaign.StartTime.AsTime(),
+		EndTime:     campaign.EndTime.AsTime(),
 	})
 	if err != nil {
 		ctx.Error("failed to fetch transactions", zap.Error(err))
@@ -63,12 +70,11 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 	}
 
 	// 計算總數量
-	var totalAmount float64
+	const usdcAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+	var totalAmount int64
 	for _, tx := range transactions {
-		for _, task := range campaign.Tasks {
-			if strings.EqualFold(task.Criteria.PoolId, tx.ToAddress) {
-				totalAmount += float64(tx.Amount)
-			}
+		if tx.Type == model.TransactionType_TRANSACTION_TYPE_SWAP {
+			ctx.Debug("swap transaction", zap.Any("tx", &tx))
 		}
 	}
 
