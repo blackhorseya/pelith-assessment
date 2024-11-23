@@ -213,7 +213,7 @@ enum TransactionType {
 }
 
 // Swap transaction details
-message SwapDetails {
+message SwapDetail {
   // Address of the token being swapped from
   string from_token_address = 1;
 
@@ -221,10 +221,10 @@ message SwapDetails {
   string to_token_address = 2;
 
   // Amount of the from_token being swapped
-  double from_token_amount = 3;
+  string from_token_amount = 3;
 
   // Amount of the to_token received
-  double to_token_amount = 4;
+  string to_token_amount = 4;
 
   // Optional: Address of the liquidity pool used for the swap
   string pool_address = 5;
@@ -269,7 +269,7 @@ message Transaction {
   TransactionType type = 9;
 
   // Swap details for swap transactions
-  optional SwapDetails swap_details = 10;
+  repeated SwapDetail swap_details = 10;
 }
 
 // Enum for transaction status

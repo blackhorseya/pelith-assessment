@@ -42,11 +42,11 @@ func NewTask(
 
 // CalculateProgress calculates the progress of a task based on the given amount.
 func (t *Task) CalculateProgress(amount float64) int {
-	if t.Criteria == nil {
+	if t.Criteria == nil || t.Criteria.MinTransactionAmount == 0 {
 		return 0
 	}
 
-	progress := int(amount / t.Criteria.MinTransactionAmount * 100)
+	progress := int((amount / t.Criteria.MinTransactionAmount) * 100)
 	if progress > 100 {
 		progress = 100
 	}
