@@ -2,7 +2,6 @@ package etherscan
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -153,8 +152,105 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	contractAddress string,
 	cond query.GetLogsCondition,
 ) (item biz.TransactionList, total int, err error) {
-	// TODO: 2024/11/24|sean|实现获取合约日志的逻辑
-	return nil, 0, errors.New("implement me, get logs by address from etherscan")
+	ctx := contextx.WithContext(c)
+
+	// 获取区块范围
+	startBlock, err := i.etherscanAPI.BlockNumber(cond.StartTime.Unix(), "after")
+	if err != nil {
+		ctx.Error("failed to fetch start block", zap.Error(err), zap.Time("start_time", cond.StartTime))
+		return nil, 0, err
+	}
+
+	if cond.EndTime.After(time.Now()) {
+		cond.EndTime = time.Now()
+	}
+	endBlock, err := i.etherscanAPI.BlockNumber(cond.EndTime.Unix(), "before")
+	if err != nil {
+		ctx.Error("failed to fetch end block", zap.Error(err), zap.Time("end_time", cond.EndTime))
+		return nil, 0, err
+	}
+
+	parsedABI, err := i.getABI(contractAddress)
+	if err != nil {
+		ctx.Error(
+			"failed to fetch contract ABI",
+			zap.Error(err),
+			zap.String("contract_address", contractAddress),
+		)
+		return nil, 0, err
+	}
+	swapEventHash := parsedABI.Events["Swap"].ID
+
+	logs, err := i.etherscanAPI.GetLogs(startBlock, endBlock, contractAddress, swapEventHash.Hex())
+	if err != nil {
+		ctx.Error("failed to fetch logs", zap.Error(err))
+		return nil, 0, err
+	}
+
+	for _, logEntry := range logs {
+		txHash := common.HexToHash(logEntry.TransactionHash)
+		tx, _, err2 := i.ethclientAPI.TransactionByHash(ctx, txHash)
+		if err2 != nil {
+			ctx.Error(
+				"failed to fetch transaction",
+				zap.Error(err2),
+				zap.String("tx_hash", logEntry.TransactionHash),
+			)
+			return nil, 0, err2
+		}
+
+		receipt, err2 := i.ethclientAPI.TransactionReceipt(ctx, txHash)
+		if err2 != nil {
+			ctx.Error(
+				"failed to fetch transaction receipt",
+				zap.Error(err2),
+				zap.String("tx_hash", logEntry.TransactionHash),
+			)
+			return nil, 0, err2
+		}
+
+		swapDetail, err2 := i.decodeSwapLogs(receipt.Logs, swapEventHash)
+		if err2 != nil {
+			ctx.Warn("failed to decode swap logs", zap.Error(err2), zap.String("tx_hash", logEntry.TransactionHash))
+			swapDetail = nil
+		}
+
+		txType := model.TransactionType_TRANSACTION_TYPE_UNSPECIFIED
+		if swapDetail != nil {
+			txType = model.TransactionType_TRANSACTION_TYPE_SWAP
+		}
+
+		chainID, err2 := i.ethclientAPI.NetworkID(ctx)
+		if err2 != nil {
+			ctx.Error("failed to fetch network ID", zap.Error(err2))
+			return nil, 0, err2
+		}
+
+		signer := types.LatestSignerForChainID(chainID)
+		from, err2 := types.Sender(signer, tx)
+		if err2 != nil {
+			ctx.Error("failed to fetch sender", zap.Error(err2))
+			return nil, 0, err2
+		}
+
+		// 构造 Transaction 实例
+		item = append(item, &biz.Transaction{
+			Transaction: model.Transaction{
+				TxHash:      tx.Hash().Hex(),
+				FromAddress: from.Hex(),
+				ToAddress:   tx.To().Hex(),
+				Amount:      tx.Value().Int64(),
+				Timestamp:   timestamppb.New(tx.Time()),
+				TaskId:      "",
+				CampaignId:  "",
+				Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
+				Type:        txType,
+				SwapDetails: []*model.SwapDetail{swapDetail},
+			},
+		})
+	}
+
+	return item, len(item), nil
 }
 
 func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {
@@ -163,7 +259,7 @@ func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash co
 	var fromAmountFloat, toAmountFloat *big.Float
 
 	// Iterate over logs to find the first and last valid Swap logs
-	for _, logEntry := range logs {
+	for idx, logEntry := range logs {
 		// Skip logs that don't match the criteria
 		if len(logEntry.Topics) < 3 || logEntry.Topics[0] != swapEventHash {
 			continue
@@ -176,10 +272,10 @@ func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash co
 
 		// Set the first valid log if not already set
 		if firstLog == nil {
-			firstLog = logs[0]
+			firstLog = logs[idx]
 		}
 		// Update the last valid log
-		lastLog = logs[len(logs)-1]
+		lastLog = logs[idx]
 	}
 
 	// Ensure we found at least one valid log
