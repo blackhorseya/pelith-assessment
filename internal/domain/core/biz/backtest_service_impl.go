@@ -41,7 +41,17 @@ func (i *backtestServiceImpl) RunBacktest(
 
 	// TODO: 2024/11/24|sean|process the transaction list
 	for _, tx := range transactionList {
-		ctx.Debug("processing transaction", zap.Any("tx", &tx))
+		if tx.IsSwapExecuted() {
+			event, err2 := campaign.OnSwapExecuted(tx)
+			if err2 != nil {
+				ctx.Error("failed to handle swap executed event", zap.Error(err2))
+				continue
+			}
+
+			if event != nil {
+				ctx.Debug("reward event", zap.Any("event", &event))
+			}
+		}
 	}
 
 	return nil
