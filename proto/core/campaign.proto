@@ -56,9 +56,13 @@ message AddTasksForCampaignRequest {
 // AddTasksForCampaignResponse is the response for add tasks for campaign
 message AddTasksForCampaignResponse {}
 
+// ListCampaignsRequest is the request for list campaigns
+message ListCampaignsRequest {}
+
 // CampaignService is the service for campaign
 service CampaignService {
   rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse) {}
   rpc StartCampaign(StartCampaignRequest) returns (StartCampaignResponse) {}
   rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse) {}
+  rpc ListCampaigns(ListCampaignsRequest) returns (stream GetCampaignResponse) {}
 }

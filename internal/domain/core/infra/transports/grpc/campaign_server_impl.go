@@ -7,6 +7,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/proto/core"
+	"google.golang.org/grpc"
 )
 
 type campaignServerImpl struct {
@@ -87,4 +88,12 @@ func (i *campaignServerImpl) GetCampaign(
 		Campaign: &campaign.Campaign,
 		Tasks:    tasks,
 	}, nil
+}
+
+func (i *campaignServerImpl) ListCampaigns(
+	req *core.ListCampaignsRequest,
+	stream grpc.ServerStreamingServer[core.GetCampaignResponse],
+) error {
+	// TODO: 2024/11/24|sean|implement me
+	panic("implement me")
 }

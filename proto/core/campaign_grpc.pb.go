@@ -22,6 +22,7 @@ const (
 	CampaignService_CreateCampaign_FullMethodName = "/core.CampaignService/CreateCampaign"
 	CampaignService_StartCampaign_FullMethodName  = "/core.CampaignService/StartCampaign"
 	CampaignService_GetCampaign_FullMethodName    = "/core.CampaignService/GetCampaign"
+	CampaignService_ListCampaigns_FullMethodName  = "/core.CampaignService/ListCampaigns"
 )
 
 // CampaignServiceClient is the client API for CampaignService service.
@@ -33,6 +34,7 @@ type CampaignServiceClient interface {
 	CreateCampaign(ctx context.Context, in *CreateCampaignRequest, opts ...grpc.CallOption) (*CreateCampaignResponse, error)
 	StartCampaign(ctx context.Context, in *StartCampaignRequest, opts ...grpc.CallOption) (*StartCampaignResponse, error)
 	GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error)
+	ListCampaigns(ctx context.Context, in *ListCampaignsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetCampaignResponse], error)
 }
 
 type campaignServiceClient struct {
@@ -73,6 +75,25 @@ func (c *campaignServiceClient) GetCampaign(ctx context.Context, in *GetCampaign
 	return out, nil
 }
 
+func (c *campaignServiceClient) ListCampaigns(ctx context.Context, in *ListCampaignsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetCampaignResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &CampaignService_ServiceDesc.Streams[0], CampaignService_ListCampaigns_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ListCampaignsRequest, GetCampaignResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CampaignService_ListCampaignsClient = grpc.ServerStreamingClient[GetCampaignResponse]
+
 // CampaignServiceServer is the server API for CampaignService service.
 // All implementations should embed UnimplementedCampaignServiceServer
 // for forward compatibility.
@@ -82,6 +103,7 @@ type CampaignServiceServer interface {
 	CreateCampaign(context.Context, *CreateCampaignRequest) (*CreateCampaignResponse, error)
 	StartCampaign(context.Context, *StartCampaignRequest) (*StartCampaignResponse, error)
 	GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error)
+	ListCampaigns(*ListCampaignsRequest, grpc.ServerStreamingServer[GetCampaignResponse]) error
 }
 
 // UnimplementedCampaignServiceServer should be embedded to have
@@ -99,6 +121,9 @@ func (UnimplementedCampaignServiceServer) StartCampaign(context.Context, *StartC
 }
 func (UnimplementedCampaignServiceServer) GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCampaign not implemented")
+}
+func (UnimplementedCampaignServiceServer) ListCampaigns(*ListCampaignsRequest, grpc.ServerStreamingServer[GetCampaignResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method ListCampaigns not implemented")
 }
 func (UnimplementedCampaignServiceServer) testEmbeddedByValue() {}
 
@@ -174,6 +199,17 @@ func _CampaignService_GetCampaign_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CampaignService_ListCampaigns_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ListCampaignsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CampaignServiceServer).ListCampaigns(m, &grpc.GenericServerStream[ListCampaignsRequest, GetCampaignResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CampaignService_ListCampaignsServer = grpc.ServerStreamingServer[GetCampaignResponse]
+
 // CampaignService_ServiceDesc is the grpc.ServiceDesc for CampaignService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -194,6 +230,12 @@ var CampaignService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CampaignService_GetCampaign_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ListCampaigns",
+			Handler:       _CampaignService_ListCampaigns_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "proto/core/campaign.proto",
 }
