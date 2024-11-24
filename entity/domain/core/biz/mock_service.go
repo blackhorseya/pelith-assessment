@@ -80,18 +80,18 @@ func (m *MockCampaignService) EXPECT() *MockCampaignServiceMockRecorder {
 }
 
 // CreateCampaign mocks base method.
-func (m *MockCampaignService) CreateCampaign(c context.Context, name string, startAt time.Time) (*Campaign, error) {
+func (m *MockCampaignService) CreateCampaign(c context.Context, name string, startAt time.Time, mode model.CampaignMode, targetPool string, minAmount float64) (*Campaign, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateCampaign", c, name, startAt)
+	ret := m.ctrl.Call(m, "CreateCampaign", c, name, startAt, mode, targetPool, minAmount)
 	ret0, _ := ret[0].(*Campaign)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CreateCampaign indicates an expected call of CreateCampaign.
-func (mr *MockCampaignServiceMockRecorder) CreateCampaign(c, name, startAt any) *gomock.Call {
+func (mr *MockCampaignServiceMockRecorder) CreateCampaign(c, name, startAt, mode, targetPool, minAmount any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCampaign", reflect.TypeOf((*MockCampaignService)(nil).CreateCampaign), c, name, startAt)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCampaign", reflect.TypeOf((*MockCampaignService)(nil).CreateCampaign), c, name, startAt, mode, targetPool, minAmount)
 }
 
 // StartCampaign mocks base method.

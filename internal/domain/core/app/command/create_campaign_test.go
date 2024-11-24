@@ -65,7 +65,14 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
-				s.service.EXPECT().CreateCampaign(gomock.Any(), "test", gomock.Any()).
+				s.service.EXPECT().CreateCampaign(
+					gomock.Any(),
+					"test",
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+				).
 					Return(nil, errors.New("mock error")).
 					Times(1)
 			}},
@@ -77,7 +84,14 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
-				s.service.EXPECT().CreateCampaign(gomock.Any(), "test", gomock.Any()).
+				s.service.EXPECT().CreateCampaign(
+					gomock.Any(),
+					"test",
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+				).
 					Return(&biz.Campaign{}, nil).
 					Times(1)
 				s.repo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(errors.New("mock error")).Times(1)
@@ -90,7 +104,14 @@ func (s *suiteCampaignCommandTester) TestCreateCampaignHandler_Handle() {
 				Name:      "test",
 				StartTime: time.Now(),
 			}, mock: func() {
-				s.service.EXPECT().CreateCampaign(gomock.Any(), "test", gomock.Any()).
+				s.service.EXPECT().CreateCampaign(
+					gomock.Any(),
+					"test",
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+					gomock.Any(),
+				).
 					Return(&biz.Campaign{}, nil).
 					Times(1)
 				s.repo.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil).Times(1)
