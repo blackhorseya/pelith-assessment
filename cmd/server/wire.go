@@ -48,6 +48,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		// app layer
 		command.NewCreateCampaignHandler,
 		command.NewAddTaskHandler,
+		command.NewStartCampaignHandler,
 		query.NewTaskQueryService,
 		query.NewTransactionQueryService,
 

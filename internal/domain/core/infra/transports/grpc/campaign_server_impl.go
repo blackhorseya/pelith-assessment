@@ -15,6 +15,7 @@ import (
 type campaignServerImpl struct {
 	createCampaignHandler *command.CreateCampaignHandler
 	addTaskHandler        *command.AddTaskHandler
+	startCampaignHandler  *command.StartCampaignHandler
 
 	campaignGetter query.CampaignGetter
 }
@@ -23,11 +24,13 @@ type campaignServerImpl struct {
 func NewCampaignServer(
 	createCampaignHandler *command.CreateCampaignHandler,
 	addTaskHandler *command.AddTaskHandler,
+	startCampaignHandler *command.StartCampaignHandler,
 	campaignGetter query.CampaignGetter,
 ) core.CampaignServiceServer {
 	return &campaignServerImpl{
 		createCampaignHandler: createCampaignHandler,
 		addTaskHandler:        addTaskHandler,
+		startCampaignHandler:  startCampaignHandler,
 		campaignGetter:        campaignGetter,
 	}
 }
@@ -56,8 +59,16 @@ func (i *campaignServerImpl) StartCampaign(
 	c context.Context,
 	req *core.StartCampaignRequest,
 ) (*core.StartCampaignResponse, error) {
-	// TODO: 2024/11/24|sean|implement me
-	panic("implement me")
+	id, err := i.startCampaignHandler.Handle(c, command.StartCampaignCommand{
+		ID: req.Id,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &core.StartCampaignResponse{
+		Id: id,
+	}, nil
 }
 
 func (i *campaignServerImpl) GetCampaign(
