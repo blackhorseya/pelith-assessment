@@ -9,7 +9,10 @@ import (
 )
 
 func migrateUp(db *sqlx.DB, name string) error {
-	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	driver, err := postgres.WithInstance(db.DB, &postgres.Config{
+		MigrationsTable:       name + "_migrations",
+		MultiStatementEnabled: true,
+	})
 	if err != nil {
 		return err
 	}
