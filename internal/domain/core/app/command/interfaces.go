@@ -52,3 +52,11 @@ type (
 		IncrementPoints(c context.Context, userID string, points int64) error
 	}
 )
+
+type (
+	// TransactionCreator is used to create a new transaction.
+	TransactionCreator interface {
+		// Create is used to create a new transaction.
+		Create(c context.Context, transaction *biz.Transaction) error
+	}
+)

@@ -253,3 +253,40 @@ func (mr *MockUserUpdaterMockRecorder) Update(c, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserUpdater)(nil).Update), c, user)
 }
+
+// MockTransactionCreator is a mock of TransactionCreator interface.
+type MockTransactionCreator struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionCreatorMockRecorder
+}
+
+// MockTransactionCreatorMockRecorder is the mock recorder for MockTransactionCreator.
+type MockTransactionCreatorMockRecorder struct {
+	mock *MockTransactionCreator
+}
+
+// NewMockTransactionCreator creates a new mock instance.
+func NewMockTransactionCreator(ctrl *gomock.Controller) *MockTransactionCreator {
+	mock := &MockTransactionCreator{ctrl: ctrl}
+	mock.recorder = &MockTransactionCreatorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransactionCreator) EXPECT() *MockTransactionCreatorMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockTransactionCreator) Create(c context.Context, transaction *biz.Transaction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", c, transaction)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockTransactionCreatorMockRecorder) Create(c, transaction any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockTransactionCreator)(nil).Create), c, transaction)
+}
