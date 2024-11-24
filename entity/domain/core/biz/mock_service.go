@@ -95,18 +95,17 @@ func (mr *MockCampaignServiceMockRecorder) CreateCampaign(c, name, startAt, mode
 }
 
 // StartCampaign mocks base method.
-func (m *MockCampaignService) StartCampaign(c context.Context, name string, startAt time.Time, tasks []*Task) (*Campaign, error) {
+func (m *MockCampaignService) StartCampaign(c context.Context, campaign *Campaign) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StartCampaign", c, name, startAt, tasks)
-	ret0, _ := ret[0].(*Campaign)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "StartCampaign", c, campaign)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // StartCampaign indicates an expected call of StartCampaign.
-func (mr *MockCampaignServiceMockRecorder) StartCampaign(c, name, startAt, tasks any) *gomock.Call {
+func (mr *MockCampaignServiceMockRecorder) StartCampaign(c, campaign any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartCampaign", reflect.TypeOf((*MockCampaignService)(nil).StartCampaign), c, name, startAt, tasks)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartCampaign", reflect.TypeOf((*MockCampaignService)(nil).StartCampaign), c, campaign)
 }
 
 // MockRewardService is a mock of RewardService interface.
