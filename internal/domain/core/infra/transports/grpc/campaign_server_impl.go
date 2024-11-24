@@ -88,29 +88,3 @@ func (i *campaignServerImpl) GetCampaign(
 		Tasks:    tasks,
 	}, nil
 }
-
-func (i *campaignServerImpl) AddTasksForCampaign(
-	c context.Context,
-	req *core.AddTasksForCampaignRequest,
-) (*core.AddTasksForCampaignResponse, error) {
-	tasks := make([]command.TaskCommand, 0, len(req.Tasks))
-	for _, task := range req.Tasks {
-		tasks = append(tasks, command.TaskCommand{
-			Name:        task.Name,
-			Description: task.Description,
-			Type:        int32(task.Type),
-			MinAmount:   task.Criteria.MinTransactionAmount,
-			PoolID:      task.Criteria.PoolId,
-		})
-	}
-
-	_, err := i.addTaskHandler.Handle(c, command.AddTaskCommand{
-		CampaignID: req.CampaignId,
-		Tasks:      tasks,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &core.AddTasksForCampaignResponse{}, nil
-}

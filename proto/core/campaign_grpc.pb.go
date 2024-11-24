@@ -19,10 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CampaignService_CreateCampaign_FullMethodName      = "/core.CampaignService/CreateCampaign"
-	CampaignService_StartCampaign_FullMethodName       = "/core.CampaignService/StartCampaign"
-	CampaignService_GetCampaign_FullMethodName         = "/core.CampaignService/GetCampaign"
-	CampaignService_AddTasksForCampaign_FullMethodName = "/core.CampaignService/AddTasksForCampaign"
+	CampaignService_CreateCampaign_FullMethodName = "/core.CampaignService/CreateCampaign"
+	CampaignService_StartCampaign_FullMethodName  = "/core.CampaignService/StartCampaign"
+	CampaignService_GetCampaign_FullMethodName    = "/core.CampaignService/GetCampaign"
 )
 
 // CampaignServiceClient is the client API for CampaignService service.
@@ -34,7 +33,6 @@ type CampaignServiceClient interface {
 	CreateCampaign(ctx context.Context, in *CreateCampaignRequest, opts ...grpc.CallOption) (*CreateCampaignResponse, error)
 	StartCampaign(ctx context.Context, in *StartCampaignRequest, opts ...grpc.CallOption) (*StartCampaignResponse, error)
 	GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error)
-	AddTasksForCampaign(ctx context.Context, in *AddTasksForCampaignRequest, opts ...grpc.CallOption) (*AddTasksForCampaignResponse, error)
 }
 
 type campaignServiceClient struct {
@@ -75,16 +73,6 @@ func (c *campaignServiceClient) GetCampaign(ctx context.Context, in *GetCampaign
 	return out, nil
 }
 
-func (c *campaignServiceClient) AddTasksForCampaign(ctx context.Context, in *AddTasksForCampaignRequest, opts ...grpc.CallOption) (*AddTasksForCampaignResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddTasksForCampaignResponse)
-	err := c.cc.Invoke(ctx, CampaignService_AddTasksForCampaign_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // CampaignServiceServer is the server API for CampaignService service.
 // All implementations should embed UnimplementedCampaignServiceServer
 // for forward compatibility.
@@ -94,7 +82,6 @@ type CampaignServiceServer interface {
 	CreateCampaign(context.Context, *CreateCampaignRequest) (*CreateCampaignResponse, error)
 	StartCampaign(context.Context, *StartCampaignRequest) (*StartCampaignResponse, error)
 	GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error)
-	AddTasksForCampaign(context.Context, *AddTasksForCampaignRequest) (*AddTasksForCampaignResponse, error)
 }
 
 // UnimplementedCampaignServiceServer should be embedded to have
@@ -112,9 +99,6 @@ func (UnimplementedCampaignServiceServer) StartCampaign(context.Context, *StartC
 }
 func (UnimplementedCampaignServiceServer) GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCampaign not implemented")
-}
-func (UnimplementedCampaignServiceServer) AddTasksForCampaign(context.Context, *AddTasksForCampaignRequest) (*AddTasksForCampaignResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddTasksForCampaign not implemented")
 }
 func (UnimplementedCampaignServiceServer) testEmbeddedByValue() {}
 
@@ -190,24 +174,6 @@ func _CampaignService_GetCampaign_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CampaignService_AddTasksForCampaign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddTasksForCampaignRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(CampaignServiceServer).AddTasksForCampaign(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: CampaignService_AddTasksForCampaign_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CampaignServiceServer).AddTasksForCampaign(ctx, req.(*AddTasksForCampaignRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // CampaignService_ServiceDesc is the grpc.ServiceDesc for CampaignService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -226,10 +192,6 @@ var CampaignService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCampaign",
 			Handler:    _CampaignService_GetCampaign_Handler,
-		},
-		{
-			MethodName: "AddTasksForCampaign",
-			Handler:    _CampaignService_AddTasksForCampaign_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

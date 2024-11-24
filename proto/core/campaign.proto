@@ -61,5 +61,4 @@ service CampaignService {
   rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse) {}
   rpc StartCampaign(StartCampaignRequest) returns (StartCampaignResponse) {}
   rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse) {}
-  rpc AddTasksForCampaign(AddTasksForCampaignRequest) returns (AddTasksForCampaignResponse) {}
 }
