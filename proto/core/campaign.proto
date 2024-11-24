@@ -23,12 +23,7 @@ message CreateCampaignResponse {
 
 // StartCampaignRequest is the request for start campaign
 message StartCampaignRequest {
-  string name = 1;
-  string description = 2;
-  google.protobuf.Timestamp start_time = 3;
-  entity.domain.core.model.CampaignMode mode = 4;
-  string target_pool = 5;
-  double min_amount = 6;
+  string id = 1;
 }
 
 // StartCampaignResponse is the response for start campaign

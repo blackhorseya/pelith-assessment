@@ -54,20 +54,8 @@ func (i *campaignServerImpl) StartCampaign(
 	c context.Context,
 	req *core.StartCampaignRequest,
 ) (*core.StartCampaignResponse, error) {
-	id, err := i.createCampaignHandler.Handle(c, command.CreateCampaignCommand{
-		Name:       req.Name,
-		StartTime:  req.StartTime.AsTime(),
-		Mode:       req.Mode,
-		TargetPool: req.TargetPool,
-		MinAmount:  req.MinAmount,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &core.StartCampaignResponse{
-		Id: id,
-	}, nil
+	// TODO: 2024/11/24|sean|implement me
+	panic("implement me")
 }
 
 func (i *campaignServerImpl) GetCampaign(
