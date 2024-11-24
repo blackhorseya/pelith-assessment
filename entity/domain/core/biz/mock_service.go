@@ -79,6 +79,21 @@ func (m *MockCampaignService) EXPECT() *MockCampaignServiceMockRecorder {
 	return m.recorder
 }
 
+// CreateCampaign mocks base method.
+func (m *MockCampaignService) CreateCampaign(c context.Context, name string, startAt time.Time) (*Campaign, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCampaign", c, name, startAt)
+	ret0, _ := ret[0].(*Campaign)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateCampaign indicates an expected call of CreateCampaign.
+func (mr *MockCampaignServiceMockRecorder) CreateCampaign(c, name, startAt any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCampaign", reflect.TypeOf((*MockCampaignService)(nil).CreateCampaign), c, name, startAt)
+}
+
 // StartCampaign mocks base method.
 func (m *MockCampaignService) StartCampaign(c context.Context, name string, startAt time.Time, tasks []*Task) (*Campaign, error) {
 	m.ctrl.T.Helper()

@@ -17,6 +17,11 @@ func NewCampaignService() biz.CampaignService {
 	return &campaignServiceImpl{}
 }
 
+func (i *campaignServiceImpl) CreateCampaign(c context.Context, name string, startAt time.Time) (*biz.Campaign, error) {
+	// TODO: 2024/11/24|sean|implement me
+	panic("implement me")
+}
+
 func (i *campaignServiceImpl) StartCampaign(
 	c context.Context,
 	name string,

@@ -20,6 +20,11 @@ func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
 	if name == "" {
 		return nil, errors.New("name cannot be empty")
 	}
+
+	if startAt.IsZero() {
+		return nil, errors.New("start time cannot be empty")
+	}
+
 	return &Campaign{
 		Campaign: model.Campaign{
 			Id:          "",

@@ -7,8 +7,9 @@ import (
 
 // CreateCampaignCommand represents the input data to create a campaign.
 type CreateCampaignCommand struct {
-	Name      string    `json:"name"`
-	StartTime time.Time `json:"start_time"`
+	Name      string         `json:"name"`
+	StartTime time.Time      `json:"start_time"`
+	Tasks     []*TaskCommand `json:"tasks"`
 }
 
 func (cmd CreateCampaignCommand) Key() int {

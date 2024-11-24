@@ -40,6 +40,16 @@ func NewTask(
 	}, nil
 }
 
+// NewTaskOfOnboarding creates a new Task aggregate for onboarding.
+func NewTaskOfOnboarding(name, description string, minAmount float64, poolID string) (*Task, error) {
+	return NewTask(name, description, model.TaskType_TASK_TYPE_ONBOARDING, minAmount, poolID)
+}
+
+// NewTaskOfSharePool creates a new Task aggregate for sharing a pool.
+func NewTaskOfSharePool(name, description string, poolID string) (*Task, error) {
+	return NewTask(name, description, model.TaskType_TASK_TYPE_SHARE_POOL, 0, poolID)
+}
+
 // CalculateProgress calculates the progress of a task based on the given amount.
 func (t *Task) CalculateProgress(amount float64) int {
 	if t.Criteria == nil || t.Criteria.MinTransactionAmount == 0 {
