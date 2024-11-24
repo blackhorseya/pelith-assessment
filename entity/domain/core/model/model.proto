@@ -101,6 +101,9 @@ message Campaign {
   // Campaign status
   // @gotags: db:"status"
   CampaignStatus status = 8;
+
+  // Pool ID (if applicable)
+  string pool_id = 9;
 }
 
 // Enum for campaign modes

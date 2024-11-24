@@ -76,7 +76,7 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 
 	// Fetch transactions for the specified address and campaign's criteria
 	transactions, _, err := s.txGetter.ListByAddress(ctx, address, ListTransactionCondition{
-		PoolAddress: campaign.Tasks()[0].Criteria.PoolId,
+		PoolAddress: campaign.PoolId,
 		StartTime:   campaign.StartTime.AsTime(),
 		EndTime:     campaign.EndTime.AsTime(),
 	})

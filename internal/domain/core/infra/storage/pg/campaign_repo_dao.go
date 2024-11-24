@@ -18,11 +18,12 @@ type CampaignDAO struct {
 	EndTime     time.Time `db:"end_time"`
 	Mode        int32     `db:"mode"`
 	Status      int32     `db:"status"`
+	PoolID      string    `db:"pool_id"`
 }
 
 // ToBizModel 將 DAO 轉換為 biz.Campaign
 func (dao *CampaignDAO) ToBizModel(tasks []*biz.Task) *biz.Campaign {
-	campaign, _ := biz.NewCampaign(dao.Name, dao.StartTime)
+	campaign, _ := biz.NewCampaign(dao.Name, dao.StartTime, dao.PoolID)
 	campaign.Id = dao.ID
 	campaign.Description = dao.Description
 	campaign.EndTime = timestamppb.New(dao.EndTime)
@@ -45,6 +46,7 @@ func FromBizModelToDAO(campaign *biz.Campaign) *CampaignDAO {
 		EndTime:     campaign.EndTime.AsTime(),
 		Mode:        int32(campaign.Mode),
 		Status:      int32(campaign.Status),
+		PoolID:      campaign.PoolId,
 	}
 }
 

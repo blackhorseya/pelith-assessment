@@ -153,7 +153,7 @@ func TestNewCampaign(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := NewCampaign(tt.args, tt.startAt)
+			_, err := NewCampaign(tt.args, tt.startAt, "")
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewCampaign() error = %v, wantErr %v", err, tt.wantErr)
 			}

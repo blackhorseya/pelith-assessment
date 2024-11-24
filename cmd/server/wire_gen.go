@@ -73,7 +73,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	taskService := biz.NewTaskService()
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
 	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
-	backtestService := biz.NewBacktestService()
+	backtestService := biz.NewBacktestService(transactionGetter)
 	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, backtestService)
 	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, addTaskHandler, startCampaignHandler, campaignGetter)
 	initServers := grpc.NewInitServersFn(campaignServiceServer)

@@ -28,12 +28,13 @@ func (i *campaignServiceImpl) CreateCampaign(
 ) (*biz.Campaign, error) {
 	ctx := contextx.WithContext(c)
 
-	campaign, err := biz.NewCampaign(name, startAt)
+	campaign, err := biz.NewCampaign(name, startAt, targetPool)
 	if err != nil {
 		ctx.Error("failed to create campaign", zap.Error(err))
 		return nil, err
 	}
 	campaign.Mode = mode
+	campaign.PoolId = targetPool
 
 	taskOfOnboarding, err := biz.NewTaskOfOnboarding("onboarding", "", minAmount, targetPool)
 	if err != nil {

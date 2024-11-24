@@ -17,7 +17,7 @@ type Campaign struct {
 }
 
 // NewCampaign creates a new Campaign aggregate.
-func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
+func NewCampaign(name string, startAt time.Time, poolID string) (*Campaign, error) {
 	if name == "" {
 		return nil, errors.New("name cannot be empty")
 	}
@@ -33,8 +33,10 @@ func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
 			Description: "",
 			StartTime:   timestamppb.New(startAt),
 			EndTime:     timestamppb.New(startAt.Add(4 * 7 * 24 * time.Hour)),
-			Status:      model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
+			Tasks:       nil,
 			Mode:        model.CampaignMode_CAMPAIGN_MODE_BACKTEST,
+			Status:      model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
+			PoolId:      poolID,
 		},
 		report: new(model.BacktestReport),
 	}, nil
