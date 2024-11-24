@@ -176,6 +176,82 @@ func (i *CampaignRepoImpl) List(
 	c context.Context,
 	cond query.ListCampaignCondition,
 ) (items []*biz.Campaign, total int, err error) {
-	// TODO: 2024/11/21|sean|implement me
-	panic("implement me")
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
+	defer cancelFunc()
+
+	// Query to count total campaigns
+	countQuery := `
+		SELECT COUNT(*) 
+		FROM campaigns
+		WHERE ($1::text IS NULL OR name ILIKE '%' || $1 || '%') 
+		AND ($2::text IS NULL OR status = $2)
+	`
+	err = i.rw.GetContext(timeout, &total, countQuery, cond.Name, cond.Status)
+	if err != nil {
+		ctx.Error("failed to count campaigns", zap.Error(err))
+		return nil, 0, err
+	}
+
+	if total == 0 {
+		// No campaigns to return
+		return []*biz.Campaign{}, 0, nil
+	}
+
+	// Query to fetch campaigns
+	campaignQuery := `
+		SELECT id, name, description, start_time, end_time, mode, status
+		FROM campaigns
+		WHERE ($1::text IS NULL OR name ILIKE '%' || $1 || '%') 
+		AND ($2::text IS NULL OR status = $2)
+		ORDER BY created_at DESC
+		LIMIT $3 OFFSET $4
+	`
+	var campaignDAOs []CampaignDAO
+	err = i.rw.SelectContext(
+		timeout, &campaignDAOs, campaignQuery, cond.Name, cond.Status, cond.Limit, cond.Offset,
+	)
+	if err != nil {
+		ctx.Error("failed to fetch campaigns", zap.Error(err))
+		return nil, 0, err
+	}
+
+	// Fetch tasks for each campaign
+	items = make([]*biz.Campaign, 0, len(campaignDAOs))
+	for _, campaignDAO := range campaignDAOs {
+		// Query to fetch tasks for the campaign
+		var taskDAOs []TaskDAO
+		taskQuery := `
+			SELECT id, campaign_id, name, description, type, criteria, status
+			FROM tasks
+			WHERE campaign_id = $1
+		`
+		err = i.rw.SelectContext(timeout, &taskDAOs, taskQuery, campaignDAO.ID)
+		if err != nil {
+			ctx.Error(
+				"failed to fetch tasks for campaign",
+				zap.String("campaign_id", campaignDAO.ID),
+				zap.Error(err),
+			)
+			return nil, 0, err
+		}
+
+		// Convert tasks to biz models
+		var tasks []*biz.Task
+		for _, taskDAO := range taskDAOs {
+			task, err2 := taskDAO.ToBizModel()
+			if err2 != nil {
+				ctx.Error("failed to convert task DAO to biz model", zap.Error(err2))
+				return nil, 0, err2
+			}
+			tasks = append(tasks, task)
+		}
+
+		// Convert campaign to biz model and add to list
+		campaign := campaignDAO.ToBizModel(tasks)
+		items = append(items, campaign)
+	}
+
+	return items, total, nil
 }

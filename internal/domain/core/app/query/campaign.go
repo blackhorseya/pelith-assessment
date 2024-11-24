@@ -6,10 +6,15 @@ import (
 	"context"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 )
 
 // ListCampaignCondition is the condition to list the campaign.
 type ListCampaignCondition struct {
+	Name   string
+	Status model.CampaignStatus
+	Limit  int
+	Offset int
 }
 
 // CampaignGetter is the interface that provides the methods to get the campaign.
