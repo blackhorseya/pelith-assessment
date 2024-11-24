@@ -104,6 +104,7 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 	defer taskStmt.Close()
 
 	for _, task := range campaign.Tasks {
+		task.CampaignID = campaignID
 		taskParams, err2 := FromBizTaskToDAO(task)
 		if err2 != nil {
 			ctx.Error("failed to convert task to DAO", zap.Error(err2))
