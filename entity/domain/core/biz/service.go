@@ -44,10 +44,15 @@ type CampaignService interface {
 // RewardService defines the domain logic for rewards and point allocation.
 type RewardService interface {
 	// AllocatePoints calculates and distributes points for a task or campaign.
-	AllocatePoints(c context.Context, taskID string, poolID *string, totalPoints int64) ([]*model.PointAllocation, error)
-
-	// RedeemReward processes a user's reward redemption.
-	RedeemReward(c context.Context, userID string, campaignID string, points int64) (*model.Reward, error)
+	// AllocatePoints(
+	// 	c context.Context,
+	// 	taskID string,
+	// 	poolID *string,
+	// 	totalPoints int64,
+	// ) ([]*model.PointAllocation, error)
+	//
+	// // RedeemReward processes a user's reward redemption.
+	// RedeemReward(c context.Context, userID string, campaignID string, points int64) (*model.Reward, error)
 }
 
 // UserService defines the domain logic for user management.
