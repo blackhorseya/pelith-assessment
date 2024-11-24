@@ -69,14 +69,14 @@ func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
 		return 0, fmt.Errorf("failed to fetch campaign: %w", err)
 	}
 
-	if campaign == nil || len(campaign.Tasks) == 0 {
+	if campaign == nil || len(campaign.Tasks()) == 0 {
 		ctx.Warn("campaign has no tasks", zap.String("campaign_id", campaignID))
 		return 0, nil
 	}
 
 	// Fetch transactions for the specified address and campaign's criteria
 	transactions, _, err := s.txGetter.ListByAddress(ctx, address, ListTransactionCondition{
-		PoolAddress: campaign.Tasks[0].Criteria.PoolId,
+		PoolAddress: campaign.Tasks()[0].Criteria.PoolId,
 		StartTime:   campaign.StartTime.AsTime(),
 		EndTime:     campaign.EndTime.AsTime(),
 	})

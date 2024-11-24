@@ -22,18 +22,17 @@ type CampaignDAO struct {
 
 // ToBizModel 將 DAO 轉換為 biz.Campaign
 func (dao *CampaignDAO) ToBizModel(tasks []*biz.Task) *biz.Campaign {
-	return &biz.Campaign{
-		Campaign: model.Campaign{
-			Id:          dao.ID,
-			Name:        dao.Name,
-			Description: dao.Description,
-			StartTime:   timestamppb.New(dao.StartTime),
-			EndTime:     timestamppb.New(dao.EndTime),
-			Mode:        model.CampaignMode(dao.Mode),
-			Status:      model.CampaignStatus(dao.Status),
-		},
-		Tasks: tasks,
+	campaign, _ := biz.NewCampaign(dao.Name, dao.StartTime)
+	campaign.Id = dao.ID
+	campaign.Description = dao.Description
+	campaign.EndTime = timestamppb.New(dao.EndTime)
+	campaign.Mode = model.CampaignMode(dao.Mode)
+	campaign.Status = model.CampaignStatus(dao.Status)
+	for _, task := range tasks {
+		_ = campaign.AddTask(task)
 	}
+
+	return campaign
 }
 
 // FromBizModelToDAO 將 biz.Campaign 轉換為 DAO

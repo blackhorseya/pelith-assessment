@@ -33,7 +33,6 @@ func Test_taskServiceImpl_CreateTask(t1 *testing.T) {
 					Campaign: model.Campaign{
 						Status: model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 					},
-					Tasks: []*biz.Task{},
 				},
 				name:        "Onboarding Task",
 				description: "Description for onboarding task",
@@ -60,7 +59,6 @@ func Test_taskServiceImpl_CreateTask(t1 *testing.T) {
 					Campaign: model.Campaign{
 						Status: model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 					},
-					Tasks: []*biz.Task{},
 				},
 				name:        "Share Pool Task",
 				description: "Description for share pool task",
@@ -90,7 +88,6 @@ func Test_taskServiceImpl_CreateTask(t1 *testing.T) {
 					Campaign: model.Campaign{
 						Status: model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 					},
-					Tasks: []*biz.Task{},
 				},
 				name:        "",
 				description: "Description",
@@ -109,7 +106,6 @@ func Test_taskServiceImpl_CreateTask(t1 *testing.T) {
 					Campaign: model.Campaign{
 						Status: model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE,
 					},
-					Tasks: []*biz.Task{},
 				},
 				name:        "Task on Active Campaign",
 				description: "Description",
