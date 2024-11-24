@@ -13,6 +13,12 @@ type CampaignStrategy interface {
 	Execute(c context.Context, campaign *biz.Campaign) error
 }
 
+type emptyStrategy struct{}
+
+func (s *emptyStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
+	return nil
+}
+
 type backtestStrategy struct{}
 
 func (s *backtestStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
@@ -36,8 +42,9 @@ type StartCampaignHandler struct {
 func NewStartCampaignHandler() *StartCampaignHandler {
 	return &StartCampaignHandler{
 		strategies: map[model.CampaignMode]CampaignStrategy{
-			model.CampaignMode_CAMPAIGN_MODE_BACKTEST:  &backtestStrategy{},
-			model.CampaignMode_CAMPAIGN_MODE_REAL_TIME: &realTimeStrategy{},
+			model.CampaignMode_CAMPAIGN_MODE_UNSPECIFIED: &emptyStrategy{},
+			model.CampaignMode_CAMPAIGN_MODE_BACKTEST:    &backtestStrategy{},
+			model.CampaignMode_CAMPAIGN_MODE_REAL_TIME:   &realTimeStrategy{},
 		},
 	}
 }
