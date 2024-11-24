@@ -36,13 +36,16 @@ func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
 			Status:      model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 			Mode:        model.CampaignMode_CAMPAIGN_MODE_BACKTEST,
 		},
+		report: new(model.BacktestReport),
 	}, nil
 }
 
+// Tasks returns the tasks associated with the campaign.
 func (c *Campaign) Tasks() []*Task {
 	return c.tasks
 }
 
+// Report returns the backtest report for the campaign.
 func (c *Campaign) Report() *model.BacktestReport {
 	return c.report
 }
