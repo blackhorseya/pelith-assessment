@@ -7,8 +7,8 @@ import (
 // DomainEvent represents a generic event with basic properties.
 type DomainEvent interface {
 	GetOccurredAt() time.Time
+	GetID() string
 	GetName() string
-	GetVersion() int
 	GetPayload() interface{}
 }
 
