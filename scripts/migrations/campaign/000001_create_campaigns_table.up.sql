@@ -8,6 +8,7 @@ CREATE TABLE campaigns
     end_time    TIMESTAMPTZ,                                     -- Campaign end time (optional)
     mode        SMALLINT     NOT NULL DEFAULT 0,                 -- Campaign mode (0: Unspecified, 1: Real-Time, 2: Backtest)
     status      SMALLINT     NOT NULL DEFAULT 0,                 -- Campaign status (0: Unspecified, 1: Pending, 2: Active, 3: Completed)
+    pool_id     VARCHAR(42)  NOT NULL,                           -- Pool ID
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),             -- Created timestamp
     updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()              -- Updated timestamp
 );

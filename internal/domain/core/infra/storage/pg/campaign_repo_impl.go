@@ -66,8 +66,8 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 
 	// 插入 Campaign 並返回生成的 ID
 	campaignQuery := `
-		INSERT INTO campaigns (name, description, start_time, end_time, mode, status, created_at, updated_at)
-		VALUES (:name, :description, :start_time, :end_time, :mode, :status, NOW(), NOW())
+		INSERT INTO campaigns (name, description, start_time, end_time, mode, status, pool_id, created_at, updated_at)
+		VALUES (:name, :description, :start_time, :end_time, :mode, :status, :pool_id, NOW(), NOW())
 		RETURNING id
 	`
 
@@ -105,6 +105,7 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 
 	for _, task := range campaign.Tasks() {
 		taskParams, err2 := FromBizTaskToDAO(task)
+		taskParams.CampaignID = campaignID
 		if err2 != nil {
 			ctx.Error("failed to convert task to DAO", zap.Error(err2))
 			return err2
@@ -113,7 +114,7 @@ func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) err
 		var taskID string
 		err2 = taskStmt.QueryRowxContext(timeout, taskParams).Scan(&taskID)
 		if err2 != nil {
-			ctx.Error("failed to insert task", zap.Error(err2))
+			ctx.Error("failed to insert task", zap.Error(err2), zap.Any("params", &taskParams))
 			return err2
 		}
 
@@ -133,7 +134,7 @@ func (i *CampaignRepoImpl) GetByID(c context.Context, id string) (*biz.Campaign,
 	// 查詢 Campaign 資料
 	var campaignDAO CampaignDAO
 	campaignQuery := `
-		SELECT id, name, description, start_time, end_time, mode, status
+		SELECT id, name, description, start_time, end_time, mode, status, pool_id
 		FROM campaigns
 		WHERE id = $1
 	`
@@ -204,7 +205,7 @@ func (i *CampaignRepoImpl) List(
 
 	// Query to fetch campaigns
 	campaignQuery := `
-		SELECT id, name, description, start_time, end_time, mode, status
+		SELECT id, name, description, start_time, end_time, mode, status, pool_id
 		FROM campaigns
 		ORDER BY created_at DESC
 		LIMIT $1 OFFSET $2
