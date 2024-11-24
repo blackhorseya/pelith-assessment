@@ -9,7 +9,7 @@ type DomainEvent interface {
 	GetOccurredAt() time.Time
 	GetName() string
 	GetVersion() int
-	Payload() interface{}
+	GetPayload() interface{}
 }
 
 // EventHandler is the interface for handling domain events.
