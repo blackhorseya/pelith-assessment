@@ -181,14 +181,18 @@ func (i *CampaignRepoImpl) List(
 	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
 	defer cancelFunc()
 
+	// Validate limit
+	const defaultMaxLimit = 1000
+	if cond.Limit <= 0 || cond.Limit > defaultMaxLimit {
+		cond.Limit = defaultMaxLimit
+	}
+
 	// Query to count total campaigns
 	countQuery := `
 		SELECT COUNT(*) 
 		FROM campaigns
-		WHERE ($1::text IS NULL OR name ILIKE '%' || $1 || '%') 
-		AND ($2::text IS NULL OR status = $2)
 	`
-	err = i.rw.GetContext(timeout, &total, countQuery, cond.Name, cond.Status)
+	err = i.rw.GetContext(timeout, &total, countQuery)
 	if err != nil {
 		ctx.Error("failed to count campaigns", zap.Error(err))
 		return nil, 0, err
@@ -203,15 +207,11 @@ func (i *CampaignRepoImpl) List(
 	campaignQuery := `
 		SELECT id, name, description, start_time, end_time, mode, status
 		FROM campaigns
-		WHERE ($1::text IS NULL OR name ILIKE '%' || $1 || '%') 
-		AND ($2::text IS NULL OR status = $2)
 		ORDER BY created_at DESC
-		LIMIT $3 OFFSET $4
+		LIMIT $1 OFFSET $2
 	`
 	var campaignDAOs []CampaignDAO
-	err = i.rw.SelectContext(
-		timeout, &campaignDAOs, campaignQuery, cond.Name, cond.Status, cond.Limit, cond.Offset,
-	)
+	err = i.rw.SelectContext(timeout, &campaignDAOs, campaignQuery, cond.Limit, cond.Offset)
 	if err != nil {
 		ctx.Error("failed to fetch campaigns", zap.Error(err))
 		return nil, 0, err
