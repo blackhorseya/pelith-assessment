@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"github.com/blackhorseya/pelith-assessment/pkg/eventx"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -83,4 +84,10 @@ func (c *Campaign) Complete() error {
 	}
 	c.Status = model.CampaignStatus_CAMPAIGN_STATUS_COMPLETED
 	return nil
+}
+
+// OnSwapExecuted handles the swap executed event.
+func (c *Campaign) OnSwapExecuted(tx *Transaction) (eventx.DomainEvent, error) {
+	// TODO: 2024/11/24|sean|Add swap logic
+	return nil, errors.New("implement OnSwapExecuted")
 }
