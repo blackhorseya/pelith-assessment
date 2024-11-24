@@ -10,7 +10,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
-	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/etherscan"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/external/etherscan"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/transports/http"
