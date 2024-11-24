@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
@@ -28,15 +29,32 @@ type backtestStrategy struct {
 }
 
 func (s *backtestStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
-	// TODO: 2024/11/24|sean|Implement the Execute method
-	panic("implement me")
+	ctx := contextx.WithContext(c)
+
+	resultCh := make(chan *model.BacktestResult)
+	var err error
+	go func() {
+		err = s.backtestService.RunBacktest(ctx, campaign, resultCh)
+		if err != nil {
+			ctx.Error("failed to run backtest", zap.Error(err))
+		}
+		close(resultCh)
+	}()
+
+	for result := range resultCh {
+		ctx.Debug("backtest result", zap.Any("result", &result))
+	}
+
+	return err
 }
 
 type realTimeStrategy struct{}
 
 func (s *realTimeStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
 	// TODO: 2024/11/24|sean|Implement the Execute method
-	panic("implement me")
+	ctx := contextx.WithContext(c)
+	ctx.Debug("real time strategy not implemented", zap.Any("campaign", &campaign))
+	return fmt.Errorf("not implemented")
 }
 
 // StartCampaignHandler is the handler for starting a campaign.
