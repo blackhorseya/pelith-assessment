@@ -31,7 +31,7 @@ type backtestStrategy struct {
 func (s *backtestStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
 	ctx := contextx.WithContext(c)
 
-	resultCh := make(chan *model.BacktestResult)
+	resultCh := make(chan *model.Reward)
 	var err error
 	go func() {
 		err = s.backtestService.RunBacktest(ctx, campaign, resultCh)

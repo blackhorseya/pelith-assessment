@@ -2,6 +2,7 @@ package etherscan
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -153,7 +154,7 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	cond query.GetLogsCondition,
 ) (item biz.TransactionList, total int, err error) {
 	// TODO: 2024/11/24|sean|实现获取合约日志的逻辑
-	panic("implement me")
+	return nil, 0, errors.New("implement me, get logs by address from etherscan")
 }
 
 func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {

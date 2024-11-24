@@ -27,6 +27,8 @@ type ListTransactionCondition struct {
 
 // GetLogsCondition is the condition for get logs.
 type GetLogsCondition struct {
+	StartTime time.Time
+	EndTime   time.Time
 }
 
 // TransactionGetter is used to get the transaction.

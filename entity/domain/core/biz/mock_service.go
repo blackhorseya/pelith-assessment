@@ -193,7 +193,7 @@ func (m *MockBacktestService) EXPECT() *MockBacktestServiceMockRecorder {
 }
 
 // RunBacktest mocks base method.
-func (m *MockBacktestService) RunBacktest(c context.Context, campaign *Campaign, resultCh chan<- *model.BacktestResult) error {
+func (m *MockBacktestService) RunBacktest(c context.Context, campaign *Campaign, resultCh chan<- *model.Reward) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RunBacktest", c, campaign, resultCh)
 	ret0, _ := ret[0].(error)

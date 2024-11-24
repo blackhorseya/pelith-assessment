@@ -64,7 +64,7 @@ type UserService interface {
 // BacktestService defines the domain logic for backtesting campaigns with historical data.
 type BacktestService interface {
 	// RunBacktest executes a backtest for a campaign within a specified time range.
-	RunBacktest(c context.Context, campaign *Campaign, resultCh chan<- *model.BacktestResult) error
+	RunBacktest(c context.Context, campaign *Campaign, resultCh chan<- *model.Reward) error
 }
 
 // TransactionService defines the domain logic for processing transactions.
