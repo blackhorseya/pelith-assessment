@@ -7,7 +7,33 @@ import (
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
-	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
+)
+
+type (
+	// TaskCreator is used to create a new task.
+	TaskCreator interface {
+		// Create is used to create a new task.
+		Create(c context.Context, task *biz.Task) error
+	}
+
+	TaskUpdater interface {
+		// Update is used to update a task.
+		Update(c context.Context, task *biz.Task) error
+	}
+)
+
+type (
+	// CampaignCreator is used to create a new campaign.
+	CampaignCreator interface {
+		// Create is used to create a new campaign.
+		Create(c context.Context, campaign *biz.Campaign) error
+	}
+
+	// CampaignUpdater is used to update the campaign.
+	CampaignUpdater interface {
+		// Update is used to update the campaign.
+		Update(c context.Context, campaign *biz.Campaign) error
+	}
 )
 
 type (
@@ -26,25 +52,3 @@ type (
 		IncrementPoints(c context.Context, userID string, points int64) error
 	}
 )
-
-// RegisterUserCommand is a command to register a new user.
-type RegisterUserCommand struct {
-	Username string
-	Address  string
-}
-
-// UserRegistrationHandler handles the registration of a new user.
-type UserRegistrationHandler struct {
-	biz  biz.UserService
-	repo UserCreator
-}
-
-// NewRegisterUserHandler creates a new UserRegistrationHandler instance.
-func NewRegisterUserHandler(b biz.UserService, r UserCreator) *UserRegistrationHandler {
-	return &UserRegistrationHandler{biz: b, repo: r}
-}
-
-func (h *UserRegistrationHandler) Handle(c context.Context, msg usecase.Message) (string, error) {
-	// TODO: 2024/11/21|sean|Implement the user registration handler.
-	panic("implement me")
-}

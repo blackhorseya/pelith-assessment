@@ -1,5 +1,3 @@
-//go:generate mockgen -destination=./mock_${GOFILE} -package=${GOPACKAGE} -source=${GOFILE}
-
 package command
 
 import (
@@ -12,19 +10,6 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"go.uber.org/zap"
-)
-
-type (
-	// TaskCreator is used to create a new task.
-	TaskCreator interface {
-		// Create is used to create a new task.
-		Create(c context.Context, task *biz.Task) error
-	}
-
-	TaskUpdater interface {
-		// Update is used to update a task.
-		Update(c context.Context, task *biz.Task) error
-	}
 )
 
 // AddTaskHandler 用於處理 Task 相關的 Command
