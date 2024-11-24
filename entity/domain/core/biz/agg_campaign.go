@@ -12,7 +12,8 @@ import (
 type Campaign struct {
 	model.Campaign
 
-	tasks []*Task
+	tasks  []*Task
+	report *model.BacktestReport
 }
 
 // NewCampaign creates a new Campaign aggregate.
@@ -40,6 +41,10 @@ func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
 
 func (c *Campaign) Tasks() []*Task {
 	return c.tasks
+}
+
+func (c *Campaign) Report() *model.BacktestReport {
+	return c.report
 }
 
 // AddTask adds a task to the campaign.
