@@ -110,5 +110,7 @@ func (h StartCampaignHandler) Handle(c context.Context, msg usecase.Message) (st
 		return "", err
 	}
 
+	// TODO: 2024/11/24|sean|save the campaign report to the database
+
 	return campaign.Id, nil
 }
