@@ -91,3 +91,18 @@ func (c *Campaign) OnSwapExecuted(tx *Transaction) (eventx.DomainEvent, error) {
 	// TODO: 2024/11/24|sean|Add swap logic
 	return nil, errors.New("implement OnSwapExecuted")
 }
+
+// HasCompletedOnboardingTask checks if the user has completed the onboarding task.
+func (c *Campaign) HasCompletedOnboardingTask(volume float64) bool {
+	if c == nil {
+		return false
+	}
+
+	for _, task := range c.Tasks() {
+		if task.Type == model.TaskType_TASK_TYPE_ONBOARDING && volume >= task.Criteria.MinTransactionAmount {
+			return true
+		}
+	}
+
+	return false
+}
