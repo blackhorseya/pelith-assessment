@@ -80,8 +80,8 @@ func (i *campaignServerImpl) GetCampaign(
 		return nil, err
 	}
 
-	tasks := make([]*model.Task, 0, len(campaign.Tasks))
-	for _, task := range campaign.Tasks {
+	tasks := make([]*model.Task, 0, len(campaign.Tasks()))
+	for _, task := range campaign.Tasks() {
 		tasks = append(tasks, &task.Task)
 	}
 
@@ -108,8 +108,8 @@ func (i *campaignServerImpl) ListCampaigns(
 	}
 
 	for _, item := range items {
-		tasks := make([]*model.Task, 0, len(item.Tasks))
-		for _, task := range item.Tasks {
+		tasks := make([]*model.Task, 0, len(item.Tasks()))
+		for _, task := range item.Tasks() {
 			tasks = append(tasks, &task.Task)
 		}
 

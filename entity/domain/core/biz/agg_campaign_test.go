@@ -30,7 +30,6 @@ func TestCampaign_AddTask(t *testing.T) {
 				Campaign: model.Campaign{
 					Status: model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 				},
-				Tasks: []*Task{},
 			},
 			args:    task,
 			wantErr: false,
@@ -41,7 +40,6 @@ func TestCampaign_AddTask(t *testing.T) {
 				Campaign: model.Campaign{
 					Status: model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE,
 				},
-				Tasks: []*Task{},
 			},
 			args:    task,
 			wantErr: true,

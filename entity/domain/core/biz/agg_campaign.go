@@ -12,7 +12,7 @@ import (
 type Campaign struct {
 	model.Campaign
 
-	Tasks []*Task
+	tasks []*Task
 }
 
 // NewCampaign creates a new Campaign aggregate.
@@ -35,8 +35,11 @@ func NewCampaign(name string, startAt time.Time) (*Campaign, error) {
 			Status:      model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 			Mode:        model.CampaignMode_CAMPAIGN_MODE_BACKTEST,
 		},
-		Tasks: make([]*Task, 0),
 	}, nil
+}
+
+func (c *Campaign) Tasks() []*Task {
+	return c.tasks
 }
 
 // AddTask adds a task to the campaign.
@@ -50,7 +53,7 @@ func (c *Campaign) AddTask(task *Task) error {
 	}
 
 	task.CampaignID = c.Id
-	c.Tasks = append(c.Tasks, task)
+	c.tasks = append(c.tasks, task)
 	return nil
 }
 
