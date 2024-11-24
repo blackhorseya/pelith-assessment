@@ -23,7 +23,9 @@ func (s *emptyStrategy) Execute(c context.Context, campaign *biz.Campaign) error
 	return nil
 }
 
-type backtestStrategy struct{}
+type backtestStrategy struct {
+	backtestService biz.BacktestService
+}
 
 func (s *backtestStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
 	// TODO: 2024/11/24|sean|Implement the Execute method
@@ -44,12 +46,17 @@ type StartCampaignHandler struct {
 }
 
 // NewStartCampaignHandler creates a new StartCampaignHandler instance.
-func NewStartCampaignHandler(campaignGetter query.CampaignGetter) *StartCampaignHandler {
+func NewStartCampaignHandler(
+	campaignGetter query.CampaignGetter,
+	backtestService biz.BacktestService,
+) *StartCampaignHandler {
 	return &StartCampaignHandler{
 		strategies: map[model.CampaignMode]CampaignStrategy{
 			model.CampaignMode_CAMPAIGN_MODE_UNSPECIFIED: &emptyStrategy{},
-			model.CampaignMode_CAMPAIGN_MODE_BACKTEST:    &backtestStrategy{},
-			model.CampaignMode_CAMPAIGN_MODE_REAL_TIME:   &realTimeStrategy{},
+			model.CampaignMode_CAMPAIGN_MODE_BACKTEST: &backtestStrategy{
+				backtestService: backtestService,
+			},
+			model.CampaignMode_CAMPAIGN_MODE_REAL_TIME: &realTimeStrategy{},
 		},
 		campaignGetter: campaignGetter,
 	}
