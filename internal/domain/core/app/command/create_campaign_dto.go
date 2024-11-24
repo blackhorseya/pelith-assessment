@@ -3,13 +3,17 @@ package command
 import (
 	"errors"
 	"time"
+
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 )
 
 // CreateCampaignCommand represents the input data to create a campaign.
 type CreateCampaignCommand struct {
-	Name      string         `json:"name"`
-	StartTime time.Time      `json:"start_time"`
-	Tasks     []*TaskCommand `json:"tasks"`
+	Name       string             `json:"name"`
+	StartTime  time.Time          `json:"start_time"`
+	Mode       model.CampaignMode `json:"mode"`
+	TargetPool string             `json:"target_pool"`
+	MinAmount  float64            `json:"min_amount"`
 }
 
 func (cmd CreateCampaignCommand) Key() int {

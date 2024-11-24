@@ -29,13 +29,36 @@ func NewCampaignServer(
 	}
 }
 
+func (i *campaignServerImpl) CreateCampaign(
+	c context.Context,
+	req *core.CreateCampaignRequest,
+) (*core.CreateCampaignResponse, error) {
+	id, err := i.createCampaignHandler.Handle(c, command.CreateCampaignCommand{
+		Name:       req.Name,
+		StartTime:  req.StartTime.AsTime(),
+		Mode:       req.Mode,
+		TargetPool: req.TargetPool,
+		MinAmount:  req.MinAmount,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &core.CreateCampaignResponse{
+		Id: id,
+	}, nil
+}
+
 func (i *campaignServerImpl) StartCampaign(
 	c context.Context,
 	req *core.StartCampaignRequest,
 ) (*core.StartCampaignResponse, error) {
 	id, err := i.createCampaignHandler.Handle(c, command.CreateCampaignCommand{
-		Name:      req.Name,
-		StartTime: req.StartTime.AsTime(),
+		Name:       req.Name,
+		StartTime:  req.StartTime.AsTime(),
+		Mode:       req.Mode,
+		TargetPool: req.TargetPool,
+		MinAmount:  req.MinAmount,
 	})
 	if err != nil {
 		return nil, err

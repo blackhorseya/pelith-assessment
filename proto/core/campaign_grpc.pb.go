@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	CampaignService_CreateCampaign_FullMethodName      = "/core.CampaignService/CreateCampaign"
 	CampaignService_StartCampaign_FullMethodName       = "/core.CampaignService/StartCampaign"
 	CampaignService_GetCampaign_FullMethodName         = "/core.CampaignService/GetCampaign"
 	CampaignService_AddTasksForCampaign_FullMethodName = "/core.CampaignService/AddTasksForCampaign"
@@ -30,6 +31,7 @@ const (
 //
 // CampaignService is the service for campaign
 type CampaignServiceClient interface {
+	CreateCampaign(ctx context.Context, in *CreateCampaignRequest, opts ...grpc.CallOption) (*CreateCampaignResponse, error)
 	StartCampaign(ctx context.Context, in *StartCampaignRequest, opts ...grpc.CallOption) (*StartCampaignResponse, error)
 	GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error)
 	AddTasksForCampaign(ctx context.Context, in *AddTasksForCampaignRequest, opts ...grpc.CallOption) (*AddTasksForCampaignResponse, error)
@@ -41,6 +43,16 @@ type campaignServiceClient struct {
 
 func NewCampaignServiceClient(cc grpc.ClientConnInterface) CampaignServiceClient {
 	return &campaignServiceClient{cc}
+}
+
+func (c *campaignServiceClient) CreateCampaign(ctx context.Context, in *CreateCampaignRequest, opts ...grpc.CallOption) (*CreateCampaignResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateCampaignResponse)
+	err := c.cc.Invoke(ctx, CampaignService_CreateCampaign_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *campaignServiceClient) StartCampaign(ctx context.Context, in *StartCampaignRequest, opts ...grpc.CallOption) (*StartCampaignResponse, error) {
@@ -79,6 +91,7 @@ func (c *campaignServiceClient) AddTasksForCampaign(ctx context.Context, in *Add
 //
 // CampaignService is the service for campaign
 type CampaignServiceServer interface {
+	CreateCampaign(context.Context, *CreateCampaignRequest) (*CreateCampaignResponse, error)
 	StartCampaign(context.Context, *StartCampaignRequest) (*StartCampaignResponse, error)
 	GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error)
 	AddTasksForCampaign(context.Context, *AddTasksForCampaignRequest) (*AddTasksForCampaignResponse, error)
@@ -91,6 +104,9 @@ type CampaignServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedCampaignServiceServer struct{}
 
+func (UnimplementedCampaignServiceServer) CreateCampaign(context.Context, *CreateCampaignRequest) (*CreateCampaignResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCampaign not implemented")
+}
 func (UnimplementedCampaignServiceServer) StartCampaign(context.Context, *StartCampaignRequest) (*StartCampaignResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StartCampaign not implemented")
 }
@@ -118,6 +134,24 @@ func RegisterCampaignServiceServer(s grpc.ServiceRegistrar, srv CampaignServiceS
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&CampaignService_ServiceDesc, srv)
+}
+
+func _CampaignService_CreateCampaign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCampaignRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CampaignServiceServer).CreateCampaign(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CampaignService_CreateCampaign_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CampaignServiceServer).CreateCampaign(ctx, req.(*CreateCampaignRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _CampaignService_StartCampaign_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -181,6 +215,10 @@ var CampaignService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "core.CampaignService",
 	HandlerType: (*CampaignServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateCampaign",
+			Handler:    _CampaignService_CreateCampaign_Handler,
+		},
 		{
 			MethodName: "StartCampaign",
 			Handler:    _CampaignService_StartCampaign_Handler,
