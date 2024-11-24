@@ -232,3 +232,42 @@ message SwapDetail {
   // Pool address (if applicable)
   string pool_address = 5;
 }
+
+// Backtest result for a specific user
+message BacktestResult {
+  // User ID associated with the result
+  string user_id = 1;
+
+  // Total swaps performed by the user
+  int32 total_swaps = 2;
+
+  // Total volume of swaps (USD)
+  double total_volume = 3;
+
+  // Points earned by the user
+  int64 points_earned = 4;
+
+  // Task completion status
+  map<string, int64 > task_progress = 5;
+}
+
+// Backtest report for a campaign
+message BacktestReport {
+  // Unique ID for the report
+  string id = 1;
+
+  // Associated campaign ID
+  string campaign_id = 2;
+
+  // Total users involved in the backtest
+  int32 total_users = 3;
+
+  // Total points distributed
+  int64 total_points = 4;
+
+  // Timestamp for when the report was generated
+  google.protobuf.Timestamp generated_at = 5;
+
+  // List of individual backtest results
+  repeated BacktestResult user_results = 6;
+}
