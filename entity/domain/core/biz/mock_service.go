@@ -131,36 +131,6 @@ func (m *MockRewardService) EXPECT() *MockRewardServiceMockRecorder {
 	return m.recorder
 }
 
-// AllocatePoints mocks base method.
-func (m *MockRewardService) AllocatePoints(c context.Context, taskID string, poolID *string, totalPoints int64) ([]*model.PointAllocation, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AllocatePoints", c, taskID, poolID, totalPoints)
-	ret0, _ := ret[0].([]*model.PointAllocation)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// AllocatePoints indicates an expected call of AllocatePoints.
-func (mr *MockRewardServiceMockRecorder) AllocatePoints(c, taskID, poolID, totalPoints any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllocatePoints", reflect.TypeOf((*MockRewardService)(nil).AllocatePoints), c, taskID, poolID, totalPoints)
-}
-
-// RedeemReward mocks base method.
-func (m *MockRewardService) RedeemReward(c context.Context, userID, campaignID string, points int64) (*model.Reward, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RedeemReward", c, userID, campaignID, points)
-	ret0, _ := ret[0].(*model.Reward)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RedeemReward indicates an expected call of RedeemReward.
-func (mr *MockRewardServiceMockRecorder) RedeemReward(c, userID, campaignID, points any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RedeemReward", reflect.TypeOf((*MockRewardService)(nil).RedeemReward), c, userID, campaignID, points)
-}
-
 // MockUserService is a mock of UserService interface.
 type MockUserService struct {
 	ctrl     *gomock.Controller

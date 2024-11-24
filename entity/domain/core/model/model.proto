@@ -16,74 +16,61 @@ message Task {
   // @gotags: db:"name"
   string name = 2;
 
-  // Detailed description of the task
+  // Task description
   // @gotags: db:"description"
   string description = 3;
 
-  // Enum for task type (e.g., Onboarding, SharePool)
+  // Task type
   // @gotags: db:"type"
   TaskType type = 4;
 
-  // Rules or thresholds for task completion
+  // Criteria for task completion
   // @gotags: db:"criteria"
   TaskCriteria criteria = 5;
 
-  // Enum for task status (Active, Inactive)
+  // Task status
   // @gotags: db:"status"
   TaskStatus status = 6;
 }
 
 // Enum for task types
 enum TaskType {
-  // Default unspecified value
-  TASK_TYPE_UNSPECIFIED = 0;
-
-  // Onboarding task type
-  TASK_TYPE_ONBOARDING = 1;
-
-  // Share pool task type
-  TASK_TYPE_SHARE_POOL = 2;
+  TASK_TYPE_UNSPECIFIED = 0;  // Default value
+  TASK_TYPE_ONBOARDING = 1;   // Onboarding task
+  TASK_TYPE_SHARE_POOL = 2;   // Share pool task
 }
 
-// Enum for task status
+// Enum for task statuses
 enum TaskStatus {
-  // Default unspecified value
-  TASK_STATUS_UNSPECIFIED = 0;
-
-  // Active status
-  TASK_STATUS_ACTIVE = 1;
-
-  // Inactive status
-  TASK_STATUS_INACTIVE = 2;
+  TASK_STATUS_UNSPECIFIED = 0; // Default value
+  TASK_STATUS_ACTIVE = 1;      // Task is active
+  TASK_STATUS_INACTIVE = 2;    // Task is inactive
 }
 
-// Rules or thresholds for task completion
+// Task criteria
 message TaskCriteria {
-  // Minimum transaction amount required for completion
+  // Minimum transaction amount to complete the task
   double min_transaction_amount = 1;
 
-  // Pool ID for pool-specific tasks (optional)
+  // Optional pool ID for pool-specific tasks
   string pool_id = 2;
 }
 
-// Task result entity
+// Task result
 message TaskResult {
-  // ID of the evaluated task
+  // Task ID
   string task_id = 1;
 
-  // ID of the user
+  // User ID
   string user_id = 2;
 
-  // ISO8601 timestamp of task completion
-  google.protobuf.Timestamp completed_at = 3;
-
-  // Completion status (true if completed)
-  bool status = 4;
+  // Task progress (e.g., percentage)
+  int64 progress = 3;
 }
 
 // Campaign entity
 message Campaign {
-  // Unique identifier for the campaign
+  // Campaign ID
   // @gotags: db:"id"
   string id = 1;
 
@@ -95,96 +82,69 @@ message Campaign {
   // @gotags: db:"description"
   string description = 3;
 
-  // ISO8601 timestamp for campaign start
+  // Campaign start time
   // @gotags: db:"start_time"
   google.protobuf.Timestamp start_time = 4;
 
-  // ISO8601 timestamp for campaign end (optional)
+  // Campaign end time
   // @gotags: db:"end_time"
   google.protobuf.Timestamp end_time = 5;
 
-  // List of associated task IDs
+  // Associated tasks
   // @gotags: db:"tasks"
-  repeated string tasks = 6;
+  repeated Task tasks = 6;
 
-  // Enum for campaign mode (Real-time or Backtest)
+  // Campaign mode
   // @gotags: db:"mode"
   CampaignMode mode = 7;
 
-  // Enum for campaign status
+  // Campaign status
   // @gotags: db:"status"
   CampaignStatus status = 8;
 }
 
 // Enum for campaign modes
 enum CampaignMode {
-  // Default unspecified value
-  CAMPAIGN_MODE_UNSPECIFIED = 0;
-
-  // Real-time campaign mode
-  CAMPAIGN_MODE_REAL_TIME = 1;
-
-  // Backtest campaign mode
-  CAMPAIGN_MODE_BACKTEST = 2;
+  CAMPAIGN_MODE_UNSPECIFIED = 0;  // Default value
+  CAMPAIGN_MODE_REAL_TIME = 1;    // Real-time campaign
+  CAMPAIGN_MODE_BACKTEST = 2;     // Backtest campaign
 }
 
-// Enum for campaign status
+// Enum for campaign statuses
 enum CampaignStatus {
-  // Default unspecified value
-  CAMPAIGN_STATUS_UNSPECIFIED = 0;
-
-  // Pending status
-  CAMPAIGN_STATUS_PENDING = 1;
-
-  // Active status
-  CAMPAIGN_STATUS_ACTIVE = 2;
-
-  // Completed status
-  CAMPAIGN_STATUS_COMPLETED = 3;
+  CAMPAIGN_STATUS_UNSPECIFIED = 0; // Default value
+  CAMPAIGN_STATUS_PENDING = 1;     // Campaign pending
+  CAMPAIGN_STATUS_ACTIVE = 2;      // Campaign active
+  CAMPAIGN_STATUS_COMPLETED = 3;   // Campaign completed
 }
 
 // User entity
 message User {
-  // Unique identifier for the user
+  // User ID
   string id = 1;
 
-  // User name or identifier
+  // User name
   string name = 2;
 
-  // Address of blockchain wallet
+  // Blockchain wallet address
   string address = 3;
 
-  // Mapping of task ID to completion status
+  // Task completion status by task ID
   map<string, bool> task_progress = 4;
 
-  // Total points earned by the user
+  // Total points earned
   int64 points = 5;
 
-  // List of transaction IDs for tracking
+  // Associated transaction IDs
   repeated string transaction_ids = 6;
-}
-
-// Point allocation entity
-message PointAllocation {
-  // ID of the user receiving points
-  string user_id = 1;
-
-  // Associated task ID
-  string task_id = 2;
-
-  // Points allocated
-  int64 points = 3;
-
-  // Allocation percentage for share pool tasks
-  double allocation = 4;
 }
 
 // Reward entity
 message Reward {
-  // Unique identifier for the reward
+  // Reward ID
   string id = 1;
 
-  // User receiving the reward
+  // Associated user ID
   string user_id = 2;
 
   // Associated campaign ID
@@ -193,96 +153,82 @@ message Reward {
   // Points used to redeem the reward
   int64 points = 4;
 
-  // ISO8601 timestamp of reward redemption
+  // Redemption timestamp
   google.protobuf.Timestamp redeemed_at = 5;
 }
 
-// 定義交易類型的列舉
-enum TransactionType {
-  // 未指定的交易類型
-  TRANSACTION_TYPE_UNSPECIFIED = 0;
-
-  // 轉帳交易
-  TRANSACTION_TYPE_TRANSFER = 1;
-
-  // Swap 交易
-  TRANSACTION_TYPE_SWAP = 2;
-
-  // 其他類型的交易
-  TRANSACTION_TYPE_OTHER = 3;
-}
-
-// Swap transaction details
-message SwapDetail {
-  // Address of the token being swapped from
-  string from_token_address = 1;
-
-  // Address of the token being swapped to
-  string to_token_address = 2;
-
-  // Amount of the from_token being swapped
-  string from_token_amount = 3;
-
-  // Amount of the to_token received
-  string to_token_amount = 4;
-
-  // Optional: Address of the liquidity pool used for the swap
-  string pool_address = 5;
-}
-
-// 交易實體
+// Transaction entity
 message Transaction {
-  // 交易的唯一識別碼（區塊鏈哈希）
+  // Transaction hash (unique ID)
   // @gotags: db:"tx_hash"
   string tx_hash = 1;
 
-  // 區塊鏈發送者地址
+  // Sender address
   // @gotags: db:"from_address"
   string from_address = 2;
 
-  // 區塊鏈接收者地址
+  // Receiver address
   // @gotags: db:"to_address"
   string to_address = 3;
 
-  // 交易金額
+  // Transaction amount
   // @gotags: db:"amount"
   int64 amount = 4;
 
-  // 區塊鏈上交易的時間戳
+  // Transaction timestamp
   // @gotags: db:"timestamp"
   google.protobuf.Timestamp timestamp = 5;
 
-  // 關聯的任務 ID（可選，用於任務追蹤）
+  // Task ID (optional)
   // @gotags: db:"task_id"
-  optional string task_id = 6;
+  string task_id = 6;
 
-  // 關聯的活動 ID（可選，用於活動追蹤）
+  // Campaign ID (optional)
   // @gotags: db:"campaign_id"
-  optional string campaign_id = 7;
+  string campaign_id = 7;
 
-  // 交易的狀態
+  // Transaction status
   // @gotags: db:"status"
   TransactionStatus status = 8;
 
-  // 交易的類型
+  // Transaction type
   // @gotags: db:"type"
   TransactionType type = 9;
 
-  // Swap details for swap transactions
+  // Swap details (if applicable)
   repeated SwapDetail swap_details = 10;
 }
 
-// Enum for transaction status
+// Enum for transaction statuses
 enum TransactionStatus {
-  // Default unspecified value
-  TRANSACTION_STATUS_UNSPECIFIED = 0;
+  TRANSACTION_STATUS_UNSPECIFIED = 0; // Default value
+  TRANSACTION_STATUS_PENDING = 1;     // Transaction pending
+  TRANSACTION_STATUS_COMPLETED = 2;   // Transaction completed
+  TRANSACTION_STATUS_FAILED = 3;      // Transaction failed
+}
 
-  // Transaction is pending
-  TRANSACTION_STATUS_PENDING = 1;
+// Enum for transaction types
+enum TransactionType {
+  TRANSACTION_TYPE_UNSPECIFIED = 0;  // Default value
+  TRANSACTION_TYPE_TRANSFER = 1;     // Transfer
+  TRANSACTION_TYPE_SWAP = 2;         // Swap
+  TRANSACTION_TYPE_OTHER = 3;        // Other
+}
 
-  // Transaction is completed
-  TRANSACTION_STATUS_COMPLETED = 2;
+// Swap details
+message SwapDetail {
+  // Token address being swapped from
+  string from_token_address = 1;
 
-  // Transaction has failed
-  TRANSACTION_STATUS_FAILED = 3;
+  // Token address being swapped to
+  string to_token_address = 2;
+
+  // Amount of the from_token
+  string from_token_amount = 3;
+
+  // Amount of the to_token
+  string to_token_amount = 4;
+
+  // Pool address (if applicable)
+  string pool_address = 5;
 }
