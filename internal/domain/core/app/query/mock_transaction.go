@@ -40,6 +40,22 @@ func (m *MockTransactionGetter) EXPECT() *MockTransactionGetterMockRecorder {
 	return m.recorder
 }
 
+// GetLogsByAddress mocks base method.
+func (m *MockTransactionGetter) GetLogsByAddress(c context.Context, contractAddress string, cond GetLogsCondition) (biz.TransactionList, int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLogsByAddress", c, contractAddress, cond)
+	ret0, _ := ret[0].(biz.TransactionList)
+	ret1, _ := ret[1].(int)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// GetLogsByAddress indicates an expected call of GetLogsByAddress.
+func (mr *MockTransactionGetterMockRecorder) GetLogsByAddress(c, contractAddress, cond any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogsByAddress", reflect.TypeOf((*MockTransactionGetter)(nil).GetLogsByAddress), c, contractAddress, cond)
+}
+
 // ListByAddress mocks base method.
 func (m *MockTransactionGetter) ListByAddress(c context.Context, address string, cond ListTransactionCondition) (biz.TransactionList, int, error) {
 	m.ctrl.T.Helper()

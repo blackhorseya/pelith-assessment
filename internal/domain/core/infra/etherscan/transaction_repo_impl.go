@@ -147,6 +147,15 @@ func (i *TransactionRepoImpl) ListByAddress(
 	return res, len(res), nil
 }
 
+func (i *TransactionRepoImpl) GetLogsByAddress(
+	c context.Context,
+	contractAddress string,
+	cond query.GetLogsCondition,
+) (item biz.TransactionList, total int, err error) {
+	// TODO: 2024/11/24|sean|实现获取合约日志的逻辑
+	panic("implement me")
+}
+
 func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {
 	var firstLog, lastLog *types.Log
 	var fromDecimals, toDecimals int

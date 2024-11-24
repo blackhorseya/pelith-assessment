@@ -25,12 +25,22 @@ type ListTransactionCondition struct {
 	EndTime     time.Time
 }
 
+// GetLogsCondition is the condition for get logs.
+type GetLogsCondition struct {
+}
+
 // TransactionGetter is used to get the transaction.
 type TransactionGetter interface {
 	ListByAddress(
 		c context.Context,
 		address string,
 		cond ListTransactionCondition,
+	) (item biz.TransactionList, total int, err error)
+
+	GetLogsByAddress(
+		c context.Context,
+		contractAddress string,
+		cond GetLogsCondition,
 	) (item biz.TransactionList, total int, err error)
 }
 
