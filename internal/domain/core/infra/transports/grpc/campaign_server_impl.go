@@ -2,12 +2,14 @@ package grpc
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/proto/core"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type campaignServerImpl struct {
@@ -82,6 +84,32 @@ func (i *campaignServerImpl) ListCampaigns(
 	req *core.ListCampaignsRequest,
 	stream grpc.ServerStreamingServer[core.GetCampaignResponse],
 ) error {
-	// TODO: 2024/11/24|sean|implement me
-	panic("implement me")
+	items, total, err := i.campaignGetter.List(stream.Context(), query.ListCampaignCondition{
+		// TODO: 2024/11/24|sean|pass the condition
+	})
+	if err != nil {
+		return err
+	}
+
+	err = stream.SendHeader(metadata.New(map[string]string{"total": strconv.Itoa(total)}))
+	if err != nil {
+		return err
+	}
+
+	for _, item := range items {
+		tasks := make([]*model.Task, 0, len(item.Tasks))
+		for _, task := range item.Tasks {
+			tasks = append(tasks, &task.Task)
+		}
+
+		err = stream.Send(&core.GetCampaignResponse{
+			Campaign: &item.Campaign,
+			Tasks:    tasks,
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
