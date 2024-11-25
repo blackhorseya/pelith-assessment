@@ -106,14 +106,26 @@ func (i *TransactionCompositeRepoImpl) GetLogsByAddress(
 		i.locks.Delete(lockKey) // 解鎖後刪除，避免內存泄漏
 	}()
 
-	// Step 1: 直接從外部 API 獲取數據
+	// Step 1: 優先從資料庫查詢數據
+	item, total, err = i.dbRepo.GetLogsByAddress(ctx, contractAddress, cond)
+	if err != nil {
+		ctx.Error("dbRepo.GetLogsByAddress", zap.Error(err))
+		return nil, 0, err // 資料庫查詢失敗時返回錯誤
+	}
+
+	// 如果資料庫有數據，直接返回
+	if total > 0 {
+		return item, total, nil
+	}
+
+	// Step 2: 若資料庫無數據，調用外部 API
 	apiData, apiTotal, apiErr := i.apiRepo.GetLogsByAddress(ctx, contractAddress, cond)
 	if apiErr != nil {
 		ctx.Error("apiRepo.GetLogsByAddress", zap.Error(apiErr))
 		return nil, 0, apiErr
 	}
 
-	// Step 2: 保存數據到資料庫
+	// Step 3: 保存從 API 獲取的數據到資料庫
 	for _, tx := range apiData {
 		saveErr := i.dbRepo.Create(ctx, tx)
 		if saveErr != nil {
@@ -123,6 +135,6 @@ func (i *TransactionCompositeRepoImpl) GetLogsByAddress(
 		}
 	}
 
-	// Step 3: 返回數據
+	// Step 4: 返回 API 獲取的數據
 	return apiData, apiTotal, nil
 }
