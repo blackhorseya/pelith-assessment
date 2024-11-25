@@ -31,6 +31,16 @@ type GetLogsCondition struct {
 	EndTime   time.Time
 }
 
+// TransactionAdapter is the adapter for transaction.
+type TransactionAdapter interface {
+	GetSwapTxByAddress(
+		c context.Context,
+		address string,
+		cond ListTransactionCondition,
+		txCh chan<- *biz.TransactionList,
+	) error
+}
+
 // TransactionGetter is used to get the transaction.
 type TransactionGetter interface {
 	ListByAddress(

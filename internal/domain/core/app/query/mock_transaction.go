@@ -17,6 +17,43 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
+// MockTransactionAdapter is a mock of TransactionAdapter interface.
+type MockTransactionAdapter struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionAdapterMockRecorder
+}
+
+// MockTransactionAdapterMockRecorder is the mock recorder for MockTransactionAdapter.
+type MockTransactionAdapterMockRecorder struct {
+	mock *MockTransactionAdapter
+}
+
+// NewMockTransactionAdapter creates a new mock instance.
+func NewMockTransactionAdapter(ctrl *gomock.Controller) *MockTransactionAdapter {
+	mock := &MockTransactionAdapter{ctrl: ctrl}
+	mock.recorder = &MockTransactionAdapterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransactionAdapter) EXPECT() *MockTransactionAdapterMockRecorder {
+	return m.recorder
+}
+
+// GetSwapTxByAddress mocks base method.
+func (m *MockTransactionAdapter) GetSwapTxByAddress(c context.Context, address string, cond ListTransactionCondition, txCh chan<- *biz.TransactionList) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSwapTxByAddress", c, address, cond, txCh)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetSwapTxByAddress indicates an expected call of GetSwapTxByAddress.
+func (mr *MockTransactionAdapterMockRecorder) GetSwapTxByAddress(c, address, cond, txCh any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByAddress", reflect.TypeOf((*MockTransactionAdapter)(nil).GetSwapTxByAddress), c, address, cond, txCh)
+}
+
 // MockTransactionGetter is a mock of TransactionGetter interface.
 type MockTransactionGetter struct {
 	ctrl     *gomock.Controller
