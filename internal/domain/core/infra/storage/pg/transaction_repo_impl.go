@@ -5,7 +5,9 @@ import (
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
+	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 // TransactionRepoImpl represents the PostgreSQL implementation of the TransactionRepo.
@@ -30,20 +32,21 @@ func (i *TransactionRepoImpl) ListByAddress(
 	address string,
 	cond query.ListTransactionCondition,
 ) (item biz.TransactionList, total int, err error) {
-	// 統一管理查詢參數
-	params := map[string]interface{}{
-		"address":      address,
-		"start_time":   cond.StartTime,
-		"end_time":     cond.EndTime,
-		"pool_address": cond.PoolAddress,
-	}
+	// 設定上下文，支援超時與日誌記錄
+	ctx := contextx.WithContext(c)
+	timeout, cancelFunc := context.WithTimeout(ctx, defaultTimeout)
+	defer cancelFunc()
+
+	// 查詢參數設置
+	params := []interface{}{address, address, cond.StartTime, cond.EndTime}
 
 	// 建立 WHERE 條件動態查詢
 	baseCondition := `
-		(t.from_address = :address OR t.to_address = :address)
-		AND t.timestamp BETWEEN :start_time AND :end_time`
+		(t.from_address = $1 OR t.to_address = $2)
+		AND t.timestamp BETWEEN $3 AND $4`
 	if cond.PoolAddress != "" {
-		baseCondition += " AND se.pool_address = :pool_address"
+		baseCondition += " AND se.pool_address = $5"
+		params = append(params, cond.PoolAddress)
 	}
 
 	// 查詢符合條件的總筆數
@@ -52,8 +55,9 @@ func (i *TransactionRepoImpl) ListByAddress(
 		FROM transactions t
 		LEFT JOIN swap_events se ON t.tx_hash = se.tx_hash
 		WHERE ` + baseCondition
-	err = i.rw.GetContext(c, &total, countQuery, params)
+	err = i.rw.GetContext(timeout, &total, countQuery, params...)
 	if err != nil {
+		ctx.Error("failed to count transactions", zap.Error(err))
 		return nil, 0, err
 	}
 
@@ -63,7 +67,7 @@ func (i *TransactionRepoImpl) ListByAddress(
 	}
 
 	// 查詢符合條件的交易資料
-	query := `
+	stmt := `
 		SELECT t.tx_hash, t.block_number, t.timestamp, t.from_address, t.to_address,
 		       se.from_token_address, se.to_token_address, se.from_token_amount, 
 		       se.to_token_amount, se.pool_address
@@ -71,14 +75,13 @@ func (i *TransactionRepoImpl) ListByAddress(
 		LEFT JOIN swap_events se ON t.tx_hash = se.tx_hash
 		WHERE ` + baseCondition + `
 		ORDER BY t.timestamp DESC`
-
-	// 查詢交易列表
 	var rows []struct {
 		TransactionDAO
 		SwapEventDAO
 	}
-	err = i.rw.SelectContext(c, &rows, query, params)
+	err = i.rw.SelectContext(timeout, &rows, stmt, params...)
 	if err != nil {
+		ctx.Error("failed to fetch transactions", zap.Error(err))
 		return nil, 0, err
 	}
 
@@ -100,22 +103,30 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	contractAddress string,
 	cond query.GetLogsCondition,
 ) (item biz.TransactionList, total int, err error) {
-	// 統一管理查詢參數
-	params := map[string]interface{}{
-		"contract_address": contractAddress,
-		"start_time":       cond.StartTime,
-		"end_time":         cond.EndTime,
-	}
+	// 使用 contextx.WithContext 來設置上下文
+	ctx := contextx.WithContext(c)
+
+	// 設置超時機制
+	timeout, cancelFunc := context.WithTimeout(ctx, defaultTimeout)
+	defer cancelFunc()
+
+	// 初始化查詢語句和參數
+	baseCondition := `
+		se.pool_address = $1
+		AND t.timestamp BETWEEN $2 AND $3`
+	params := []interface{}{contractAddress, cond.StartTime, cond.EndTime}
 
 	// 查詢符合條件的總筆數
 	countQuery := `
 		SELECT COUNT(*)
 		FROM swap_events se
 		JOIN transactions t ON se.tx_hash = t.tx_hash
-		WHERE se.pool_address = :contract_address
-		  AND t.timestamp BETWEEN :start_time AND :end_time`
-	err = i.rw.GetContext(c, &total, countQuery, params)
+		WHERE ` + baseCondition
+
+	// 執行查詢總筆數
+	err = i.rw.GetContext(timeout, &total, countQuery, params...)
 	if err != nil {
+		ctx.Error("failed to count swap events", zap.Error(err))
 		return nil, 0, err
 	}
 
@@ -131,15 +142,16 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 		       t.block_number, t.timestamp, t.from_address, t.to_address
 		FROM swap_events se
 		JOIN transactions t ON se.tx_hash = t.tx_hash
-		WHERE se.pool_address = :contract_address
-		  AND t.timestamp BETWEEN :start_time AND :end_time
+		WHERE ` + baseCondition + `
 		ORDER BY t.timestamp DESC`
+
 	var rows []struct {
 		TransactionDAO
 		SwapEventDAO
 	}
-	err = i.rw.SelectContext(c, &rows, logsQuery, params)
+	err = i.rw.SelectContext(timeout, &rows, logsQuery, params...)
 	if err != nil {
+		ctx.Error("failed to fetch swap events", zap.Error(err))
 		return nil, 0, err
 	}
 
@@ -151,6 +163,12 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 		transaction.SwapDetails = append(transaction.SwapDetails, swapDetail)
 		item = append(item, transaction)
 	}
+
+	// Log 最終查詢結果
+	ctx.Info("fetched swap events successfully",
+		zap.Int("total", total),
+		zap.Int("fetched_rows", len(rows)),
+	)
 
 	return item, total, nil
 }
