@@ -16,6 +16,7 @@ type campaignServerImpl struct {
 	createCampaignHandler *command.CreateCampaignHandler
 	addTaskHandler        *command.AddTaskHandler
 	startCampaignHandler  *command.StartCampaignHandler
+	runBacktestHandler    *command.RunBacktestHandler
 
 	campaignGetter query.CampaignGetter
 }
@@ -25,12 +26,14 @@ func NewCampaignServer(
 	createCampaignHandler *command.CreateCampaignHandler,
 	addTaskHandler *command.AddTaskHandler,
 	startCampaignHandler *command.StartCampaignHandler,
+	runBacktestHandler *command.RunBacktestHandler,
 	campaignGetter query.CampaignGetter,
 ) core.CampaignServiceServer {
 	return &campaignServerImpl{
 		createCampaignHandler: createCampaignHandler,
 		addTaskHandler:        addTaskHandler,
 		startCampaignHandler:  startCampaignHandler,
+		runBacktestHandler:    runBacktestHandler,
 		campaignGetter:        campaignGetter,
 	}
 }
@@ -129,6 +132,24 @@ func (i *campaignServerImpl) RunBacktestByCampaign(
 	req *core.GetCampaignRequest,
 	stream grpc.ServerStreamingServer[core.BacktestResultResponse],
 ) error {
-	// TODO: 2024/11/25|sean|implement the backtest
-	panic("implement me")
+	resultCh := make(chan *model.BacktestResult)
+	var err error
+	go func() {
+		err = i.runBacktestHandler.Handle(stream.Context(), req.Id, resultCh)
+		close(resultCh)
+	}()
+
+	for result := range resultCh {
+		err = stream.Send(&core.BacktestResultResponse{
+			Result: result,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
