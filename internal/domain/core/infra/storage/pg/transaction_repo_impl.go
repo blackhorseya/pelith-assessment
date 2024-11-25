@@ -90,7 +90,7 @@ func (i *TransactionRepoImpl) ListByAddress(
 	for _, row := range rows {
 		transaction := row.TransactionDAO.ToBizModel()
 		if row.SwapEventDAO.ID != 0 { // 確認有關聯的 SwapEvent
-			transaction.SwapDetails = append(transaction.SwapDetails, row.SwapEventDAO.ToModel())
+			transaction.SwapDetail = row.SwapEventDAO.ToModel()
 		}
 		transactions = append(transactions, transaction)
 	}
@@ -158,9 +158,8 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	// 將查詢結果轉換為 biz.TransactionList
 	item = biz.TransactionList{}
 	for _, row := range rows {
-		swapDetail := row.SwapEventDAO.ToModel()
 		transaction := row.TransactionDAO.ToBizModel()
-		transaction.SwapDetails = append(transaction.SwapDetails, swapDetail)
+		transaction.SwapDetail = row.SwapEventDAO.ToModel()
 		item = append(item, transaction)
 	}
 
@@ -203,10 +202,9 @@ func (i *TransactionRepoImpl) Create(c context.Context, transaction *biz.Transac
 	}
 
 	// 插入 swap_event 資料
-	if transaction.SwapDetails != nil {
-		for _, swap := range transaction.SwapDetails {
-			swapEventDAO := FromModelSwapDetailToDAO(transaction.GetTransaction().TxHash, swap)
-			swapQuery := `
+	if transaction.SwapDetail != nil {
+		swapEventDAO := FromModelSwapDetailToDAO(transaction.GetTransaction().TxHash, transaction.SwapDetail)
+		swapQuery := `
 				INSERT INTO swap_events (
 				                         tx_hash, 
 				                         from_token_address, 
@@ -215,10 +213,9 @@ func (i *TransactionRepoImpl) Create(c context.Context, transaction *biz.Transac
 				                         to_token_amount, 
 				                         pool_address)
 				VALUES (:tx_hash, :from_token_address, :to_token_address, :from_token_amount, :to_token_amount, :pool_address)`
-			_, err = tx.NamedExecContext(c, swapQuery, swapEventDAO)
-			if err != nil {
-				return err
-			}
+		_, err = tx.NamedExecContext(c, swapQuery, swapEventDAO)
+		if err != nil {
+			return err
 		}
 	}
 
