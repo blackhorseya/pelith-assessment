@@ -235,7 +235,7 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 		}
 
 		// 构造 Transaction 实例
-		item = append(item, &biz.Transaction{
+		got := &biz.Transaction{
 			Transaction: model.Transaction{
 				TxHash:      tx.Hash().Hex(),
 				FromAddress: from.Hex(),
@@ -248,7 +248,9 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 				Type:        txType,
 				SwapDetails: []*model.SwapDetail{swapDetail},
 			},
-		})
+		}
+		item = append(item, got)
+		ctx.Debug("fetched transaction", zap.String("tx_hash", got.TxHash))
 	}
 
 	return item, len(item), nil
