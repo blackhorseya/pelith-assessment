@@ -77,7 +77,13 @@ func (i *TransactionRepoImpl) Create(c context.Context, transaction *biz.Transac
 		for _, swap := range transaction.SwapDetails {
 			swapEventDAO := FromModelSwapDetailToDAO(transaction.TxHash, swap)
 			swapQuery := `
-				INSERT INTO swap_events (tx_hash, from_token_address, to_token_address, from_token_amount, to_token_amount, pool_address)
+				INSERT INTO swap_events (
+				                         tx_hash, 
+				                         from_token_address, 
+				                         to_token_address, 
+				                         from_token_amount, 
+				                         to_token_amount, 
+				                         pool_address)
 				VALUES (:tx_hash, :from_token_address, :to_token_address, :from_token_amount, :to_token_amount, :pool_address)`
 			_, err = tx.NamedExecContext(c, swapQuery, swapEventDAO)
 			if err != nil {
