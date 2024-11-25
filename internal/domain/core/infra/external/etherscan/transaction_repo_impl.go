@@ -77,7 +77,7 @@ func (i *TransactionRepoImpl) GetByHashWithPool(c context.Context, hash, poolAdd
 	}
 	swapEventHash := parsedABI.Events["Swap"].ID
 
-	swapDetail, err := tx.GetSwapForPool(common.HexToHash(poolAddress), swapEventHash)
+	swapDetail, err := tx.GetSwapForPool(common.HexToAddress(poolAddress), swapEventHash)
 	if err != nil || swapDetail == nil {
 		ctx.Debug(
 			"the tx is not a swap tx",
@@ -156,7 +156,7 @@ func (i *TransactionRepoImpl) ListByAddress(
 
 		// 如果有目标合约，则解析日志
 		if cond.PoolAddress != "" {
-			swapDetail, err2 := got.GetSwapForPool(common.HexToHash(cond.PoolAddress), swapEventHash)
+			swapDetail, err2 := got.GetSwapForPool(common.HexToAddress(cond.PoolAddress), swapEventHash)
 			if err2 != nil || swapDetail == nil {
 				ctx.Debug(
 					"the tx is not a swap tx",
@@ -265,7 +265,7 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 			return err2
 		}
 
-		swapDetail, err2 := tx.GetSwapForPool(common.HexToHash(contractAddress), swapEventHash)
+		swapDetail, err2 := tx.GetSwapForPool(common.HexToAddress(contractAddress), swapEventHash)
 		if err2 != nil || swapDetail == nil {
 			ctx.Debug(
 				"the tx is not a swap tx",
