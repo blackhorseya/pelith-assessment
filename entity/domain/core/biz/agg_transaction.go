@@ -102,13 +102,14 @@ func (x *Transaction) GetSwapForPool(poolAddress, swapEventHash common.Hash) (*m
 	fromAmount = new(big.Int).SetBytes(firstLog.Data[:32]) // First 32 bytes represent the amount
 	toAmount = new(big.Int).SetBytes(lastLog.Data[:32])    // First 32 bytes represent the amount
 
-	return &model.SwapDetail{
+	x.SwapDetail = &model.SwapDetail{
 		FromTokenAddress: fromTokenAddress.Hex(),
 		ToTokenAddress:   toTokenAddress.Hex(),
 		FromTokenAmount:  fromAmount.String(),
 		ToTokenAmount:    toAmount.String(),
 		PoolAddress:      poolAddress.Hex(),
-	}, nil
+	}
+	return x.SwapDetail, nil
 }
 
 // IsSwapType is used to check if the transaction is swap executed.

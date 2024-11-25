@@ -269,6 +269,17 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 			return err2
 		}
 
+		swapDetail, err2 := tx.GetSwapForPool(common.HexToHash(contractAddress), swapEventHash)
+		if err2 != nil || swapDetail == nil {
+			ctx.Debug(
+				"the tx is not a swap tx",
+				zap.String("tx_hash", tx.GetTransaction().TxHash),
+				zap.String("pool_address", contractAddress),
+				zap.Error(err2),
+			)
+			continue
+		}
+
 		if txCh != nil {
 			txCh <- tx
 		}

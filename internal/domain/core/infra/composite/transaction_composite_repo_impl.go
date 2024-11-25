@@ -145,6 +145,44 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
 	cond query.ListTransactionCondition,
 	txCh chan<- *biz.Transaction,
 ) error {
-	// TODO: 2024/11/25|sean|implement me
-	panic("implement me")
+	ctx := contextx.WithContext(c)
+
+	lockKey := "lock_" + address
+
+	lock, _ := i.locks.LoadOrStore(lockKey, &sync.Mutex{})
+	mtx, ok := lock.(*sync.Mutex)
+	if !ok {
+		ctx.Error("failed to load lock", zap.String("lockKey", lockKey))
+		return errors.New("failed to load lock")
+	}
+
+	mtx.Lock()
+	defer func() {
+		mtx.Unlock()
+		i.locks.Delete(lockKey)
+	}()
+
+	item, total, err := i.dbRepo.GetLogsByAddress(ctx, address, query.GetLogsCondition{
+		StartTime: cond.StartTime,
+		EndTime:   cond.EndTime,
+	})
+	if err != nil {
+		ctx.Error("dbRepo.GetLogsByAddress", zap.Error(err))
+		return err
+	}
+
+	if total > 0 {
+		for _, tx := range item {
+			txCh <- tx
+		}
+		return nil
+	}
+
+	err = i.apiRepo.GetSwapTxByPoolAddress(ctx, address, cond, txCh)
+	if err != nil {
+		ctx.Error("apiRepo.GetSwapTxByPoolAddress", zap.Error(err))
+		return err
+	}
+
+	return nil
 }
