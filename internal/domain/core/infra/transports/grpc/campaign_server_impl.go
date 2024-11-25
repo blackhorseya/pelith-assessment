@@ -124,3 +124,11 @@ func (i *campaignServerImpl) ListCampaigns(
 
 	return nil
 }
+
+func (i *campaignServerImpl) RunBacktestByCampaign(
+	req *core.GetCampaignRequest,
+	stream grpc.ServerStreamingServer[core.BacktestResultResponse],
+) error {
+	// TODO: 2024/11/25|sean|implement the backtest
+	panic("implement me")
+}

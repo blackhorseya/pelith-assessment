@@ -254,6 +254,248 @@ func (mr *MockCampaignService_ListCampaignsServerMockRecorder) SetTrailer(arg0 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockCampaignService_ListCampaignsServer)(nil).SetTrailer), arg0)
 }
 
+// MockCampaignService_RunBacktestByCampaignClient is a mock of CampaignService_RunBacktestByCampaignClient interface.
+type MockCampaignService_RunBacktestByCampaignClient struct {
+	ctrl     *gomock.Controller
+	recorder *MockCampaignService_RunBacktestByCampaignClientMockRecorder
+}
+
+// MockCampaignService_RunBacktestByCampaignClientMockRecorder is the mock recorder for MockCampaignService_RunBacktestByCampaignClient.
+type MockCampaignService_RunBacktestByCampaignClientMockRecorder struct {
+	mock *MockCampaignService_RunBacktestByCampaignClient
+}
+
+// NewMockCampaignService_RunBacktestByCampaignClient creates a new mock instance.
+func NewMockCampaignService_RunBacktestByCampaignClient(ctrl *gomock.Controller) *MockCampaignService_RunBacktestByCampaignClient {
+	mock := &MockCampaignService_RunBacktestByCampaignClient{ctrl: ctrl}
+	mock.recorder = &MockCampaignService_RunBacktestByCampaignClientMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCampaignService_RunBacktestByCampaignClient) EXPECT() *MockCampaignService_RunBacktestByCampaignClientMockRecorder {
+	return m.recorder
+}
+
+// CloseSend mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignClient) CloseSend() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CloseSend")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CloseSend indicates an expected call of CloseSend.
+func (mr *MockCampaignService_RunBacktestByCampaignClientMockRecorder) CloseSend() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CloseSend", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignClient)(nil).CloseSend))
+}
+
+// Context mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignClient) Context() context.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Context")
+	ret0, _ := ret[0].(context.Context)
+	return ret0
+}
+
+// Context indicates an expected call of Context.
+func (mr *MockCampaignService_RunBacktestByCampaignClientMockRecorder) Context() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignClient)(nil).Context))
+}
+
+// Header mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignClient) Header() (metadata.MD, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Header")
+	ret0, _ := ret[0].(metadata.MD)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Header indicates an expected call of Header.
+func (mr *MockCampaignService_RunBacktestByCampaignClientMockRecorder) Header() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Header", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignClient)(nil).Header))
+}
+
+// Recv mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignClient) Recv() (*BacktestResultResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Recv")
+	ret0, _ := ret[0].(*BacktestResultResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Recv indicates an expected call of Recv.
+func (mr *MockCampaignService_RunBacktestByCampaignClientMockRecorder) Recv() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Recv", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignClient)(nil).Recv))
+}
+
+// RecvMsg mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignClient) RecvMsg(arg0 interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RecvMsg", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RecvMsg indicates an expected call of RecvMsg.
+func (mr *MockCampaignService_RunBacktestByCampaignClientMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignClient)(nil).RecvMsg), arg0)
+}
+
+// SendMsg mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignClient) SendMsg(arg0 interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendMsg", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendMsg indicates an expected call of SendMsg.
+func (mr *MockCampaignService_RunBacktestByCampaignClientMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignClient)(nil).SendMsg), arg0)
+}
+
+// Trailer mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignClient) Trailer() metadata.MD {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Trailer")
+	ret0, _ := ret[0].(metadata.MD)
+	return ret0
+}
+
+// Trailer indicates an expected call of Trailer.
+func (mr *MockCampaignService_RunBacktestByCampaignClientMockRecorder) Trailer() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Trailer", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignClient)(nil).Trailer))
+}
+
+// MockCampaignService_RunBacktestByCampaignServer is a mock of CampaignService_RunBacktestByCampaignServer interface.
+type MockCampaignService_RunBacktestByCampaignServer struct {
+	ctrl     *gomock.Controller
+	recorder *MockCampaignService_RunBacktestByCampaignServerMockRecorder
+}
+
+// MockCampaignService_RunBacktestByCampaignServerMockRecorder is the mock recorder for MockCampaignService_RunBacktestByCampaignServer.
+type MockCampaignService_RunBacktestByCampaignServerMockRecorder struct {
+	mock *MockCampaignService_RunBacktestByCampaignServer
+}
+
+// NewMockCampaignService_RunBacktestByCampaignServer creates a new mock instance.
+func NewMockCampaignService_RunBacktestByCampaignServer(ctrl *gomock.Controller) *MockCampaignService_RunBacktestByCampaignServer {
+	mock := &MockCampaignService_RunBacktestByCampaignServer{ctrl: ctrl}
+	mock.recorder = &MockCampaignService_RunBacktestByCampaignServerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCampaignService_RunBacktestByCampaignServer) EXPECT() *MockCampaignService_RunBacktestByCampaignServerMockRecorder {
+	return m.recorder
+}
+
+// Context mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignServer) Context() context.Context {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Context")
+	ret0, _ := ret[0].(context.Context)
+	return ret0
+}
+
+// Context indicates an expected call of Context.
+func (mr *MockCampaignService_RunBacktestByCampaignServerMockRecorder) Context() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Context", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignServer)(nil).Context))
+}
+
+// RecvMsg mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignServer) RecvMsg(arg0 interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RecvMsg", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RecvMsg indicates an expected call of RecvMsg.
+func (mr *MockCampaignService_RunBacktestByCampaignServerMockRecorder) RecvMsg(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RecvMsg", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignServer)(nil).RecvMsg), arg0)
+}
+
+// Send mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignServer) Send(arg0 *BacktestResultResponse) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Send", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Send indicates an expected call of Send.
+func (mr *MockCampaignService_RunBacktestByCampaignServerMockRecorder) Send(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Send", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignServer)(nil).Send), arg0)
+}
+
+// SendHeader mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignServer) SendHeader(arg0 metadata.MD) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendHeader", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendHeader indicates an expected call of SendHeader.
+func (mr *MockCampaignService_RunBacktestByCampaignServerMockRecorder) SendHeader(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendHeader", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignServer)(nil).SendHeader), arg0)
+}
+
+// SendMsg mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignServer) SendMsg(arg0 interface{}) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendMsg", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SendMsg indicates an expected call of SendMsg.
+func (mr *MockCampaignService_RunBacktestByCampaignServerMockRecorder) SendMsg(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendMsg", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignServer)(nil).SendMsg), arg0)
+}
+
+// SetHeader mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignServer) SetHeader(arg0 metadata.MD) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetHeader", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetHeader indicates an expected call of SetHeader.
+func (mr *MockCampaignService_RunBacktestByCampaignServerMockRecorder) SetHeader(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHeader", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignServer)(nil).SetHeader), arg0)
+}
+
+// SetTrailer mocks base method.
+func (m *MockCampaignService_RunBacktestByCampaignServer) SetTrailer(arg0 metadata.MD) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetTrailer", arg0)
+}
+
+// SetTrailer indicates an expected call of SetTrailer.
+func (mr *MockCampaignService_RunBacktestByCampaignServerMockRecorder) SetTrailer(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetTrailer", reflect.TypeOf((*MockCampaignService_RunBacktestByCampaignServer)(nil).SetTrailer), arg0)
+}
+
 // MockCampaignServiceClient is a mock of CampaignServiceClient interface.
 type MockCampaignServiceClient struct {
 	ctrl     *gomock.Controller
@@ -335,6 +577,26 @@ func (mr *MockCampaignServiceClientMockRecorder) ListCampaigns(ctx, in interface
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCampaigns", reflect.TypeOf((*MockCampaignServiceClient)(nil).ListCampaigns), varargs...)
+}
+
+// RunBacktestByCampaign mocks base method.
+func (m *MockCampaignServiceClient) RunBacktestByCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (CampaignService_RunBacktestByCampaignClient, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "RunBacktestByCampaign", varargs...)
+	ret0, _ := ret[0].(CampaignService_RunBacktestByCampaignClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// RunBacktestByCampaign indicates an expected call of RunBacktestByCampaign.
+func (mr *MockCampaignServiceClientMockRecorder) RunBacktestByCampaign(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunBacktestByCampaign", reflect.TypeOf((*MockCampaignServiceClient)(nil).RunBacktestByCampaign), varargs...)
 }
 
 // StartCampaign mocks base method.
@@ -422,6 +684,20 @@ func (m *MockCampaignServiceServer) ListCampaigns(blob *ListCampaignsRequest, se
 func (mr *MockCampaignServiceServerMockRecorder) ListCampaigns(blob, server interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListCampaigns", reflect.TypeOf((*MockCampaignServiceServer)(nil).ListCampaigns), blob, server)
+}
+
+// RunBacktestByCampaign mocks base method.
+func (m *MockCampaignServiceServer) RunBacktestByCampaign(blob *GetCampaignRequest, server CampaignService_RunBacktestByCampaignServer) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RunBacktestByCampaign", blob, server)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RunBacktestByCampaign indicates an expected call of RunBacktestByCampaign.
+func (mr *MockCampaignServiceServerMockRecorder) RunBacktestByCampaign(blob, server interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunBacktestByCampaign", reflect.TypeOf((*MockCampaignServiceServer)(nil).RunBacktestByCampaign), blob, server)
 }
 
 // StartCampaign mocks base method.

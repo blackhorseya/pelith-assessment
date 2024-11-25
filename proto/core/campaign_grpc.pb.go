@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CampaignService_CreateCampaign_FullMethodName = "/core.CampaignService/CreateCampaign"
-	CampaignService_StartCampaign_FullMethodName  = "/core.CampaignService/StartCampaign"
-	CampaignService_GetCampaign_FullMethodName    = "/core.CampaignService/GetCampaign"
-	CampaignService_ListCampaigns_FullMethodName  = "/core.CampaignService/ListCampaigns"
+	CampaignService_CreateCampaign_FullMethodName        = "/core.CampaignService/CreateCampaign"
+	CampaignService_StartCampaign_FullMethodName         = "/core.CampaignService/StartCampaign"
+	CampaignService_GetCampaign_FullMethodName           = "/core.CampaignService/GetCampaign"
+	CampaignService_ListCampaigns_FullMethodName         = "/core.CampaignService/ListCampaigns"
+	CampaignService_RunBacktestByCampaign_FullMethodName = "/core.CampaignService/RunBacktestByCampaign"
 )
 
 // CampaignServiceClient is the client API for CampaignService service.
@@ -35,6 +36,7 @@ type CampaignServiceClient interface {
 	StartCampaign(ctx context.Context, in *StartCampaignRequest, opts ...grpc.CallOption) (*StartCampaignResponse, error)
 	GetCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (*GetCampaignResponse, error)
 	ListCampaigns(ctx context.Context, in *ListCampaignsRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[GetCampaignResponse], error)
+	RunBacktestByCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BacktestResultResponse], error)
 }
 
 type campaignServiceClient struct {
@@ -94,6 +96,25 @@ func (c *campaignServiceClient) ListCampaigns(ctx context.Context, in *ListCampa
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type CampaignService_ListCampaignsClient = grpc.ServerStreamingClient[GetCampaignResponse]
 
+func (c *campaignServiceClient) RunBacktestByCampaign(ctx context.Context, in *GetCampaignRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[BacktestResultResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &CampaignService_ServiceDesc.Streams[1], CampaignService_RunBacktestByCampaign_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GetCampaignRequest, BacktestResultResponse]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CampaignService_RunBacktestByCampaignClient = grpc.ServerStreamingClient[BacktestResultResponse]
+
 // CampaignServiceServer is the server API for CampaignService service.
 // All implementations should embed UnimplementedCampaignServiceServer
 // for forward compatibility.
@@ -104,6 +125,7 @@ type CampaignServiceServer interface {
 	StartCampaign(context.Context, *StartCampaignRequest) (*StartCampaignResponse, error)
 	GetCampaign(context.Context, *GetCampaignRequest) (*GetCampaignResponse, error)
 	ListCampaigns(*ListCampaignsRequest, grpc.ServerStreamingServer[GetCampaignResponse]) error
+	RunBacktestByCampaign(*GetCampaignRequest, grpc.ServerStreamingServer[BacktestResultResponse]) error
 }
 
 // UnimplementedCampaignServiceServer should be embedded to have
@@ -124,6 +146,9 @@ func (UnimplementedCampaignServiceServer) GetCampaign(context.Context, *GetCampa
 }
 func (UnimplementedCampaignServiceServer) ListCampaigns(*ListCampaignsRequest, grpc.ServerStreamingServer[GetCampaignResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method ListCampaigns not implemented")
+}
+func (UnimplementedCampaignServiceServer) RunBacktestByCampaign(*GetCampaignRequest, grpc.ServerStreamingServer[BacktestResultResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method RunBacktestByCampaign not implemented")
 }
 func (UnimplementedCampaignServiceServer) testEmbeddedByValue() {}
 
@@ -210,6 +235,17 @@ func _CampaignService_ListCampaigns_Handler(srv interface{}, stream grpc.ServerS
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type CampaignService_ListCampaignsServer = grpc.ServerStreamingServer[GetCampaignResponse]
 
+func _CampaignService_RunBacktestByCampaign_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetCampaignRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CampaignServiceServer).RunBacktestByCampaign(m, &grpc.GenericServerStream[GetCampaignRequest, BacktestResultResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CampaignService_RunBacktestByCampaignServer = grpc.ServerStreamingServer[BacktestResultResponse]
+
 // CampaignService_ServiceDesc is the grpc.ServiceDesc for CampaignService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -234,6 +270,11 @@ var CampaignService_ServiceDesc = grpc.ServiceDesc{
 		{
 			StreamName:    "ListCampaigns",
 			Handler:       _CampaignService_ListCampaigns_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RunBacktestByCampaign",
+			Handler:       _CampaignService_RunBacktestByCampaign_Handler,
 			ServerStreams: true,
 		},
 	},

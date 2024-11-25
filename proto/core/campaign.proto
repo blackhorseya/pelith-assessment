@@ -54,10 +54,16 @@ message AddTasksForCampaignResponse {}
 // ListCampaignsRequest is the request for list campaigns
 message ListCampaignsRequest {}
 
+// BacktestResultResponse is the response for backtest result
+message BacktestResultResponse {
+  entity.domain.core.model.BacktestResult result = 1;
+}
+
 // CampaignService is the service for campaign
 service CampaignService {
   rpc CreateCampaign(CreateCampaignRequest) returns (CreateCampaignResponse) {}
   rpc StartCampaign(StartCampaignRequest) returns (StartCampaignResponse) {}
   rpc GetCampaign(GetCampaignRequest) returns (GetCampaignResponse) {}
   rpc ListCampaigns(ListCampaignsRequest) returns (stream GetCampaignResponse) {}
+  rpc RunBacktestByCampaign(GetCampaignRequest) returns (stream BacktestResultResponse) {}
 }
