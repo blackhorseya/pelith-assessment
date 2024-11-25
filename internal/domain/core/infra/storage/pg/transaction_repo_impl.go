@@ -44,23 +44,6 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 }
 
 func (i *TransactionRepoImpl) Create(c context.Context, transaction *biz.Transaction) error {
-	dao := &TransactionDAO{
-		TxHash:      transaction.TxHash,
-		BlockNumber: transaction.BlockNumber,
-		Timestamp:   transaction.Timestamp.AsTime(),
-		FromAddress: transaction.FromAddress,
-		ToAddress:   transaction.ToAddress,
-		Value:       transaction.Amount,
-		Status:      true,
-	}
-
-	stmt := `
-		INSERT INTO transactions (
-			tx_hash, block_number, timestamp, from_address, to_address, value, gas_used, gas_price, status
-		) VALUES (
-			:tx_hash, :block_number, :timestamp, :from_address, :to_address, :value, :gas_used, :gas_price, :status
-		)
-	`
-	_, err := i.rw.NamedExecContext(c, stmt, dao)
-	return err
+	// TODO: 2024/11/25|sean|implement me
+	panic("implement me")
 }
