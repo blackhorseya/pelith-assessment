@@ -56,39 +56,7 @@ func NewTransactionGetter(impl *TransactionRepoImpl) query.TransactionGetter {
 }
 
 func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
-	ctx := contextx.WithContext(c)
-
-	// 获取交易
-	tx, isPending, err := i.ethclientAPI.TransactionByHash(ctx, common.HexToHash(hash))
-	if err != nil {
-		ctx.Error("failed to fetch transaction", zap.Error(err), zap.String("tx_hash", hash))
-		return nil, err
-	}
-	from, err := i.getFromByTx(ctx, tx)
-	if err != nil {
-		ctx.Error("failed to fetch sender", zap.Error(err), zap.String("tx_hash", hash))
-		return nil, err
-	}
-
-	// 获取交易 Receipt
-	receipt, err := i.ethclientAPI.TransactionReceipt(ctx, common.HexToHash(hash))
-	if err != nil {
-		ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", hash))
-		return nil, err
-	}
-
-	txStatus := model.TransactionStatus_TRANSACTION_STATUS_COMPLETED
-	if isPending {
-		txStatus = model.TransactionStatus_TRANSACTION_STATUS_PENDING
-	}
-
-	return biz.NewTransaction(
-		tx.Hash().Hex(),
-		from.Hex(),
-		tx.To().Hex(),
-		receipt.BlockNumber.Int64(),
-		tx.Time(),
-	).WithReceipt(receipt).WithStatus(txStatus), nil
+	return i.getByHash(c, hash)
 }
 
 func (i *TransactionRepoImpl) ListByAddress(
@@ -262,7 +230,7 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 	c context.Context,
 	contractAddress string,
 	cond query.ListTransactionCondition,
-	txCh chan<- *biz.TransactionList,
+	txCh chan<- *biz.Transaction,
 ) error {
 	ctx := contextx.WithContext(c)
 
@@ -296,11 +264,18 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 	}
 
 	for _, logEntry := range logs {
-		ctx.Debug("fetched log", zap.String("tx_hash", logEntry.TransactionHash))
-		// TODO: 2024/11/25|sean|fetch transaction details
+		tx, err2 := i.getByHash(ctx, logEntry.TransactionHash)
+		if err2 != nil || tx == nil {
+			ctx.Error("failed to fetch transaction", zap.Error(err2), zap.String("tx_hash", logEntry.TransactionHash))
+			return err2
+		}
+
+		if txCh != nil {
+			txCh <- tx
+		}
 	}
 
-	panic("implement me")
+	return nil
 }
 
 func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
@@ -404,4 +379,40 @@ func normalizeAmount(amount *big.Int, decimals int) *big.Float {
 	amountFloat := new(big.Float).SetInt(amount)           // 转换为浮点数
 	decimalsFloat := new(big.Float).SetInt(decimalsFactor) // 转换为浮点数
 	return new(big.Float).Quo(amountFloat, decimalsFloat)  // 执行归一化
+}
+
+func (i *TransactionRepoImpl) getByHash(c context.Context, hash string) (*biz.Transaction, error) {
+	ctx := contextx.WithContext(c)
+
+	// 获取交易
+	tx, isPending, err := i.ethclientAPI.TransactionByHash(ctx, common.HexToHash(hash))
+	if err != nil {
+		ctx.Error("failed to fetch transaction", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+	from, err := i.getFromByTx(ctx, tx)
+	if err != nil {
+		ctx.Error("failed to fetch sender", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+
+	// 获取交易 Receipt
+	receipt, err := i.ethclientAPI.TransactionReceipt(ctx, common.HexToHash(hash))
+	if err != nil {
+		ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+
+	txStatus := model.TransactionStatus_TRANSACTION_STATUS_COMPLETED
+	if isPending {
+		txStatus = model.TransactionStatus_TRANSACTION_STATUS_PENDING
+	}
+
+	return biz.NewTransaction(
+		tx.Hash().Hex(),
+		from.Hex(),
+		tx.To().Hex(),
+		receipt.BlockNumber.Int64(),
+		tx.Time(),
+	).WithReceipt(receipt).WithStatus(txStatus), nil
 }
