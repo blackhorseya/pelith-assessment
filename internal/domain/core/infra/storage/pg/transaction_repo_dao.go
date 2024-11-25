@@ -5,6 +5,7 @@ import (
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // TransactionDAO represents the transactions table
@@ -24,6 +25,21 @@ func FromBizTransactionToDAO(transaction *biz.Transaction) *TransactionDAO {
 		Timestamp:   transaction.Timestamp.AsTime(),
 		FromAddress: transaction.FromAddress,
 		ToAddress:   transaction.ToAddress,
+	}
+}
+
+// ToBizModel converts a TransactionDAO to a biz.Transaction
+func (dao *TransactionDAO) ToBizModel() *biz.Transaction {
+	return &biz.Transaction{
+		Transaction: model.Transaction{
+			TxHash:      dao.TxHash,
+			BlockNumber: dao.BlockNumber,
+			FromAddress: dao.FromAddress,
+			ToAddress:   dao.ToAddress,
+			Timestamp:   timestamppb.New(dao.Timestamp),
+			Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
+			Type:        model.TransactionType_TRANSACTION_TYPE_SWAP,
+		},
 	}
 }
 
@@ -47,5 +63,16 @@ func FromModelSwapDetailToDAO(txHash string, swap *model.SwapDetail) *SwapEventD
 		FromTokenAmount:  swap.FromTokenAmount,
 		ToTokenAmount:    swap.ToTokenAmount,
 		PoolAddress:      swap.PoolAddress,
+	}
+}
+
+// ToModel converts a SwapEventDAO to a model.SwapDetail
+func (dao *SwapEventDAO) ToModel() *model.SwapDetail {
+	return &model.SwapDetail{
+		FromTokenAddress: dao.FromTokenAddress,
+		ToTokenAddress:   dao.ToTokenAddress,
+		FromTokenAmount:  dao.FromTokenAmount,
+		ToTokenAmount:    dao.ToTokenAmount,
+		PoolAddress:      dao.PoolAddress,
 	}
 }
