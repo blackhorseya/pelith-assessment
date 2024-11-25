@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"strings"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
@@ -69,7 +70,7 @@ func (x *Transaction) GetSwapForPool(poolAddress common.Address, swapEventHash c
 	var fromTokenAddress, toTokenAddress common.Address
 	var fromAmount, toAmount *big.Int
 
-	for idx, logEntry := range x.receipt.Logs {
+	for _, logEntry := range x.receipt.Logs {
 		// Skip logs that don't match the criteria
 		if len(logEntry.Topics) < 3 || logEntry.Topics[0] != swapEventHash {
 			continue
@@ -82,10 +83,10 @@ func (x *Transaction) GetSwapForPool(poolAddress common.Address, swapEventHash c
 
 		// Set the first valid log if not already set
 		if firstLog == nil {
-			firstLog = x.receipt.Logs[idx]
+			firstLog = x.receipt.Logs[0]
 		}
 		// Update the last valid log
-		lastLog = x.receipt.Logs[idx]
+		lastLog = x.receipt.Logs[len(x.receipt.Logs)-1]
 	}
 
 	if firstLog == nil || lastLog == nil {
@@ -115,6 +116,23 @@ func (x *Transaction) GetSwapForPool(poolAddress common.Address, swapEventHash c
 // IsSwapType is used to check if the transaction is swap executed.
 func (x *Transaction) IsSwapType() bool {
 	return x.tx.Type == model.TransactionType_TRANSACTION_TYPE_SWAP
+}
+
+// GetSwapAmountByTokenAddress is used to get the swap amount by token address.
+func (x *Transaction) GetSwapAmountByTokenAddress(tokenAddress string) string {
+	if x.SwapDetail == nil {
+		return "0"
+	}
+
+	if strings.EqualFold(x.SwapDetail.FromTokenAddress, tokenAddress) {
+		return x.SwapDetail.FromTokenAmount
+	}
+
+	if strings.EqualFold(x.SwapDetail.ToTokenAddress, tokenAddress) {
+		return x.SwapDetail.ToTokenAmount
+	}
+
+	return "0"
 }
 
 // Process is used to process the transaction.
