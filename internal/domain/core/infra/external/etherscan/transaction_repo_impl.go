@@ -137,28 +137,12 @@ func (i *TransactionRepoImpl) ListByAddress(
 
 	// 遍历交易并解析日志
 	for _, tx := range txs {
-		txType := model.TransactionType_TRANSACTION_TYPE_UNSPECIFIED
-		var swapDetails []*model.SwapDetail
-
 		var receipt *types.Receipt
 		// 获取交易的 Receipt
 		receipt, err = i.ethclientAPI.TransactionReceipt(context.Background(), common.HexToHash(tx.Hash))
 		if err != nil {
 			ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", tx.Hash))
 			return nil, 0, err
-		}
-
-		// 解析 Swap 日志
-		swapDetail, err2 := i.decodeSwapLogs(receipt.Logs, swapEventHash)
-		if err2 != nil {
-			ctx.Warn("failed to decode swap logs", zap.Error(err2), zap.String("tx_hash", tx.Hash))
-			swapDetail = nil
-		}
-
-		if swapDetail != nil {
-			txType = model.TransactionType_TRANSACTION_TYPE_SWAP
-			swapDetail.PoolAddress = cond.PoolAddress
-			swapDetails = append(swapDetails, swapDetail)
 		}
 
 		// 构造 Transaction 实例
@@ -169,8 +153,21 @@ func (i *TransactionRepoImpl) ListByAddress(
 			receipt.BlockNumber.Int64(),
 			tx.TimeStamp.Time(),
 		).WithReceipt(receipt)
-		// TODO: 2024/11/25|sean|handle type ???
-		ctx.Debug("fetched transaction", zap.String("tx_hash", got.GetTransaction().TxHash), zap.Any("type", txType))
+
+		// 如果有目标合约，则解析日志
+		if cond.PoolAddress != "" {
+			swapDetail, err2 := got.GetSwapForPool(common.HexToHash(cond.PoolAddress), swapEventHash)
+			if err2 != nil || swapDetail == nil {
+				ctx.Debug(
+					"the tx is not a swap tx",
+					zap.String("tx_hash", got.GetTransaction().TxHash),
+					zap.String("pool_address", cond.PoolAddress),
+					zap.Error(err2),
+				)
+				continue
+			}
+		}
+
 		res = append(res, got)
 	}
 

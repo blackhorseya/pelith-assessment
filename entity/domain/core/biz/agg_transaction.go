@@ -3,10 +3,13 @@ package biz
 import (
 	"context"
 	"errors"
+	"fmt"
+	"math/big"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/pkg/eventx"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -54,6 +57,58 @@ func (x *Transaction) WithStatus(status model.TransactionStatus) *Transaction {
 // GetTransaction is used to get the transaction.
 func (x *Transaction) GetTransaction() *model.Transaction {
 	return x.tx
+}
+
+// GetSwapForPool is used to get the swap for the pool.
+func (x *Transaction) GetSwapForPool(poolAddress, swapEventHash common.Hash) (*model.SwapDetail, error) {
+	if x.receipt == nil {
+		return nil, errors.New("I need receipt to get swap for pool")
+	}
+
+	var firstLog, lastLog *types.Log
+	var fromTokenAddress, toTokenAddress common.Address
+	var fromAmount, toAmount *big.Int
+
+	for idx, logEntry := range x.receipt.Logs {
+		// Skip logs that don't match the criteria
+		if len(logEntry.Topics) < 3 || logEntry.Topics[0] != swapEventHash {
+			continue
+		}
+
+		// Ensure data length is sufficient
+		if len(logEntry.Data) < 64 {
+			return nil, fmt.Errorf("log data length is insufficient: %s", logEntry.Data)
+		}
+
+		// Set the first valid log if not already set
+		if firstLog == nil {
+			firstLog = x.receipt.Logs[idx]
+		}
+		// Update the last valid log
+		lastLog = x.receipt.Logs[idx]
+	}
+
+	if firstLog == nil || lastLog == nil {
+		return nil, errors.New("no logs found")
+	}
+
+	if len(firstLog.Data) < 32 || len(lastLog.Data) < 32 {
+		return nil, errors.New("log data length is insufficient")
+	}
+
+	fromTokenAddress = firstLog.Address
+	toTokenAddress = lastLog.Address
+
+	fromAmount = new(big.Int).SetBytes(firstLog.Data[:32]) // First 32 bytes represent the amount
+	toAmount = new(big.Int).SetBytes(lastLog.Data[:32])    // First 32 bytes represent the amount
+
+	return &model.SwapDetail{
+		FromTokenAddress: fromTokenAddress.Hex(),
+		ToTokenAddress:   toTokenAddress.Hex(),
+		FromTokenAmount:  fromAmount.String(),
+		ToTokenAmount:    toAmount.String(),
+		PoolAddress:      poolAddress.Hex(),
+	}, nil
 }
 
 // IsSwapType is used to check if the transaction is swap executed.
