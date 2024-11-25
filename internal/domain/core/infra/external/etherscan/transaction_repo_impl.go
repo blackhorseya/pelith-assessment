@@ -215,6 +215,7 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 			ctx.Warn("failed to decode swap logs", zap.Error(err2), zap.String("tx_hash", logEntry.TransactionHash))
 			swapDetail = nil
 		}
+		swapDetail.PoolAddress = contractAddress
 
 		txType := model.TransactionType_TRANSACTION_TYPE_UNSPECIFIED
 		if swapDetail != nil {

@@ -1,11 +1,11 @@
 -- Create the transactions table
 CREATE TABLE IF NOT EXISTS transactions
 (
-    tx_hash      TEXT PRIMARY KEY, -- Transaction hash
-    block_number INTEGER,          -- Block number
-    timestamp    TIMESTAMP,        -- Transaction timestamp
-    from_address TEXT,             -- Sender address
-    to_address   TEXT              -- Receiver address
+    tx_hash      TEXT PRIMARY KEY,   -- Transaction hash
+    block_number INTEGER   NOT NULL, -- Block number
+    timestamp    TIMESTAMP NOT NULL, -- Transaction timestamp
+    from_address TEXT      NOT NULL, -- Sender address
+    to_address   TEXT      NOT NULL  -- Receiver address
 );
 
 -- Create the swap_events table
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS swap_events
     to_token_address   TEXT NOT NULL,                       -- Destination token address
     from_token_amount  TEXT NOT NULL,                       -- Source token amount
     to_token_amount    TEXT NOT NULL,                       -- Destination token amount
-    pool_address       TEXT,                                -- Swap pool address (if applicable)
+    pool_address       TEXT NOT NULL,                       -- Swap pool address (if applicable)
     FOREIGN KEY (tx_hash) REFERENCES transactions (tx_hash) -- Foreign key to transactions
 );
 
