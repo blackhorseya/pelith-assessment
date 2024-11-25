@@ -15,6 +15,40 @@ type TransactionRepoImpl struct {
 	rw *sqlx.DB
 }
 
+func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
+	// 設定上下文，支援超時與日誌記錄
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(ctx, defaultTimeout)
+	defer cancelFunc()
+
+	// 查詢交易資料
+	stmt := `
+		SELECT t.tx_hash, t.block_number, t.timestamp, t.from_address, t.to_address,
+		       se.from_token_address, se.to_token_address, se.from_token_amount, 
+		       se.to_token_amount, se.pool_address
+		FROM transactions t
+		LEFT JOIN swap_events se ON t.tx_hash = se.tx_hash
+		WHERE t.tx_hash = $1`
+	var row struct {
+		TransactionDAO
+		SwapEventDAO
+	}
+	err = i.rw.GetContext(timeout, &row, stmt, hash)
+	if err != nil {
+		ctx.Error("failed to fetch transaction", zap.Error(err))
+		return nil, err
+	}
+
+	// 將 DAO 轉為業務模型
+	transaction := row.TransactionDAO.ToBizModel()
+	if row.SwapEventDAO.ID != 0 { // 確認有關聯的 SwapEvent
+		transaction.SwapDetail = row.SwapEventDAO.ToModel()
+	}
+
+	return transaction, nil
+}
+
 // NewTransactionRepoImpl creates a new TransactionRepoImpl.
 func NewTransactionRepoImpl(rw *sqlx.DB) (*TransactionRepoImpl, error) {
 	err := migrateUp(rw, "transaction")

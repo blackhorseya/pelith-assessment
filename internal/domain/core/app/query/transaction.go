@@ -54,7 +54,7 @@ type TransactionGetter interface {
 		c context.Context,
 		contractAddress string,
 		cond GetLogsCondition,
-	) (item biz.TransactionList, total int, err error)
+	) (txIDs []string, total int, err error)
 }
 
 // TransactionQueryService is the service for transaction query.

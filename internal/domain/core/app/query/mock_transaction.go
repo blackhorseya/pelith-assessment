@@ -93,10 +93,10 @@ func (mr *MockTransactionGetterMockRecorder) GetByHash(c, hash any) *gomock.Call
 }
 
 // GetLogsByAddress mocks base method.
-func (m *MockTransactionGetter) GetLogsByAddress(c context.Context, contractAddress string, cond GetLogsCondition) (biz.TransactionList, int, error) {
+func (m *MockTransactionGetter) GetLogsByAddress(c context.Context, contractAddress string, cond GetLogsCondition) ([]string, int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetLogsByAddress", c, contractAddress, cond)
-	ret0, _ := ret[0].(biz.TransactionList)
+	ret0, _ := ret[0].([]string)
 	ret1, _ := ret[1].(int)
 	ret2, _ := ret[2].(error)
 	return ret0, ret1, ret2

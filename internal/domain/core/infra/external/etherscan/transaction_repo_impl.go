@@ -146,7 +146,7 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	c context.Context,
 	contractAddress string,
 	cond query.GetLogsCondition,
-) (item biz.TransactionList, total int, err error) {
+) (item []string, total int, err error) {
 	ctx := contextx.WithContext(c)
 
 	// 获取区块范围
@@ -183,43 +183,7 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	}
 
 	for _, logEntry := range logs {
-		txHash := common.HexToHash(logEntry.TransactionHash)
-		tx, _, err2 := i.ethclientAPI.TransactionByHash(ctx, txHash)
-		if err2 != nil {
-			ctx.Error(
-				"failed to fetch transaction",
-				zap.Error(err2),
-				zap.String("tx_hash", logEntry.TransactionHash),
-			)
-			return nil, 0, err2
-		}
-
-		receipt, err2 := i.ethclientAPI.TransactionReceipt(ctx, txHash)
-		if err2 != nil {
-			ctx.Error(
-				"failed to fetch transaction receipt",
-				zap.Error(err2),
-				zap.String("tx_hash", logEntry.TransactionHash),
-			)
-			return nil, 0, err2
-		}
-
-		from, err2 := i.getFromByTx(ctx, tx)
-		if err2 != nil {
-			ctx.Error("failed to fetch sender", zap.Error(err2))
-			return nil, 0, err2
-		}
-
-		// 构造 Transaction 实例
-		got := biz.NewTransaction(
-			tx.Hash().Hex(),
-			from.Hex(),
-			tx.To().Hex(),
-			receipt.BlockNumber.Int64(),
-			tx.Time(),
-		).WithReceipt(receipt)
-		item = append(item, got)
-		ctx.Debug("fetched transaction", zap.String("tx_hash", got.GetTransaction().TxHash))
+		item = append(item, logEntry.TransactionHash)
 	}
 
 	return item, len(item), nil

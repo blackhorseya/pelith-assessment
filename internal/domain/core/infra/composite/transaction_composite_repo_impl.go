@@ -104,54 +104,47 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
 		i.locks.Delete(lockKey)
 	}()
 
-	// Step 1: 查詢本地資料庫
-	item, total, err := i.dbRepo.GetLogsByAddress(ctx, address, query.GetLogsCondition{
+	// Step 1: 從外部 API 獲取交易哈希列表
+	txHashes, _, err := i.apiRepo.GetLogsByAddress(ctx, address, query.GetLogsCondition{
 		StartTime: cond.StartTime,
 		EndTime:   cond.EndTime,
 	})
 	if err != nil {
-		ctx.Error("dbRepo.GetLogsByAddress", zap.Error(err))
+		ctx.Error("apiRepo.GetLogsByAddress", zap.Error(err))
 		return err
 	}
 
-	if total > 0 {
-		for _, tx := range item {
+	// Step 2: 遍歷交易哈希並檢查資料庫
+	for _, txHash := range txHashes {
+		// 查詢資料庫是否存在此交易
+		tx, _ := i.dbRepo.GetByHash(ctx, txHash)
+		if tx != nil {
+			// 如果資料庫中存在，直接傳遞
 			txCh <- tx
+			continue
 		}
-		return nil
-	}
 
-	// Step 2: 從外部 API 獲取數據
-	apiTxCh := make(chan *biz.Transaction)
-	go func() {
-		defer close(apiTxCh)
-		err = i.apiRepo.GetSwapTxByPoolAddress(ctx, address, cond, apiTxCh)
+		// Step 3: 如果資料庫中不存在，通過外部 API 補齊數據
+		tx, err = i.apiRepo.GetByHash(ctx, txHash)
 		if err != nil {
-			ctx.Error("apiRepo.GetSwapTxByPoolAddress", zap.Error(err))
+			ctx.Error("apiRepo.GetTxByHash", zap.String("txHash", txHash), zap.Error(err))
+			continue // 忽略失敗的哈希，處理其他
 		}
-	}()
 
-	// Step 3: 寫入資料庫並傳遞給 txCh
-	for apiTx := range apiTxCh {
+		// 將交易詳細信息傳遞給調用方
 		select {
-		case txCh <- apiTx: // 傳遞數據到調用方的 channel
-		case <-ctx.Done(): // 如果 context 被取消，停止操作
+		case txCh <- tx:
+		case <-ctx.Done():
 			ctx.Error("context cancelled while sending transaction", zap.Error(ctx.Err()))
 			return ctx.Err()
 		}
 
-		// 儲存數據到資料庫
-		saveErr := i.dbRepo.Create(ctx, apiTx)
+		// 儲存交易到資料庫
+		saveErr := i.dbRepo.Create(ctx, tx)
 		if saveErr != nil {
 			ctx.Error("dbRepo.Create", zap.Error(saveErr))
-			// 儲存失敗不會中斷整體邏輯，繼續處理其他交易
-			continue
+			// 儲存失敗不影響主邏輯，繼續處理其他
 		}
-	}
-
-	if err != nil {
-		ctx.Error("apiRepo.GetSwapTxByPoolAddress", zap.Error(err))
-		return err
 	}
 
 	return nil
