@@ -73,10 +73,10 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 		WHERE se.pool_address = :contract_address
 		  AND t.timestamp BETWEEN :start_time AND :end_time
 		ORDER BY t.timestamp DESC`
-	rows := []struct {
+	var rows []struct {
 		TransactionDAO
 		SwapEventDAO
-	}{}
+	}
 	err = i.rw.SelectContext(c, &rows, logsQuery, params)
 	if err != nil {
 		return nil, 0, err
@@ -85,10 +85,10 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	// 將查詢結果轉換為 biz.TransactionList
 	item = biz.TransactionList{}
 	for _, row := range rows {
-		// swapDetail := row.SwapEventDAO.ToModel()
-		// transaction := row.TransactionDAO.ToBizModel()
-		// transaction.SwapDetail = swapDetail
-		// item = append(item, transaction)
+		swapDetail := row.SwapEventDAO.ToModel()
+		transaction := row.TransactionDAO.ToBizModel()
+		transaction.SwapDetails = append(transaction.SwapDetails, swapDetail)
+		item = append(item, transaction)
 	}
 
 	return item, total, nil
