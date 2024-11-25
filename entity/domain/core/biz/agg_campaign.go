@@ -48,6 +48,17 @@ func (c *Campaign) Tasks() []*Task {
 	return c.tasks
 }
 
+// GetTaskByType returns the task of the specified type.
+func (c *Campaign) GetTaskByType(taskType model.TaskType) *Task {
+	for _, task := range c.Tasks() {
+		if task.Type == taskType {
+			return task
+		}
+	}
+
+	return nil
+}
+
 // Report returns the backtest report for the campaign.
 func (c *Campaign) Report() *model.BacktestReport {
 	return c.report
