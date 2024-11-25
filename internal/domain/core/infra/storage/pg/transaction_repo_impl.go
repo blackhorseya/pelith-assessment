@@ -39,8 +39,59 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 	contractAddress string,
 	cond query.GetLogsCondition,
 ) (item biz.TransactionList, total int, err error) {
-	// TODO: 2024/11/25|sean|implement me
-	panic("implement me")
+	// 統一管理查詢參數
+	params := map[string]interface{}{
+		"contract_address": contractAddress,
+		"start_time":       cond.StartTime,
+		"end_time":         cond.EndTime,
+	}
+
+	// 查詢符合條件的總筆數
+	countQuery := `
+		SELECT COUNT(*)
+		FROM swap_events se
+		JOIN transactions t ON se.tx_hash = t.tx_hash
+		WHERE se.pool_address = :contract_address
+		  AND t.timestamp BETWEEN :start_time AND :end_time`
+	err = i.rw.GetContext(c, &total, countQuery, params)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 如果總筆數為 0，直接返回
+	if total == 0 {
+		return biz.TransactionList{}, 0, nil
+	}
+
+	// 查詢符合條件的交易資料
+	logsQuery := `
+		SELECT se.tx_hash, se.from_token_address, se.to_token_address, 
+		       se.from_token_amount, se.to_token_amount, se.pool_address,
+		       t.block_number, t.timestamp, t.from_address, t.to_address
+		FROM swap_events se
+		JOIN transactions t ON se.tx_hash = t.tx_hash
+		WHERE se.pool_address = :contract_address
+		  AND t.timestamp BETWEEN :start_time AND :end_time
+		ORDER BY t.timestamp DESC`
+	rows := []struct {
+		TransactionDAO
+		SwapEventDAO
+	}{}
+	err = i.rw.SelectContext(c, &rows, logsQuery, params)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 將查詢結果轉換為 biz.TransactionList
+	item = biz.TransactionList{}
+	for _, row := range rows {
+		// swapDetail := row.SwapEventDAO.ToModel()
+		// transaction := row.TransactionDAO.ToBizModel()
+		// transaction.SwapDetail = swapDetail
+		// item = append(item, transaction)
+	}
+
+	return item, total, nil
 }
 
 func (i *TransactionRepoImpl) Create(c context.Context, transaction *biz.Transaction) error {
