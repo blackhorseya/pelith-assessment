@@ -2,6 +2,7 @@ package composite
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
@@ -41,7 +42,11 @@ func (i *TransactionCompositeRepoImpl) ListByAddress(
 	lockKey := "lock_" + address
 
 	lock, _ := i.locks.LoadOrStore(lockKey, &sync.Mutex{})
-	mtx := lock.(*sync.Mutex)
+	mtx, ok := lock.(*sync.Mutex)
+	if !ok {
+		ctx.Error("failed to load lock", zap.String("lockKey", lockKey))
+		return nil, 0, errors.New("failed to load lock")
+	}
 
 	mtx.Lock()
 	defer func() {
@@ -88,7 +93,11 @@ func (i *TransactionCompositeRepoImpl) GetLogsByAddress(
 
 	// 加載或創建新的 Mutex
 	mutex, _ := i.locks.LoadOrStore(lockKey, &sync.Mutex{})
-	mtx := mutex.(*sync.Mutex)
+	mtx, ok := mutex.(*sync.Mutex)
+	if !ok {
+		ctx.Error("failed to load lock", zap.String("lockKey", lockKey))
+		return nil, 0, errors.New("failed to load lock")
+	}
 
 	// 加鎖
 	mtx.Lock()

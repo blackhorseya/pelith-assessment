@@ -24,6 +24,7 @@ func NewBacktestService(txRepo *composite.TransactionCompositeRepoImpl) biz.Back
 	}
 }
 
+//nolint:gocognit // ignore cognitive complexity
 func (i *backtestServiceImpl) RunBacktest(
 	c context.Context,
 	campaign *biz.Campaign,
@@ -51,7 +52,6 @@ func (i *backtestServiceImpl) RunBacktest(
 			// 處理 Onboarding Task
 			if task.Type == model.TaskType_TASK_TYPE_ONBOARDING &&
 				float64(tx.Amount) >= task.Criteria.MinTransactionAmount {
-
 				// 發放 Onboarding Task 獎勵
 				reward := &model.Reward{
 					Id:         "", // 生成唯一 ID
