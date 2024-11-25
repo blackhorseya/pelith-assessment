@@ -138,3 +138,13 @@ func (i *TransactionCompositeRepoImpl) GetLogsByAddress(
 	// Step 4: 返回 API 獲取的數據
 	return apiData, apiTotal, nil
 }
+
+func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
+	c context.Context,
+	address string,
+	cond query.ListTransactionCondition,
+	txCh chan<- *biz.TransactionList,
+) error {
+	// TODO: 2024/11/25|sean|implement me
+	panic("implement me")
+}
