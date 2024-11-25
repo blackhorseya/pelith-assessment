@@ -147,6 +147,7 @@ func (i *TransactionRepoImpl) ListByAddress(
 	return res, len(res), nil
 }
 
+//nolint:funlen // it's acceptable
 func (i *TransactionRepoImpl) GetLogsByAddress(
 	c context.Context,
 	contractAddress string,

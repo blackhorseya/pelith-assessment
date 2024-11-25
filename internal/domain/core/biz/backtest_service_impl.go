@@ -6,23 +6,25 @@ import (
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/infra/composite"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"github.com/blackhorseya/pelith-assessment/pkg/eventx"
 	"go.uber.org/zap"
 )
 
 type backtestServiceImpl struct {
-	bus      eventx.EventBus
-	txGetter query.TransactionGetter
+	bus    eventx.EventBus
+	txRepo *composite.TransactionCompositeRepoImpl
 }
 
 // NewBacktestService creates a new BacktestService instance.
-func NewBacktestService(txGetter query.TransactionGetter) biz.BacktestService {
+func NewBacktestService(txRepo *composite.TransactionCompositeRepoImpl) biz.BacktestService {
 	return &backtestServiceImpl{
-		txGetter: txGetter,
+		txRepo: txRepo,
 	}
 }
 
+//nolint:gocognit // ignore cognitive complexity
 func (i *backtestServiceImpl) RunBacktest(
 	c context.Context,
 	campaign *biz.Campaign,
@@ -31,7 +33,7 @@ func (i *backtestServiceImpl) RunBacktest(
 	ctx := contextx.WithContext(c)
 
 	// 1. 獲取交易記錄
-	transactionList, _, err := i.txGetter.GetLogsByAddress(c, campaign.PoolId, query.GetLogsCondition{
+	transactionList, _, err := i.txRepo.GetLogsByAddress(c, campaign.PoolId, query.GetLogsCondition{
 		StartTime: campaign.StartTime.AsTime(),
 		EndTime:   campaign.EndTime.AsTime(),
 	})
@@ -50,7 +52,6 @@ func (i *backtestServiceImpl) RunBacktest(
 			// 處理 Onboarding Task
 			if task.Type == model.TaskType_TASK_TYPE_ONBOARDING &&
 				float64(tx.Amount) >= task.Criteria.MinTransactionAmount {
-
 				// 發放 Onboarding Task 獎勵
 				reward := &model.Reward{
 					Id:         "", // 生成唯一 ID
