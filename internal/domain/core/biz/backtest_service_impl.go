@@ -80,7 +80,7 @@ func (i *backtestServiceImpl) RunBacktest(
 					ctx.Info(
 						"Onboarding Task reward sent",
 						zap.String("user", swapTx.GetTransaction().FromAddress),
-						zap.Any("reward", reward),
+						zap.Any("reward", &reward),
 					)
 				default:
 					ctx.Error(
