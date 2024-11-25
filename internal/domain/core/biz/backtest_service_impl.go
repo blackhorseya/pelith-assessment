@@ -2,6 +2,7 @@ package biz
 
 import (
 	"context"
+	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
@@ -33,14 +34,12 @@ func (i *backtestServiceImpl) RunBacktest(
 	ctx := contextx.WithContext(c)
 
 	// 1. 獲取交易記錄
-	transactionList, _, err := i.txRepo.GetLogsByAddress(c, campaign.PoolId, query.GetLogsCondition{
+	txCh := make(chan *model.Transaction)
+	var err error
+	err = i.txRepo.GetSwapTxByPoolAddress(c, campaign.PoolId, query.ListTransactionCondition{
 		StartTime: campaign.StartTime.AsTime(),
 		EndTime:   campaign.EndTime.AsTime(),
-	})
-	if err != nil {
-		ctx.Error("failed to get logs by address", zap.Error(err))
-		return err
-	}
+	}, txCh)
 
 	// 2. 準備累積數據
 	userSwapVolume := make(map[string]float64) // 用戶的交易量
