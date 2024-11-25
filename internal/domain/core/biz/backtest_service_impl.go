@@ -24,7 +24,6 @@ func NewBacktestService(txRepo *composite.TransactionCompositeRepoImpl) biz.Back
 	}
 }
 
-//nolint:gocognit // ignore cognitive complexity
 func (i *backtestServiceImpl) RunBacktest(
 	c context.Context,
 	campaign *biz.Campaign,
