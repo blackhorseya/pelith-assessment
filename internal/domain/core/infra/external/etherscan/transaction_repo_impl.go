@@ -142,7 +142,6 @@ func (i *TransactionRepoImpl) ListByAddress(
 	return res, len(res), nil
 }
 
-//nolint:funlen // it's acceptable
 func (i *TransactionRepoImpl) GetLogsByAddress(
 	c context.Context,
 	contractAddress string,
@@ -306,8 +305,6 @@ func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
 }
 
 // getTokenDetails 获取 ERC20 Token 的 symbol 和 decimals
-//
-//nolint:unparam // it's a placeholder for future use
 func (i *TransactionRepoImpl) getTokenDetails(tokenAddress common.Address) (string, int, error) {
 	// ERC20 ABI，仅包含 symbol 和 decimals 方法
 	const erc20ABI = `[{
