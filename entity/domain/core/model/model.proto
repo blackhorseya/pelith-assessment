@@ -166,6 +166,9 @@ message Transaction {
   // @gotags: db:"tx_hash"
   string tx_hash = 1;
 
+  // Block number
+  int64 block_number = 11;
+
   // Sender address
   // @gotags: db:"from_address"
   string from_address = 2;

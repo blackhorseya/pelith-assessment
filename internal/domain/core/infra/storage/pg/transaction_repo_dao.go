@@ -7,11 +7,11 @@ import (
 // TransactionDAO represents the transactions table
 type TransactionDAO struct {
 	TxHash      string    `db:"tx_hash"`      // TransactionDAO hash
-	BlockNumber int       `db:"block_number"` // Block number
+	BlockNumber int64     `db:"block_number"` // Block number
 	Timestamp   time.Time `db:"timestamp"`    // TransactionDAO timestamp
 	FromAddress string    `db:"from_address"` // Sender address
 	ToAddress   string    `db:"to_address"`   // Receiver address
-	Value       float64   `db:"value"`        // TransactionDAO value
+	Value       int64     `db:"value"`        // TransactionDAO value
 	GasUsed     int       `db:"gas_used"`     // Gas used
 	GasPrice    float64   `db:"gas_price"`    // Gas price
 	Status      bool      `db:"status"`       // TransactionDAO status (success or failure)
