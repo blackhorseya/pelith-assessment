@@ -5,11 +5,7 @@ CREATE TABLE IF NOT EXISTS transactions
     block_number INTEGER,          -- Block number
     timestamp    TIMESTAMP,        -- Transaction timestamp
     from_address TEXT,             -- Sender address
-    to_address   TEXT,             -- Receiver address
-    value        NUMERIC,          -- Transaction value
-    gas_used     INTEGER,          -- Gas used
-    gas_price    NUMERIC,          -- Gas price
-    status       BOOLEAN           -- Transaction status (success or failure)
+    to_address   TEXT              -- Receiver address
 );
 
 -- Create the swap_events table

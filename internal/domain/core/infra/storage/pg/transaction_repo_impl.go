@@ -44,6 +44,53 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 }
 
 func (i *TransactionRepoImpl) Create(c context.Context, transaction *biz.Transaction) error {
-	// TODO: 2024/11/24|sean|implement me
-	panic("implement me")
+	// 設定資料庫交易
+	tx, err := i.rw.BeginTxx(c, nil)
+	if err != nil {
+		return err
+	}
+
+	// 使用 defer 確保在出現錯誤時回滾
+	defer func() {
+		if p := recover(); p != nil {
+			_ = tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			_ = tx.Rollback()
+		} else {
+			err = tx.Commit()
+		}
+	}()
+
+	// 插入 transaction 資料
+	transactionDAO := FromBizTransactionToDAO(transaction)
+	transactionQuery := `
+		INSERT INTO transactions (tx_hash, block_number, timestamp, from_address, to_address)
+		VALUES (:tx_hash, :block_number, :timestamp, :from_address, :to_address)`
+	_, err = tx.NamedExecContext(c, transactionQuery, transactionDAO)
+	if err != nil {
+		return err
+	}
+
+	// 插入 swap_event 資料
+	if transaction.SwapDetails != nil {
+		for _, swap := range transaction.SwapDetails {
+			swapEventDAO := FromModelSwapDetailToDAO(transaction.TxHash, swap)
+			swapQuery := `
+				INSERT INTO swap_events (
+				                         tx_hash, 
+				                         from_token_address, 
+				                         to_token_address, 
+				                         from_token_amount, 
+				                         to_token_amount, 
+				                         pool_address)
+				VALUES (:tx_hash, :from_token_address, :to_token_address, :from_token_amount, :to_token_amount, :pool_address)`
+			_, err = tx.NamedExecContext(c, swapQuery, swapEventDAO)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
