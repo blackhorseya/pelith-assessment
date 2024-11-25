@@ -41,7 +41,7 @@ func (m *MockTransactionAdapter) EXPECT() *MockTransactionAdapterMockRecorder {
 }
 
 // GetSwapTxByPoolAddress mocks base method.
-func (m *MockTransactionAdapter) GetSwapTxByPoolAddress(c context.Context, address string, cond ListTransactionCondition, txCh chan<- *biz.TransactionList) error {
+func (m *MockTransactionAdapter) GetSwapTxByPoolAddress(c context.Context, address string, cond ListTransactionCondition, txCh chan<- *biz.Transaction) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSwapTxByPoolAddress", c, address, cond, txCh)
 	ret0, _ := ret[0].(error)

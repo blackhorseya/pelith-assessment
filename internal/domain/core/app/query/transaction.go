@@ -36,7 +36,7 @@ type TransactionAdapter interface {
 		c context.Context,
 		address string,
 		cond ListTransactionCondition,
-		txCh chan<- *biz.TransactionList,
+		txCh chan<- *biz.Transaction,
 	) error
 }
 

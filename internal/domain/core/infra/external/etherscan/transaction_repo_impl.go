@@ -21,7 +21,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/nanmu42/etherscan-api"
 	"go.uber.org/zap"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // TransactionRepoImpl is the implementation of TransactionRepo.
@@ -57,41 +56,7 @@ func NewTransactionGetter(impl *TransactionRepoImpl) query.TransactionGetter {
 }
 
 func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
-	ctx := contextx.WithContext(c)
-
-	// 获取交易
-	tx, isPending, err := i.ethclientAPI.TransactionByHash(ctx, common.HexToHash(hash))
-	if err != nil {
-		ctx.Error("failed to fetch transaction", zap.Error(err), zap.String("tx_hash", hash))
-		return nil, err
-	}
-	from, err := i.getFromByTx(ctx, tx)
-	if err != nil {
-		ctx.Error("failed to fetch sender", zap.Error(err), zap.String("tx_hash", hash))
-		return nil, err
-	}
-
-	// 获取交易 Receipt
-	receipt, err := i.ethclientAPI.TransactionReceipt(ctx, common.HexToHash(hash))
-	if err != nil {
-		ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", hash))
-		return nil, err
-	}
-
-	txStatus := model.TransactionStatus_TRANSACTION_STATUS_COMPLETED
-	if isPending {
-		txStatus = model.TransactionStatus_TRANSACTION_STATUS_PENDING
-	}
-
-	return biz.NewTransaction(&model.Transaction{
-		TxHash:      tx.Hash().Hex(),
-		BlockNumber: receipt.BlockNumber.Int64(),
-		FromAddress: from.Hex(),
-		ToAddress:   tx.To().Hex(),
-		Amount:      tx.Value().Int64(),
-		Timestamp:   timestamppb.New(tx.Time()),
-		Status:      txStatus,
-	}, receipt), nil
+	return i.getByHash(c, hash)
 }
 
 func (i *TransactionRepoImpl) ListByAddress(
@@ -140,52 +105,43 @@ func (i *TransactionRepoImpl) ListByAddress(
 
 	// 遍历交易并解析日志
 	for _, tx := range txs {
-		txType := model.TransactionType_TRANSACTION_TYPE_UNSPECIFIED
-		var swapDetails []*model.SwapDetail
-
 		var receipt *types.Receipt
-		if cond.PoolAddress != "" {
-			// 获取交易的 Receipt
-			receipt, err = i.ethclientAPI.TransactionReceipt(context.Background(), common.HexToHash(tx.Hash))
-			if err != nil {
-				ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", tx.Hash))
-				return nil, 0, err
-			}
-
-			// 解析 Swap 日志
-			swapDetail, err2 := i.decodeSwapLogs(receipt.Logs, swapEventHash)
-			if err2 != nil {
-				ctx.Warn("failed to decode swap logs", zap.Error(err2), zap.String("tx_hash", tx.Hash))
-				swapDetail = nil
-			}
-
-			if swapDetail != nil {
-				txType = model.TransactionType_TRANSACTION_TYPE_SWAP
-				swapDetail.PoolAddress = cond.PoolAddress
-				swapDetails = append(swapDetails, swapDetail)
-			}
+		// 获取交易的 Receipt
+		receipt, err = i.ethclientAPI.TransactionReceipt(context.Background(), common.HexToHash(tx.Hash))
+		if err != nil {
+			ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", tx.Hash))
+			return nil, 0, err
 		}
 
 		// 构造 Transaction 实例
-		got := biz.NewTransaction(&model.Transaction{
-			TxHash:      tx.Hash,
-			FromAddress: tx.From,
-			ToAddress:   tx.To,
-			Amount:      tx.Value.Int().Int64(),
-			Timestamp:   timestamppb.New(tx.TimeStamp.Time()),
-			TaskId:      "",
-			CampaignId:  "",
-			Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
-			Type:        txType,
-			SwapDetails: swapDetails,
-		}, receipt)
+		got := biz.NewTransaction(
+			tx.Hash,
+			tx.From,
+			tx.To,
+			receipt.BlockNumber.Int64(),
+			tx.TimeStamp.Time(),
+		).WithReceipt(receipt)
+
+		// 如果有目标合约，则解析日志
+		if cond.PoolAddress != "" {
+			swapDetail, err2 := got.GetSwapForPool(common.HexToHash(cond.PoolAddress), swapEventHash)
+			if err2 != nil || swapDetail == nil {
+				ctx.Debug(
+					"the tx is not a swap tx",
+					zap.String("tx_hash", got.GetTransaction().TxHash),
+					zap.String("pool_address", cond.PoolAddress),
+					zap.Error(err2),
+				)
+				continue
+			}
+		}
+
 		res = append(res, got)
 	}
 
 	return res, len(res), nil
 }
 
-//nolint:funlen // it's acceptable
 func (i *TransactionRepoImpl) GetLogsByAddress(
 	c context.Context,
 	contractAddress string,
@@ -248,18 +204,6 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 			return nil, 0, err2
 		}
 
-		swapDetail, err2 := i.decodeSwapLogs(receipt.Logs, swapEventHash)
-		if err2 != nil {
-			ctx.Warn("failed to decode swap logs", zap.Error(err2), zap.String("tx_hash", logEntry.TransactionHash))
-			swapDetail = nil
-		}
-
-		txType := model.TransactionType_TRANSACTION_TYPE_UNSPECIFIED
-		if swapDetail != nil {
-			txType = model.TransactionType_TRANSACTION_TYPE_SWAP
-			swapDetail.PoolAddress = contractAddress
-		}
-
 		from, err2 := i.getFromByTx(ctx, tx)
 		if err2 != nil {
 			ctx.Error("failed to fetch sender", zap.Error(err2))
@@ -267,19 +211,13 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 		}
 
 		// 构造 Transaction 实例
-		got := biz.NewTransaction(&model.Transaction{
-			TxHash:      tx.Hash().Hex(),
-			BlockNumber: receipt.BlockNumber.Int64(),
-			FromAddress: from.Hex(),
-			ToAddress:   tx.To().Hex(),
-			Amount:      tx.Value().Int64(),
-			Timestamp:   timestamppb.New(tx.Time()),
-			TaskId:      "",
-			CampaignId:  "",
-			Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
-			Type:        txType,
-			SwapDetails: []*model.SwapDetail{swapDetail},
-		}, receipt)
+		got := biz.NewTransaction(
+			tx.Hash().Hex(),
+			from.Hex(),
+			tx.To().Hex(),
+			receipt.BlockNumber.Int64(),
+			tx.Time(),
+		).WithReceipt(receipt)
 		item = append(item, got)
 		ctx.Debug("fetched transaction", zap.String("tx_hash", got.GetTransaction().TxHash))
 	}
@@ -291,7 +229,7 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 	c context.Context,
 	contractAddress string,
 	cond query.ListTransactionCondition,
-	txCh chan<- *biz.TransactionList,
+	txCh chan<- *biz.Transaction,
 ) error {
 	ctx := contextx.WithContext(c)
 
@@ -325,67 +263,18 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 	}
 
 	for _, logEntry := range logs {
-		ctx.Debug("fetched log", zap.String("tx_hash", logEntry.TransactionHash))
-		// TODO: 2024/11/25|sean|fetch transaction details
-	}
-
-	panic("implement me")
-}
-
-func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {
-	var firstLog, lastLog *types.Log
-	var fromDecimals, toDecimals int
-	var fromAmountFloat, toAmountFloat *big.Float
-
-	// Iterate over logs to find the first and last valid Swap logs
-	for idx, logEntry := range logs {
-		// Skip logs that don't match the criteria
-		if len(logEntry.Topics) < 3 || logEntry.Topics[0] != swapEventHash {
-			continue
+		tx, err2 := i.getByHash(ctx, logEntry.TransactionHash)
+		if err2 != nil || tx == nil {
+			ctx.Error("failed to fetch transaction", zap.Error(err2), zap.String("tx_hash", logEntry.TransactionHash))
+			return err2
 		}
 
-		// Ensure data length is sufficient
-		if len(logEntry.Data) < 64 {
-			return nil, fmt.Errorf("log data length is insufficient: %s", logEntry.Data)
+		if txCh != nil {
+			txCh <- tx
 		}
-
-		// Set the first valid log if not already set
-		if firstLog == nil {
-			firstLog = logs[idx]
-		}
-		// Update the last valid log
-		lastLog = logs[idx]
 	}
 
-	// Ensure we found at least one valid log
-	if firstLog == nil || lastLog == nil {
-		return nil, fmt.Errorf("no valid Swap log found")
-	}
-
-	// Parse the first log for "from" token details
-	fromTokenAddress := firstLog.Address
-	fromAmount := new(big.Int).SetBytes(firstLog.Data[:32]) // First 32 bytes represent the amount
-	_, fromDecimals, err := i.getTokenDetails(fromTokenAddress)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get From Token details (address: %s): %w", fromTokenAddress.Hex(), err)
-	}
-	fromAmountFloat = normalizeAmount(fromAmount, fromDecimals)
-
-	// Parse the last log for "to" token details
-	toTokenAddress := lastLog.Address
-	toAmount := new(big.Int).SetBytes(lastLog.Data[:32]) // First 32 bytes represent the amount
-	_, toDecimals, err = i.getTokenDetails(toTokenAddress)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get To Token details (address: %s): %w", toTokenAddress.Hex(), err)
-	}
-	toAmountFloat = normalizeAmount(toAmount, toDecimals)
-
-	return &model.SwapDetail{
-		FromTokenAddress: fromTokenAddress.Hex(),
-		ToTokenAddress:   toTokenAddress.Hex(),
-		FromTokenAmount:  fmt.Sprintf("%.6f", fromAmountFloat),
-		ToTokenAmount:    fmt.Sprintf("%.6f", toAmountFloat),
-	}, nil
+	return nil
 }
 
 func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
@@ -416,8 +305,6 @@ func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
 }
 
 // getTokenDetails 获取 ERC20 Token 的 symbol 和 decimals
-//
-//nolint:unparam // it's a placeholder for future use
 func (i *TransactionRepoImpl) getTokenDetails(tokenAddress common.Address) (string, int, error) {
 	// ERC20 ABI，仅包含 symbol 和 decimals 方法
 	const erc20ABI = `[{
@@ -489,4 +376,40 @@ func normalizeAmount(amount *big.Int, decimals int) *big.Float {
 	amountFloat := new(big.Float).SetInt(amount)           // 转换为浮点数
 	decimalsFloat := new(big.Float).SetInt(decimalsFactor) // 转换为浮点数
 	return new(big.Float).Quo(amountFloat, decimalsFloat)  // 执行归一化
+}
+
+func (i *TransactionRepoImpl) getByHash(c context.Context, hash string) (*biz.Transaction, error) {
+	ctx := contextx.WithContext(c)
+
+	// 获取交易
+	tx, isPending, err := i.ethclientAPI.TransactionByHash(ctx, common.HexToHash(hash))
+	if err != nil {
+		ctx.Error("failed to fetch transaction", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+	from, err := i.getFromByTx(ctx, tx)
+	if err != nil {
+		ctx.Error("failed to fetch sender", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+
+	// 获取交易 Receipt
+	receipt, err := i.ethclientAPI.TransactionReceipt(ctx, common.HexToHash(hash))
+	if err != nil {
+		ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+
+	txStatus := model.TransactionStatus_TRANSACTION_STATUS_COMPLETED
+	if isPending {
+		txStatus = model.TransactionStatus_TRANSACTION_STATUS_PENDING
+	}
+
+	return biz.NewTransaction(
+		tx.Hash().Hex(),
+		from.Hex(),
+		tx.To().Hex(),
+		receipt.BlockNumber.Int64(),
+		tx.Time(),
+	).WithReceipt(receipt).WithStatus(txStatus), nil
 }
