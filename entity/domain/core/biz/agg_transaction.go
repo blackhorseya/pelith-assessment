@@ -3,10 +3,12 @@ package biz
 import (
 	"context"
 	"errors"
+	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/pkg/eventx"
 	"github.com/ethereum/go-ethereum/core/types"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Transaction is an aggregate root that represents the transaction.
@@ -19,12 +21,34 @@ type Transaction struct {
 }
 
 // NewTransaction is used to create a new transaction.
-func NewTransaction(tx *model.Transaction, receipt *types.Receipt) *Transaction {
+func NewTransaction(txHash, from, to string, blockNumber int64, ts time.Time) *Transaction {
 	return &Transaction{
-		tx:          tx,
-		receipt:     receipt,
-		SwapDetails: tx.SwapDetails,
+		tx: &model.Transaction{
+			TxHash:      txHash,
+			BlockNumber: blockNumber,
+			FromAddress: from,
+			ToAddress:   to,
+			Amount:      0,
+			Timestamp:   timestamppb.New(ts),
+			TaskId:      "",
+			CampaignId:  "",
+			Status:      0,
+			Type:        0,
+			SwapDetails: nil,
+		},
 	}
+}
+
+// WithReceipt is used to set the receipt.
+func (x *Transaction) WithReceipt(receipt *types.Receipt) *Transaction {
+	x.receipt = receipt
+	return x
+}
+
+// WithStatus is used to set the status.
+func (x *Transaction) WithStatus(status model.TransactionStatus) *Transaction {
+	x.tx.Status = status
+	return x
 }
 
 // GetTransaction is used to get the transaction.
