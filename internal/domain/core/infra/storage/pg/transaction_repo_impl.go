@@ -5,15 +5,24 @@ import (
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
+	"github.com/jmoiron/sqlx"
 )
 
 // TransactionRepoImpl represents the PostgreSQL implementation of the TransactionRepo.
 type TransactionRepoImpl struct {
+	rw *sqlx.DB
 }
 
 // NewTransactionRepoImpl creates a new TransactionRepoImpl.
-func NewTransactionRepoImpl() *TransactionRepoImpl {
-	return &TransactionRepoImpl{}
+func NewTransactionRepoImpl(rw *sqlx.DB) (*TransactionRepoImpl, error) {
+	err := migrateUp(rw, "transaction")
+	if err != nil {
+		return nil, err
+	}
+
+	return &TransactionRepoImpl{
+		rw: rw,
+	}, nil
 }
 
 func (i *TransactionRepoImpl) ListByAddress(

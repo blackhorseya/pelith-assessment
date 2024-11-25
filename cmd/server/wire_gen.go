@@ -74,7 +74,10 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	taskService := biz.NewTaskService()
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
 	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
-	pgTransactionRepoImpl := pg.NewTransactionRepoImpl()
+	pgTransactionRepoImpl, err := pg.NewTransactionRepoImpl(db)
+	if err != nil {
+		return nil, nil, err
+	}
 	transactionCompositeRepoImpl := composite.NewTransactionCompositeRepoImpl(pgTransactionRepoImpl, transactionRepoImpl)
 	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
 	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, backtestService)
