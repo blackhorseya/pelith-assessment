@@ -2,6 +2,8 @@ package pg
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
@@ -25,7 +27,7 @@ func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *b
 	// 查詢交易資料
 	stmt := `
 		SELECT t.tx_hash, t.block_number, t.timestamp, t.from_address, t.to_address,
-		       se.from_token_address, se.to_token_address, se.from_token_amount, 
+		       se.id, se.from_token_address, se.to_token_address, se.from_token_amount, 
 		       se.to_token_amount, se.pool_address
 		FROM transactions t
 		LEFT JOIN swap_events se ON t.tx_hash = se.tx_hash
@@ -36,6 +38,10 @@ func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *b
 	}
 	err = i.rw.GetContext(timeout, &row, stmt, hash)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, err
+		}
+
 		ctx.Error("failed to fetch transaction", zap.Error(err))
 		return nil, err
 	}

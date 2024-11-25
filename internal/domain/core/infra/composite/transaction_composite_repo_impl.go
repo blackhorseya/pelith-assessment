@@ -125,19 +125,14 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
 		}
 
 		// Step 3: 如果資料庫中不存在，通過外部 API 補齊數據
-		tx, err = i.apiRepo.GetByHash(ctx, txHash)
+		tx, err = i.apiRepo.GetByHashWithPool(ctx, txHash, address)
 		if err != nil {
 			ctx.Error("apiRepo.GetTxByHash", zap.String("txHash", txHash), zap.Error(err))
 			continue // 忽略失敗的哈希，處理其他
 		}
 
 		// 將交易詳細信息傳遞給調用方
-		select {
-		case txCh <- tx:
-		case <-ctx.Done():
-			ctx.Error("context cancelled while sending transaction", zap.Error(ctx.Err()))
-			return ctx.Err()
-		}
+		txCh <- tx
 
 		// 儲存交易到資料庫
 		saveErr := i.dbRepo.Create(ctx, tx)

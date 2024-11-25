@@ -2,6 +2,7 @@ package etherscan
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"math/big"
@@ -57,6 +58,37 @@ func NewTransactionGetter(impl *TransactionRepoImpl) query.TransactionGetter {
 
 func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
 	return i.getByHash(c, hash)
+}
+
+// GetByHashWithPool is used to get the transaction by hash with pool address.
+func (i *TransactionRepoImpl) GetByHashWithPool(c context.Context, hash, poolAddress string) (*biz.Transaction, error) {
+	ctx := contextx.WithContext(c)
+
+	tx, err := i.getByHash(c, hash)
+	if err != nil {
+		ctx.Error("failed to fetch transaction", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+
+	parsedABI, err := i.getABI(poolAddress)
+	if err != nil {
+		ctx.Error("failed to fetch contract ABI", zap.Error(err), zap.String("contract_address", poolAddress))
+		return nil, err
+	}
+	swapEventHash := parsedABI.Events["Swap"].ID
+
+	swapDetail, err := tx.GetSwapForPool(common.HexToHash(poolAddress), swapEventHash)
+	if err != nil || swapDetail == nil {
+		ctx.Debug(
+			"the tx is not a swap tx",
+			zap.String("tx_hash", tx.GetTransaction().TxHash),
+			zap.String("pool_address", poolAddress),
+			zap.Error(err),
+		)
+		return nil, errors.New("the tx is not a swap tx")
+	}
+
+	return tx, nil
 }
 
 func (i *TransactionRepoImpl) ListByAddress(
