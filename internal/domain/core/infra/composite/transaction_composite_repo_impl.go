@@ -143,7 +143,7 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
 	c context.Context,
 	address string,
 	cond query.ListTransactionCondition,
-	txCh chan<- *biz.TransactionList,
+	txCh chan<- *biz.Transaction,
 ) error {
 	// TODO: 2024/11/25|sean|implement me
 	panic("implement me")

@@ -24,7 +24,6 @@ func NewBacktestService(txRepo *composite.TransactionCompositeRepoImpl) biz.Back
 	}
 }
 
-//nolint:gocognit // ignore cognitive complexity
 func (i *backtestServiceImpl) RunBacktest(
 	c context.Context,
 	campaign *biz.Campaign,
@@ -33,57 +32,68 @@ func (i *backtestServiceImpl) RunBacktest(
 	ctx := contextx.WithContext(c)
 
 	// 1. 獲取交易記錄
-	transactionList, _, err := i.txRepo.GetLogsByAddress(c, campaign.PoolId, query.GetLogsCondition{
-		StartTime: campaign.StartTime.AsTime(),
-		EndTime:   campaign.EndTime.AsTime(),
-	})
-	if err != nil {
-		ctx.Error("failed to get logs by address", zap.Error(err))
-		return err
-	}
+	txCh := make(chan *biz.Transaction)
+	var err error
+	go func() {
+		err = i.txRepo.GetSwapTxByPoolAddress(c, campaign.PoolId, query.ListTransactionCondition{
+			StartTime: campaign.StartTime.AsTime(),
+			EndTime:   campaign.EndTime.AsTime(),
+		}, txCh)
+		if err != nil {
+			ctx.Error("failed to get swapTx swapTx by pool address", zap.Error(err))
+		}
+		close(txCh)
+	}()
 
 	// 2. 準備累積數據
-	userSwapVolume := make(map[string]float64) // 用戶的交易量
+	const usdcAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+	userSwapVolume := make(map[string]float64) // 用戶的交易量 usdc
 	totalSwapVolume := 0.0                     // 總交易量
+	// onboardingTask := campaign.GetTaskByType(model.TaskType_TASK_TYPE_ONBOARDING)
+	// sharePoolTask := campaign.GetTaskByType(model.TaskType_TASK_TYPE_SHARE_POOL)
 
 	// 3. 處理交易記錄
-	for _, tx := range transactionList {
-		for _, task := range campaign.Tasks() {
-			// 處理 Onboarding Task
-			if task.Type == model.TaskType_TASK_TYPE_ONBOARDING &&
-				float64(tx.GetTransaction().Amount) >= task.Criteria.MinTransactionAmount {
-				// 發放 Onboarding Task 獎勵
-				reward := &model.Reward{
-					Id:         "", // 生成唯一 ID
-					UserId:     tx.GetTransaction().FromAddress,
-					CampaignId: campaign.Id,
-					Points:     100, // 固定獎勵點數
-				}
-
-				// 發送到結果通道
-				select {
-				case resultCh <- reward:
-					ctx.Info(
-						"Onboarding Task reward sent",
-						zap.String("user", tx.GetTransaction().FromAddress),
-						zap.Any("reward", reward),
-					)
-				default:
-					ctx.Error(
-						"resultCh is full, dropping onboarding reward",
-						zap.String("user", tx.GetTransaction().FromAddress),
-					)
-				}
-			}
-
-			// 累積交易量以便處理 Share Pool Task
-			if task.Type == model.TaskType_TASK_TYPE_SHARE_POOL {
-				// TODO: 2024/11/25|sean|!! fix me !! you need to get usdc amount from swap details
-				userSwapVolume[tx.GetTransaction().FromAddress] += float64(tx.GetTransaction().Amount)
-				totalSwapVolume += float64(tx.GetTransaction().Amount)
-			}
-		}
+	for swapTx := range txCh {
+		ctx.Debug("processing swapTx", zap.Any("swapTx", &swapTx))
 	}
+
+	// for _, swapTx := range transactionList {
+	// 	for _, task := range campaign.Tasks() {
+	// 		// 處理 Onboarding Task
+	// 		if task.Type == model.TaskType_TASK_TYPE_ONBOARDING &&
+	// 			float64(swapTx.GetTransaction().Amount) >= task.Criteria.MinTransactionAmount {
+	// 			// 發放 Onboarding Task 獎勵
+	// 			reward := &model.Reward{
+	// 				Id:         "", // 生成唯一 ID
+	// 				UserId:     swapTx.GetTransaction().FromAddress,
+	// 				CampaignId: campaign.Id,
+	// 				Points:     100, // 固定獎勵點數
+	// 			}
+	//
+	// 			// 發送到結果通道
+	// 			select {
+	// 			case resultCh <- reward:
+	// 				ctx.Info(
+	// 					"Onboarding Task reward sent",
+	// 					zap.String("user", swapTx.GetTransaction().FromAddress),
+	// 					zap.Any("reward", reward),
+	// 				)
+	// 			default:
+	// 				ctx.Error(
+	// 					"resultCh is full, dropping onboarding reward",
+	// 					zap.String("user", swapTx.GetTransaction().FromAddress),
+	// 				)
+	// 			}
+	// 		}
+	//
+	// 		// 累積交易量以便處理 Share Pool Task
+	// 		if task.Type == model.TaskType_TASK_TYPE_SHARE_POOL {
+	// 			// TODO: 2024/11/25|sean|!! fix me !! you need to get usdc amount from swapTx details
+	// 			userSwapVolume[swapTx.GetTransaction().FromAddress] += float64(swapTx.GetTransaction().Amount)
+	// 			totalSwapVolume += float64(swapTx.GetTransaction().Amount)
+	// 		}
+	// 	}
+	// }
 
 	// 4. 分配 Share Pool Task 獎勵
 	for _, task := range campaign.Tasks() {

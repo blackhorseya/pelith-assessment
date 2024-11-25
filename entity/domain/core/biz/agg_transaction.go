@@ -20,7 +20,7 @@ type Transaction struct {
 
 	receipt *types.Receipt
 
-	SwapDetails []*model.SwapDetail
+	SwapDetail *model.SwapDetail
 }
 
 // NewTransaction is used to create a new transaction.
