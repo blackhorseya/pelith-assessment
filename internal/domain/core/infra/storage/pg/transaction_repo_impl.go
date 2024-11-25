@@ -30,8 +30,69 @@ func (i *TransactionRepoImpl) ListByAddress(
 	address string,
 	cond query.ListTransactionCondition,
 ) (item biz.TransactionList, total int, err error) {
-	// TODO: 2024/11/25|sean|implement me
-	panic("implement me")
+	// 統一管理查詢參數
+	params := map[string]interface{}{
+		"address":      address,
+		"start_time":   cond.StartTime,
+		"end_time":     cond.EndTime,
+		"pool_address": cond.PoolAddress,
+	}
+
+	// 建立 WHERE 條件動態查詢
+	baseCondition := `
+		(t.from_address = :address OR t.to_address = :address)
+		AND t.timestamp BETWEEN :start_time AND :end_time`
+	if cond.PoolAddress != "" {
+		baseCondition += " AND se.pool_address = :pool_address"
+	}
+
+	// 查詢符合條件的總筆數
+	countQuery := `
+		SELECT COUNT(*)
+		FROM transactions t
+		LEFT JOIN swap_events se ON t.tx_hash = se.tx_hash
+		WHERE ` + baseCondition
+	err = i.rw.GetContext(c, &total, countQuery, params)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 如果總筆數為 0，直接返回
+	if total == 0 {
+		return biz.TransactionList{}, 0, nil
+	}
+
+	// 查詢符合條件的交易資料
+	query := `
+		SELECT t.tx_hash, t.block_number, t.timestamp, t.from_address, t.to_address,
+		       se.from_token_address, se.to_token_address, se.from_token_amount, 
+		       se.to_token_amount, se.pool_address
+		FROM transactions t
+		LEFT JOIN swap_events se ON t.tx_hash = se.tx_hash
+		WHERE ` + baseCondition + `
+		ORDER BY t.timestamp DESC`
+
+	// 查詢交易列表
+	var rows []struct {
+		TransactionDAO
+		SwapEventDAO
+	}
+	err = i.rw.SelectContext(c, &rows, query, params)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 將 DAO 轉為業務模型
+	var transactions biz.TransactionList
+	for _, row := range rows {
+		transaction := row.TransactionDAO.ToBizModel()
+		if row.SwapEventDAO.ID != 0 { // 確認有關聯的 SwapEvent
+			transaction.SwapDetails = append(transaction.SwapDetails, row.SwapEventDAO.ToModel())
+		}
+		transactions = append(transactions, transaction)
+	}
+
+	return transactions, total, nil
 }
 
 func (i *TransactionRepoImpl) GetLogsByAddress(
