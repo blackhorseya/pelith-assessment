@@ -205,7 +205,7 @@ func (i *TransactionRepoImpl) Create(c context.Context, transaction *biz.Transac
 	// 插入 swap_event 資料
 	if transaction.SwapDetails != nil {
 		for _, swap := range transaction.SwapDetails {
-			swapEventDAO := FromModelSwapDetailToDAO(transaction.TxHash, swap)
+			swapEventDAO := FromModelSwapDetailToDAO(transaction.GetTransaction().TxHash, swap)
 			swapQuery := `
 				INSERT INTO swap_events (
 				                         tx_hash, 

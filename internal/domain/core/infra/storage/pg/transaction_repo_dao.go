@@ -20,27 +20,25 @@ type TransactionDAO struct {
 // FromBizTransactionToDAO converts a biz.Transaction to a TransactionDAO
 func FromBizTransactionToDAO(transaction *biz.Transaction) *TransactionDAO {
 	return &TransactionDAO{
-		TxHash:      transaction.TxHash,
-		BlockNumber: transaction.BlockNumber,
-		Timestamp:   transaction.Timestamp.AsTime(),
-		FromAddress: transaction.FromAddress,
-		ToAddress:   transaction.ToAddress,
+		TxHash:      transaction.GetTransaction().TxHash,
+		BlockNumber: transaction.GetTransaction().BlockNumber,
+		Timestamp:   transaction.GetTransaction().Timestamp.AsTime(),
+		FromAddress: transaction.GetTransaction().FromAddress,
+		ToAddress:   transaction.GetTransaction().ToAddress,
 	}
 }
 
 // ToBizModel converts a TransactionDAO to a biz.Transaction
 func (dao *TransactionDAO) ToBizModel() *biz.Transaction {
-	return &biz.Transaction{
-		Transaction: model.Transaction{
-			TxHash:      dao.TxHash,
-			BlockNumber: dao.BlockNumber,
-			FromAddress: dao.FromAddress,
-			ToAddress:   dao.ToAddress,
-			Timestamp:   timestamppb.New(dao.Timestamp),
-			Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
-			Type:        model.TransactionType_TRANSACTION_TYPE_SWAP,
-		},
-	}
+	return biz.NewTransaction(&model.Transaction{
+		TxHash:      dao.TxHash,
+		BlockNumber: dao.BlockNumber,
+		FromAddress: dao.FromAddress,
+		ToAddress:   dao.ToAddress,
+		Timestamp:   timestamppb.New(dao.Timestamp),
+		Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
+		Type:        model.TransactionType_TRANSACTION_TYPE_SWAP,
+	}, nil)
 }
 
 // SwapEventDAO represents the swap_events table

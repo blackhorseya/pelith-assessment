@@ -51,6 +51,44 @@ func NewTransactionRepoImpl(app *configx.Application) (*TransactionRepoImpl, err
 	}, nil
 }
 
+func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
+	ctx := contextx.WithContext(c)
+
+	// 获取交易
+	tx, isPending, err := i.ethclientAPI.TransactionByHash(ctx, common.HexToHash(hash))
+	if err != nil {
+		ctx.Error("failed to fetch transaction", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+	from, err := i.getFromByTx(ctx, tx)
+	if err != nil {
+		ctx.Error("failed to fetch sender", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+
+	// 获取交易 Receipt
+	receipt, err := i.ethclientAPI.TransactionReceipt(ctx, common.HexToHash(hash))
+	if err != nil {
+		ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", hash))
+		return nil, err
+	}
+
+	txStatus := model.TransactionStatus_TRANSACTION_STATUS_COMPLETED
+	if isPending {
+		txStatus = model.TransactionStatus_TRANSACTION_STATUS_PENDING
+	}
+
+	return biz.NewTransaction(&model.Transaction{
+		TxHash:      tx.Hash().Hex(),
+		BlockNumber: receipt.BlockNumber.Int64(),
+		FromAddress: from.Hex(),
+		ToAddress:   tx.To().Hex(),
+		Amount:      tx.Value().Int64(),
+		Timestamp:   timestamppb.New(tx.Time()),
+		Status:      txStatus,
+	}, receipt), nil
+}
+
 // NewTransactionGetter is used to create a new TransactionGetter.
 func NewTransactionGetter(impl *TransactionRepoImpl) query.TransactionGetter {
 	return impl
@@ -105,12 +143,13 @@ func (i *TransactionRepoImpl) ListByAddress(
 		txType := model.TransactionType_TRANSACTION_TYPE_UNSPECIFIED
 		var swapDetails []*model.SwapDetail
 
+		var receipt *types.Receipt
 		if cond.PoolAddress != "" {
 			// 获取交易的 Receipt
-			receipt, err2 := i.ethclientAPI.TransactionReceipt(context.Background(), common.HexToHash(tx.Hash))
-			if err2 != nil {
-				ctx.Error("failed to fetch transaction receipt", zap.Error(err2), zap.String("tx_hash", tx.Hash))
-				return nil, 0, err2
+			receipt, err = i.ethclientAPI.TransactionReceipt(context.Background(), common.HexToHash(tx.Hash))
+			if err != nil {
+				ctx.Error("failed to fetch transaction receipt", zap.Error(err), zap.String("tx_hash", tx.Hash))
+				return nil, 0, err
 			}
 
 			// 解析 Swap 日志
@@ -128,20 +167,19 @@ func (i *TransactionRepoImpl) ListByAddress(
 		}
 
 		// 构造 Transaction 实例
-		res = append(res, &biz.Transaction{
-			Transaction: model.Transaction{
-				TxHash:      tx.Hash,
-				FromAddress: tx.From,
-				ToAddress:   tx.To,
-				Amount:      tx.Value.Int().Int64(),
-				Timestamp:   timestamppb.New(tx.TimeStamp.Time()),
-				TaskId:      "",
-				CampaignId:  "",
-				Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
-				Type:        txType,
-				SwapDetails: swapDetails,
-			},
-		})
+		got := biz.NewTransaction(&model.Transaction{
+			TxHash:      tx.Hash,
+			FromAddress: tx.From,
+			ToAddress:   tx.To,
+			Amount:      tx.Value.Int().Int64(),
+			Timestamp:   timestamppb.New(tx.TimeStamp.Time()),
+			TaskId:      "",
+			CampaignId:  "",
+			Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
+			Type:        txType,
+			SwapDetails: swapDetails,
+		}, receipt)
+		res = append(res, got)
 	}
 
 	return res, len(res), nil
@@ -222,40 +260,76 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 			swapDetail.PoolAddress = contractAddress
 		}
 
-		chainID, err2 := i.ethclientAPI.NetworkID(ctx)
-		if err2 != nil {
-			ctx.Error("failed to fetch network ID", zap.Error(err2))
-			return nil, 0, err2
-		}
-
-		signer := types.LatestSignerForChainID(chainID)
-		from, err2 := types.Sender(signer, tx)
+		from, err2 := i.getFromByTx(ctx, tx)
 		if err2 != nil {
 			ctx.Error("failed to fetch sender", zap.Error(err2))
 			return nil, 0, err2
 		}
 
 		// 构造 Transaction 实例
-		got := &biz.Transaction{
-			Transaction: model.Transaction{
-				TxHash:      tx.Hash().Hex(),
-				BlockNumber: receipt.BlockNumber.Int64(),
-				FromAddress: from.Hex(),
-				ToAddress:   tx.To().Hex(),
-				Amount:      tx.Value().Int64(),
-				Timestamp:   timestamppb.New(tx.Time()),
-				TaskId:      "",
-				CampaignId:  "",
-				Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
-				Type:        txType,
-				SwapDetails: []*model.SwapDetail{swapDetail},
-			},
-		}
+		got := biz.NewTransaction(&model.Transaction{
+			TxHash:      tx.Hash().Hex(),
+			BlockNumber: receipt.BlockNumber.Int64(),
+			FromAddress: from.Hex(),
+			ToAddress:   tx.To().Hex(),
+			Amount:      tx.Value().Int64(),
+			Timestamp:   timestamppb.New(tx.Time()),
+			TaskId:      "",
+			CampaignId:  "",
+			Status:      model.TransactionStatus_TRANSACTION_STATUS_COMPLETED,
+			Type:        txType,
+			SwapDetails: []*model.SwapDetail{swapDetail},
+		}, receipt)
 		item = append(item, got)
-		ctx.Debug("fetched transaction", zap.String("tx_hash", got.TxHash))
+		ctx.Debug("fetched transaction", zap.String("tx_hash", got.GetTransaction().TxHash))
 	}
 
 	return item, len(item), nil
+}
+
+func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
+	c context.Context,
+	contractAddress string,
+	cond query.ListTransactionCondition,
+	txCh chan<- *biz.TransactionList,
+) error {
+	ctx := contextx.WithContext(c)
+
+	// 获取区块范围
+	startBlock, err := i.etherscanAPI.BlockNumber(cond.StartTime.Unix(), "after")
+	if err != nil {
+		ctx.Error("failed to fetch start block", zap.Error(err), zap.Time("start_time", cond.StartTime))
+		return err
+	}
+
+	if cond.EndTime.After(time.Now()) {
+		cond.EndTime = time.Now()
+	}
+	endBlock, err := i.etherscanAPI.BlockNumber(cond.EndTime.Unix(), "before")
+	if err != nil {
+		ctx.Error("failed to fetch end block", zap.Error(err), zap.Time("end_time", cond.EndTime))
+		return err
+	}
+
+	parsedABI, err := i.getABI(contractAddress)
+	if err != nil {
+		ctx.Error("failed to fetch contract ABI", zap.Error(err), zap.String("contract_address", contractAddress))
+		return err
+	}
+	swapEventHash := parsedABI.Events["Swap"].ID
+
+	logs, err := i.etherscanAPI.GetLogs(startBlock, endBlock, contractAddress, swapEventHash.Hex())
+	if err != nil {
+		ctx.Error("failed to fetch logs", zap.Error(err))
+		return err
+	}
+
+	for _, logEntry := range logs {
+		ctx.Debug("fetched log", zap.String("tx_hash", logEntry.TransactionHash))
+		// TODO: 2024/11/25|sean|fetch transaction details
+	}
+
+	panic("implement me")
 }
 
 func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {
@@ -387,6 +461,23 @@ func (i *TransactionRepoImpl) getTokenDetails(tokenAddress common.Address) (stri
 	}
 
 	return symbol, int(decimals), nil
+}
+
+func (i *TransactionRepoImpl) getFromByTx(ctx contextx.Contextx, tx *types.Transaction) (common.Address, error) {
+	chainID, err := i.ethclientAPI.NetworkID(ctx)
+	if err != nil {
+		ctx.Error("failed to fetch network ID", zap.Error(err))
+		return common.Address{}, err
+	}
+
+	signer := types.LatestSignerForChainID(chainID)
+	from, err := types.Sender(signer, tx)
+	if err != nil {
+		ctx.Error("failed to fetch sender", zap.Error(err))
+		return common.Address{}, err
+	}
+
+	return from, nil
 }
 
 // 将 Token 金额根据 decimals 归一化为浮点数

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
-	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"go.uber.org/zap"
 )
@@ -33,7 +32,7 @@ type GetLogsCondition struct {
 
 // TransactionAdapter is the adapter for transaction.
 type TransactionAdapter interface {
-	GetSwapTxByAddress(
+	GetSwapTxByPoolAddress(
 		c context.Context,
 		address string,
 		cond ListTransactionCondition,
@@ -43,6 +42,8 @@ type TransactionAdapter interface {
 
 // TransactionGetter is used to get the transaction.
 type TransactionGetter interface {
+	GetByHash(c context.Context, hash string) (item *biz.Transaction, err error)
+
 	ListByAddress(
 		c context.Context,
 		address string,
@@ -112,11 +113,11 @@ func calculateTotalUSDC(ctx contextx.Contextx, transactions []*biz.Transaction, 
 
 	for _, tx := range transactions {
 		// Skip non-swap transactions
-		if tx.Type != model.TransactionType_TRANSACTION_TYPE_SWAP {
+		if tx.IsSwapType() {
 			continue
 		}
 
-		for _, detail := range tx.SwapDetails {
+		for _, detail := range tx.GetTransaction().SwapDetails {
 			// Process USDC "from" and "to" amounts
 			if amount, err := getUSDCAmount(detail.FromTokenAddress, detail.FromTokenAmount, usdcAddress); err != nil {
 				ctx.Error("failed to parse FromTokenAmount", zap.Error(err))

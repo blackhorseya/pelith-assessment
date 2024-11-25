@@ -51,11 +51,11 @@ func (i *backtestServiceImpl) RunBacktest(
 		for _, task := range campaign.Tasks() {
 			// 處理 Onboarding Task
 			if task.Type == model.TaskType_TASK_TYPE_ONBOARDING &&
-				float64(tx.Amount) >= task.Criteria.MinTransactionAmount {
+				float64(tx.GetTransaction().Amount) >= task.Criteria.MinTransactionAmount {
 				// 發放 Onboarding Task 獎勵
 				reward := &model.Reward{
 					Id:         "", // 生成唯一 ID
-					UserId:     tx.FromAddress,
+					UserId:     tx.GetTransaction().FromAddress,
 					CampaignId: campaign.Id,
 					Points:     100, // 固定獎勵點數
 				}
@@ -63,16 +63,24 @@ func (i *backtestServiceImpl) RunBacktest(
 				// 發送到結果通道
 				select {
 				case resultCh <- reward:
-					ctx.Info("Onboarding Task reward sent", zap.String("user", tx.FromAddress), zap.Any("reward", reward))
+					ctx.Info(
+						"Onboarding Task reward sent",
+						zap.String("user", tx.GetTransaction().FromAddress),
+						zap.Any("reward", reward),
+					)
 				default:
-					ctx.Error("resultCh is full, dropping onboarding reward", zap.String("user", tx.FromAddress))
+					ctx.Error(
+						"resultCh is full, dropping onboarding reward",
+						zap.String("user", tx.GetTransaction().FromAddress),
+					)
 				}
 			}
 
 			// 累積交易量以便處理 Share Pool Task
 			if task.Type == model.TaskType_TASK_TYPE_SHARE_POOL {
-				userSwapVolume[tx.FromAddress] += float64(tx.Amount)
-				totalSwapVolume += float64(tx.Amount)
+				// TODO: 2024/11/25|sean|!! fix me !! you need to get usdc amount from swap details
+				userSwapVolume[tx.GetTransaction().FromAddress] += float64(tx.GetTransaction().Amount)
+				totalSwapVolume += float64(tx.GetTransaction().Amount)
 			}
 		}
 	}
