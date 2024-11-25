@@ -215,11 +215,11 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 			ctx.Warn("failed to decode swap logs", zap.Error(err2), zap.String("tx_hash", logEntry.TransactionHash))
 			swapDetail = nil
 		}
-		swapDetail.PoolAddress = contractAddress
 
 		txType := model.TransactionType_TRANSACTION_TYPE_UNSPECIFIED
 		if swapDetail != nil {
 			txType = model.TransactionType_TRANSACTION_TYPE_SWAP
+			swapDetail.PoolAddress = contractAddress
 		}
 
 		chainID, err2 := i.ethclientAPI.NetworkID(ctx)
@@ -239,6 +239,7 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 		got := &biz.Transaction{
 			Transaction: model.Transaction{
 				TxHash:      tx.Hash().Hex(),
+				BlockNumber: receipt.BlockNumber.Int64(),
 				FromAddress: from.Hex(),
 				ToAddress:   tx.To().Hex(),
 				Amount:      tx.Value().Int64(),
