@@ -303,62 +303,6 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 	panic("implement me")
 }
 
-func (i *TransactionRepoImpl) decodeSwapLogs(logs []*types.Log, swapEventHash common.Hash) (*model.SwapDetail, error) {
-	var firstLog, lastLog *types.Log
-	var fromDecimals, toDecimals int
-	var fromAmountFloat, toAmountFloat *big.Float
-
-	// Iterate over logs to find the first and last valid Swap logs
-	for idx, logEntry := range logs {
-		// Skip logs that don't match the criteria
-		if len(logEntry.Topics) < 3 || logEntry.Topics[0] != swapEventHash {
-			continue
-		}
-
-		// Ensure data length is sufficient
-		if len(logEntry.Data) < 64 {
-			return nil, fmt.Errorf("log data length is insufficient: %s", logEntry.Data)
-		}
-
-		// Set the first valid log if not already set
-		if firstLog == nil {
-			firstLog = logs[idx]
-		}
-		// Update the last valid log
-		lastLog = logs[idx]
-	}
-
-	// Ensure we found at least one valid log
-	if firstLog == nil || lastLog == nil {
-		return nil, fmt.Errorf("no valid Swap log found")
-	}
-
-	// Parse the first log for "from" token details
-	fromTokenAddress := firstLog.Address
-	fromAmount := new(big.Int).SetBytes(firstLog.Data[:32]) // First 32 bytes represent the amount
-	_, fromDecimals, err := i.getTokenDetails(fromTokenAddress)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get From Token details (address: %s): %w", fromTokenAddress.Hex(), err)
-	}
-	fromAmountFloat = normalizeAmount(fromAmount, fromDecimals)
-
-	// Parse the last log for "to" token details
-	toTokenAddress := lastLog.Address
-	toAmount := new(big.Int).SetBytes(lastLog.Data[:32]) // First 32 bytes represent the amount
-	_, toDecimals, err = i.getTokenDetails(toTokenAddress)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get To Token details (address: %s): %w", toTokenAddress.Hex(), err)
-	}
-	toAmountFloat = normalizeAmount(toAmount, toDecimals)
-
-	return &model.SwapDetail{
-		FromTokenAddress: fromTokenAddress.Hex(),
-		ToTokenAddress:   toTokenAddress.Hex(),
-		FromTokenAmount:  fmt.Sprintf("%.6f", fromAmountFloat),
-		ToTokenAmount:    fmt.Sprintf("%.6f", toAmountFloat),
-	}, nil
-}
-
 func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
