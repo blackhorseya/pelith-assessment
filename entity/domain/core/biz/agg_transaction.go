@@ -62,7 +62,7 @@ func (x *Transaction) GetTransaction() *model.Transaction {
 // GetSwapForPool is used to get the swap for the pool.
 func (x *Transaction) GetSwapForPool(poolAddress, swapEventHash common.Hash) (*model.SwapDetail, error) {
 	if x.receipt == nil {
-		return nil, errors.New("I need receipt to get swap for pool")
+		return nil, errors.New("i need receipt to get swap for pool")
 	}
 
 	var firstLog, lastLog *types.Log
