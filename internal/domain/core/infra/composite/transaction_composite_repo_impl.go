@@ -81,64 +81,6 @@ func (i *TransactionCompositeRepoImpl) ListByAddress(
 	return item, total, nil
 }
 
-func (i *TransactionCompositeRepoImpl) GetLogsByAddress(
-	c context.Context,
-	contractAddress string,
-	cond query.GetLogsCondition,
-) (item biz.TransactionList, total int, err error) {
-	ctx := contextx.WithContext(c)
-
-	// 鎖的 Key
-	lockKey := "lock_" + contractAddress
-
-	// 加載或創建新的 Mutex
-	mutex, _ := i.locks.LoadOrStore(lockKey, &sync.Mutex{})
-	mtx, ok := mutex.(*sync.Mutex)
-	if !ok {
-		ctx.Error("failed to load lock", zap.String("lockKey", lockKey))
-		return nil, 0, errors.New("failed to load lock")
-	}
-
-	// 加鎖
-	mtx.Lock()
-	defer func() {
-		mtx.Unlock()
-		i.locks.Delete(lockKey) // 解鎖後刪除，避免內存泄漏
-	}()
-
-	// Step 1: 優先從資料庫查詢數據
-	item, total, err = i.dbRepo.GetLogsByAddress(ctx, contractAddress, cond)
-	if err != nil {
-		ctx.Error("dbRepo.GetLogsByAddress", zap.Error(err))
-		return nil, 0, err // 資料庫查詢失敗時返回錯誤
-	}
-
-	// 如果資料庫有數據，直接返回
-	if total > 0 {
-		return item, total, nil
-	}
-
-	// Step 2: 若資料庫無數據，調用外部 API
-	apiData, apiTotal, apiErr := i.apiRepo.GetLogsByAddress(ctx, contractAddress, cond)
-	if apiErr != nil {
-		ctx.Error("apiRepo.GetLogsByAddress", zap.Error(apiErr))
-		return nil, 0, apiErr
-	}
-
-	// Step 3: 保存從 API 獲取的數據到資料庫
-	for _, tx := range apiData {
-		saveErr := i.dbRepo.Create(ctx, tx)
-		if saveErr != nil {
-			// 日誌記錄，但不影響主邏輯
-			ctx.Error("dbRepo.Create", zap.Error(saveErr))
-			continue
-		}
-	}
-
-	// Step 4: 返回 API 獲取的數據
-	return apiData, apiTotal, nil
-}
-
 func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
 	c context.Context,
 	address string,
@@ -162,6 +104,7 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
 		i.locks.Delete(lockKey)
 	}()
 
+	// Step 1: 查詢本地資料庫
 	item, total, err := i.dbRepo.GetLogsByAddress(ctx, address, query.GetLogsCondition{
 		StartTime: cond.StartTime,
 		EndTime:   cond.EndTime,
@@ -178,7 +121,34 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByPoolAddress(
 		return nil
 	}
 
-	err = i.apiRepo.GetSwapTxByPoolAddress(ctx, address, cond, txCh)
+	// Step 2: 從外部 API 獲取數據
+	apiTxCh := make(chan *biz.Transaction)
+	go func() {
+		defer close(apiTxCh)
+		err = i.apiRepo.GetSwapTxByPoolAddress(ctx, address, cond, apiTxCh)
+		if err != nil {
+			ctx.Error("apiRepo.GetSwapTxByPoolAddress", zap.Error(err))
+		}
+	}()
+
+	// Step 3: 寫入資料庫並傳遞給 txCh
+	for apiTx := range apiTxCh {
+		select {
+		case txCh <- apiTx: // 傳遞數據到調用方的 channel
+		case <-ctx.Done(): // 如果 context 被取消，停止操作
+			ctx.Error("context cancelled while sending transaction", zap.Error(ctx.Err()))
+			return ctx.Err()
+		}
+
+		// 儲存數據到資料庫
+		saveErr := i.dbRepo.Create(ctx, apiTx)
+		if saveErr != nil {
+			ctx.Error("dbRepo.Create", zap.Error(saveErr))
+			// 儲存失敗不會中斷整體邏輯，繼續處理其他交易
+			continue
+		}
+	}
+
 	if err != nil {
 		ctx.Error("apiRepo.GetSwapTxByPoolAddress", zap.Error(err))
 		return err
