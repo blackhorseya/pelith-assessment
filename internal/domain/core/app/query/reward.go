@@ -4,10 +4,8 @@ package query
 
 import (
 	"context"
-	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
-	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 )
 
 type (
@@ -30,7 +28,6 @@ func NewRewardQueryStore(rewardGetter RewardGetter) *RewardQueryStore {
 }
 
 // GetRewardHistoryByWalletAddress is used to get reward history by wallet address
-func (s *RewardQueryStore) GetRewardHistoryByWalletAddress(c context.Context, address string) ([]*model.Reward, error) {
-	// TODO: 2024/11/26|sean|implement the handler
-	return nil, errors.New("not implemented")
+func (s *RewardQueryStore) GetRewardHistoryByWalletAddress(c context.Context, address string) ([]*biz.Reward, error) {
+	return s.rewardGetter.GetByAddress(c, address)
 }
