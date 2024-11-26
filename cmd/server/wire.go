@@ -58,6 +58,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		biz.NewCampaignService,
 		biz.NewTaskService,
 		biz.NewBacktestService,
+		biz.NewUserService,
 
 		// repo layer
 		pg.NewCampaignRepo,

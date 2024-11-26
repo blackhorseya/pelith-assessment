@@ -37,13 +37,13 @@ type GetTasksStatusQuery struct {
 // @Param params query GetTasksStatusQuery false "query string"
 // @Router /api/v1/users/{address}/tasks/status [get]
 func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
-	tasks, err := ctrl.userStore.GetTasksStatus(c.Request.Context(), c.Param("address"))
+	ret, err := ctrl.userStore.GetTasksStatus(c.Request.Context(), c.Param("address"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, tasks)
+	c.JSON(http.StatusOK, ret)
 }
 
 // GetPointsHistoryQuery is the query to get points history

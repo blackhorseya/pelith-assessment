@@ -51,7 +51,8 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	rewardQueryStore := query.NewRewardQueryStore(rewardGetter)
-	userQueryStore := query.NewUserQueryStore()
+	userService := biz.NewUserService()
+	userQueryStore := query.NewUserQueryStore(userService)
 	queryController := http.NewQueryController(rewardQueryStore, userQueryStore)
 	initRoutes := http.NewInitUserRoutesFn(queryController)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)

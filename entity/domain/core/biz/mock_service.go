@@ -140,33 +140,19 @@ func (m *MockUserService) EXPECT() *MockUserServiceMockRecorder {
 	return m.recorder
 }
 
-// RegisterUser mocks base method.
-func (m *MockUserService) RegisterUser(c context.Context, username, address string) (*model.User, error) {
+// GetUserTaskListByAddress mocks base method.
+func (m *MockUserService) GetUserTaskListByAddress(c context.Context, address string) (*User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RegisterUser", c, username, address)
-	ret0, _ := ret[0].(*model.User)
+	ret := m.ctrl.Call(m, "GetUserTaskListByAddress", c, address)
+	ret0, _ := ret[0].(*User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// RegisterUser indicates an expected call of RegisterUser.
-func (mr *MockUserServiceMockRecorder) RegisterUser(c, username, address any) *gomock.Call {
+// GetUserTaskListByAddress indicates an expected call of GetUserTaskListByAddress.
+func (mr *MockUserServiceMockRecorder) GetUserTaskListByAddress(c, address any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockUserService)(nil).RegisterUser), c, username, address)
-}
-
-// UpdateUserProgress mocks base method.
-func (m *MockUserService) UpdateUserProgress(c context.Context, userID, taskID string, completed bool) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateUserProgress", c, userID, taskID, completed)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// UpdateUserProgress indicates an expected call of UpdateUserProgress.
-func (mr *MockUserServiceMockRecorder) UpdateUserProgress(c, userID, taskID, completed any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUserProgress", reflect.TypeOf((*MockUserService)(nil).UpdateUserProgress), c, userID, taskID, completed)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserTaskListByAddress", reflect.TypeOf((*MockUserService)(nil).GetUserTaskListByAddress), c, address)
 }
 
 // MockBacktestService is a mock of BacktestService interface.

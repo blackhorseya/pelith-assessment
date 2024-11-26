@@ -4,8 +4,8 @@ package query
 
 import (
 	"context"
-	"errors"
 
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 )
 
@@ -27,15 +27,17 @@ type UserGetter interface {
 
 // UserQueryStore defines the interface for storing user query data.
 type UserQueryStore struct {
+	userService biz.UserService
 }
 
 // NewUserQueryStore creates a new UserQueryStore instance.
-func NewUserQueryStore() *UserQueryStore {
-	return &UserQueryStore{}
+func NewUserQueryStore(userService biz.UserService) *UserQueryStore {
+	return &UserQueryStore{
+		userService: userService,
+	}
 }
 
 // GetTasksStatus retrieves the status of tasks for a user.
-func (s *UserQueryStore) GetTasksStatus(c context.Context, address string) (interface{}, error) {
-	// TODO: 2024/11/26|sean|implement GetTasksStatus
-	return nil, errors.New("not implemented")
+func (s *UserQueryStore) GetTasksStatus(c context.Context, address string) (*biz.User, error) {
+	return s.userService.GetUserTaskListByAddress(c, address)
 }
