@@ -59,7 +59,17 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	userService := biz.NewUserService(campaignGetter)
+	transactionRepoImpl, err := pg.NewTransactionRepoImpl(db)
+	if err != nil {
+		return nil, nil, err
+	}
+	etherscanTransactionRepoImpl, err := etherscan.NewTransactionRepoImpl(application)
+	if err != nil {
+		return nil, nil, err
+	}
+	transactionCompositeRepoImpl := composite.NewTransactionCompositeRepoImpl(transactionRepoImpl, etherscanTransactionRepoImpl)
+	transactionRepo := composite.NewTransactionRepoImpl(transactionCompositeRepoImpl)
+	userService := biz.NewUserService(campaignGetter, transactionRepo)
 	userQueryStore := query.NewUserQueryStore(userService)
 	queryController := http.NewQueryController(rewardQueryStore, userQueryStore)
 	initRoutes := http.NewInitUserRoutesFn(queryController)
@@ -77,15 +87,6 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	taskRepoImpl := pg.NewTaskRepo(db)
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
 	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
-	transactionRepoImpl, err := pg.NewTransactionRepoImpl(db)
-	if err != nil {
-		return nil, nil, err
-	}
-	etherscanTransactionRepoImpl, err := etherscan.NewTransactionRepoImpl(application)
-	if err != nil {
-		return nil, nil, err
-	}
-	transactionCompositeRepoImpl := composite.NewTransactionCompositeRepoImpl(transactionRepoImpl, etherscanTransactionRepoImpl)
 	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
 	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, backtestService)
 	campaignUpdater, err := pg.NewCampaignUpdater(campaignRepoImpl)

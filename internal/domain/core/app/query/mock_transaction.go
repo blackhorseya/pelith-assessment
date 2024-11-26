@@ -17,7 +17,7 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockTransactionAdapter is a mock of TransactionAdapter interface.
+// MockTransactionAdapter is a mock of TransactionRepo interface.
 type MockTransactionAdapter struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionAdapterMockRecorder

@@ -32,6 +32,21 @@ func NewTransactionCompositeRepoImpl(
 	}
 }
 
+// NewTransactionRepoImpl creates a new TransactionRepoImpl.
+func NewTransactionRepoImpl(impl *TransactionCompositeRepoImpl) query.TransactionRepo {
+	return impl
+}
+
+func (i *TransactionCompositeRepoImpl) GetSwapTxByUserAddressAndPoolAddress(
+	c context.Context,
+	address, poolAddress string,
+	cond query.ListTransactionCondition,
+	txCh chan<- *biz.Transaction,
+) error {
+	// TODO: 2024/11/26|sean|implement GetSwapTxByUserAddressAndPoolAddress
+	return errors.New("implement GetSwapTxByUserAddressAndPoolAddress")
+}
+
 func (i *TransactionCompositeRepoImpl) ListByAddress(
 	c context.Context,
 	address string,

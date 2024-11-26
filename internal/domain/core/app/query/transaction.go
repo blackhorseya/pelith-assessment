@@ -25,8 +25,8 @@ type GetLogsCondition struct {
 	EndTime   time.Time
 }
 
-// TransactionAdapter is the adapter for transaction.
-type TransactionAdapter interface {
+// TransactionRepo is the adapter for transaction.
+type TransactionRepo interface {
 	GetSwapTxByPoolAddress(
 		c context.Context,
 		address string,

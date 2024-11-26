@@ -73,6 +73,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		pg.NewRewardGetter,
 		etherscan.NewTransactionRepoImpl,
 		composite.NewTransactionCompositeRepoImpl,
+		composite.NewTransactionRepoImpl,
 
 		// infra
 		httpx.NewGinServer,
