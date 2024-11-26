@@ -31,8 +31,7 @@ type (
 
 	// CampaignUpdater is used to update the campaign.
 	CampaignUpdater interface {
-		// Update is used to update the campaign.
-		Update(c context.Context, campaign *biz.Campaign) error
+		DistributeReward(c context.Context, campaign *biz.Campaign, reward *model.Reward) error
 	}
 )
 

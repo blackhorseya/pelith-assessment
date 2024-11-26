@@ -152,18 +152,18 @@ func (m *MockCampaignUpdater) EXPECT() *MockCampaignUpdaterMockRecorder {
 	return m.recorder
 }
 
-// Update mocks base method.
-func (m *MockCampaignUpdater) Update(c context.Context, campaign *biz.Campaign) error {
+// DistributeReward mocks base method.
+func (m *MockCampaignUpdater) DistributeReward(c context.Context, campaign *biz.Campaign, reward *model.Reward) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", c, campaign)
+	ret := m.ctrl.Call(m, "DistributeReward", c, campaign, reward)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Update indicates an expected call of Update.
-func (mr *MockCampaignUpdaterMockRecorder) Update(c, campaign any) *gomock.Call {
+// DistributeReward indicates an expected call of DistributeReward.
+func (mr *MockCampaignUpdaterMockRecorder) DistributeReward(c, campaign, reward any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockCampaignUpdater)(nil).Update), c, campaign)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DistributeReward", reflect.TypeOf((*MockCampaignUpdater)(nil).DistributeReward), c, campaign, reward)
 }
 
 // MockUserCreator is a mock of UserCreator interface.
