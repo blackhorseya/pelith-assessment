@@ -48,6 +48,31 @@ func NewCampaignUpdater(impl *CampaignRepoImpl) (command.CampaignUpdater, error)
 	return impl, nil
 }
 
+// NewCampaignDeleter is used to create a new CampaignDeleter.
+func NewCampaignDeleter(impl *CampaignRepoImpl) (command.CampaignDeleter, error) {
+	return impl, nil
+}
+
+func (i *CampaignRepoImpl) CleanReward(c context.Context, campaignID string) error {
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
+	defer cancelFunc()
+
+	stmt := `
+		DELETE FROM rewards
+		WHERE campaign_id = $1
+	`
+
+	_, err := i.rw.ExecContext(timeout, stmt, campaignID)
+	if err != nil {
+		ctx.Error("failed to clean rewards", zap.Error(err), zap.String("campaign_id", campaignID))
+		return err
+	}
+
+	return nil
+}
+
 func (i *CampaignRepoImpl) DistributeReward(c context.Context, reward *model.Reward) error {
 	ctx := contextx.WithContext(c)
 

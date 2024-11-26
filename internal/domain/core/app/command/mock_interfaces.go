@@ -166,6 +166,43 @@ func (mr *MockCampaignUpdaterMockRecorder) DistributeReward(c, reward any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DistributeReward", reflect.TypeOf((*MockCampaignUpdater)(nil).DistributeReward), c, reward)
 }
 
+// MockCampaignDeleter is a mock of CampaignDeleter interface.
+type MockCampaignDeleter struct {
+	ctrl     *gomock.Controller
+	recorder *MockCampaignDeleterMockRecorder
+}
+
+// MockCampaignDeleterMockRecorder is the mock recorder for MockCampaignDeleter.
+type MockCampaignDeleterMockRecorder struct {
+	mock *MockCampaignDeleter
+}
+
+// NewMockCampaignDeleter creates a new mock instance.
+func NewMockCampaignDeleter(ctrl *gomock.Controller) *MockCampaignDeleter {
+	mock := &MockCampaignDeleter{ctrl: ctrl}
+	mock.recorder = &MockCampaignDeleterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCampaignDeleter) EXPECT() *MockCampaignDeleterMockRecorder {
+	return m.recorder
+}
+
+// CleanReward mocks base method.
+func (m *MockCampaignDeleter) CleanReward(c context.Context, campaignID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CleanReward", c, campaignID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CleanReward indicates an expected call of CleanReward.
+func (mr *MockCampaignDeleterMockRecorder) CleanReward(c, campaignID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CleanReward", reflect.TypeOf((*MockCampaignDeleter)(nil).CleanReward), c, campaignID)
+}
+
 // MockUserCreator is a mock of UserCreator interface.
 type MockUserCreator struct {
 	ctrl     *gomock.Controller
