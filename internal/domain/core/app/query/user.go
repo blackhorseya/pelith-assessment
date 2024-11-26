@@ -4,6 +4,7 @@ package query
 
 import (
 	"context"
+	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 )
@@ -22,4 +23,19 @@ type UserGetter interface {
 
 	// List retrieves users based on specified conditions.
 	List(c context.Context, cond ListUserCondition) (item []*model.User, total int, err error)
+}
+
+// UserQueryStore defines the interface for storing user query data.
+type UserQueryStore struct {
+}
+
+// NewUserQueryStore creates a new UserQueryStore instance.
+func NewUserQueryStore() *UserQueryStore {
+	return &UserQueryStore{}
+}
+
+// GetTasksStatus retrieves the status of tasks for a user.
+func (s *UserQueryStore) GetTasksStatus(c context.Context, address string) (interface{}, error) {
+	// TODO: 2024/11/26|sean|implement GetTasksStatus
+	return nil, errors.New("not implemented")
 }

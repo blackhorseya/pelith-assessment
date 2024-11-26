@@ -51,9 +51,8 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		command.NewAddTaskHandler,
 		command.NewStartCampaignHandler,
 		command.NewRunBacktestHandler,
-		query.NewTaskQueryService,
-		query.NewTransactionQueryService,
 		query.NewRewardQueryStore,
+		query.NewUserQueryStore,
 
 		// entity layer
 		biz.NewCampaignService,
@@ -68,12 +67,10 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		pg.NewCampaignDeleter,
 		pg.NewTaskRepo,
 		pg.NewTaskCreator,
-		pg.NewTaskGetter,
 		pg.NewTransactionRepoImpl,
 		pg.NewRewardRepo,
 		pg.NewRewardGetter,
 		etherscan.NewTransactionRepoImpl,
-		etherscan.NewTransactionGetter,
 		composite.NewTransactionCompositeRepoImpl,
 
 		// infra
