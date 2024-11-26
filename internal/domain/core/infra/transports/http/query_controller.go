@@ -36,7 +36,7 @@ type GetTasksStatusQuery struct {
 // @Produce json
 // @Param address path string true "User address"
 // @Param params query GetTasksStatusQuery false "query string"
-// @Router /api/v1/users/{address}/tasks/status [get]
+// @Router /v1/users/{address}/tasks/status [get]
 func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
 	ret, err := ctrl.userStore.GetTasksStatus(c.Request.Context(), c.Param("address"), c.Query("campaignID"))
 	if err != nil {
@@ -61,7 +61,7 @@ type GetPointsHistoryQuery struct {
 // @Produce json
 // @Param address path string true "User address"
 // @Param params query GetPointsHistoryQuery false "query string"
-// @Router /api/v1/users/{address}/points/history [get]
+// @Router /v1/users/{address}/points/history [get]
 func (ctrl *QueryController) GetPointsHistory(c *gin.Context) {
 	rewards, err := ctrl.rewardStore.GetRewardHistoryByWalletAddress(c.Request.Context(), c.Param("address"))
 	if err != nil {

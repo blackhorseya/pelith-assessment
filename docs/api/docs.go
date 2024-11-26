@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/users/{address}/points/history": {
+        "/v1/users/{address}/points/history": {
             "get": {
                 "description": "Get points history by address",
                 "consumes": [
@@ -55,7 +55,7 @@ const docTemplate = `{
                 "responses": {}
             }
         },
-        "/api/v1/users/{address}/tasks/status": {
+        "/v1/users/{address}/tasks/status": {
             "get": {
                 "description": "Get tasks status by address",
                 "consumes": [

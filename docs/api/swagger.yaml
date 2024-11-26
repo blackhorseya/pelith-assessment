@@ -1,7 +1,7 @@
 info:
   contact: {}
 paths:
-  /api/v1/users/{address}/points/history:
+  /v1/users/{address}/points/history:
     get:
       consumes:
       - application/json
@@ -29,7 +29,7 @@ paths:
       summary: Get points history
       tags:
       - users
-  /api/v1/users/{address}/tasks/status:
+  /v1/users/{address}/tasks/status:
     get:
       consumes:
       - application/json
