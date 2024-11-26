@@ -43,8 +43,23 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByUserAddressAndPoolAddress(
 	cond query.ListTransactionCondition,
 	txCh chan<- *biz.Transaction,
 ) error {
-	// TODO: 2024/11/26|sean|implement GetSwapTxByUserAddressAndPoolAddress
-	return errors.New("implement GetSwapTxByUserAddressAndPoolAddress")
+	ctx := contextx.WithContext(c)
+
+	cond.PoolAddress = poolAddress
+	txs, total, err := i.dbRepo.ListByAddress(ctx, address, cond)
+	if err != nil {
+		ctx.Error("dbRepo.ListByAddress", zap.Error(err), zap.Any("condition", cond))
+		return err
+	}
+	if total == 0 {
+		return errors.New("no transaction found")
+	}
+
+	for _, tx := range txs {
+		txCh <- tx
+	}
+
+	return nil
 }
 
 func (i *TransactionCompositeRepoImpl) ListByAddress(
