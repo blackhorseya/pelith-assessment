@@ -58,7 +58,6 @@ func (h *RunBacktestHandler) Handle(c context.Context, campaignID string, result
 		err = h.campaignUpdater.DistributeReward(ctx, reward)
 		if err != nil {
 			ctx.Error("failed to distribute reward", zap.Error(err))
-			continue
 		}
 		resultCh <- reward
 	}

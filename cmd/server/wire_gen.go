@@ -81,7 +81,11 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	transactionCompositeRepoImpl := composite.NewTransactionCompositeRepoImpl(pgTransactionRepoImpl, transactionRepoImpl)
 	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
 	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, backtestService)
-	runBacktestHandler := command.NewRunBacktestHandler(backtestService, campaignGetter)
+	campaignUpdater, err := pg.NewCampaignUpdater(campaignRepoImpl)
+	if err != nil {
+		return nil, nil, err
+	}
+	runBacktestHandler := command.NewRunBacktestHandler(backtestService, campaignGetter, campaignUpdater)
 	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, addTaskHandler, startCampaignHandler, runBacktestHandler, campaignGetter)
 	initServers := grpc.NewInitServersFn(campaignServiceServer)
 	healthServer := grpc.NewHealthServer()
