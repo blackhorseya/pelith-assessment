@@ -133,7 +133,7 @@ message User {
   string address = 3;
 
   // Task completion status by task ID
-  map<string, bool> task_progress = 4;
+  map<string, int64> task_progress = 4;
 
   // Total points earned
   int64 points = 5;

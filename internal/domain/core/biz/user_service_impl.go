@@ -16,10 +16,11 @@ func NewUserService() biz.UserService {
 }
 
 func (i *userServiceImpl) RegisterUser(c context.Context, username string, address string) (*model.User, error) {
-	user, err := biz.NewUser(username, address)
+	user, err := biz.NewUser(address)
 	if err != nil {
 		return nil, err
 	}
+	user.Name = username
 
 	return &user.User, nil
 }
