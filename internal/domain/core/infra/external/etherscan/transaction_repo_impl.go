@@ -51,11 +51,6 @@ func NewTransactionRepoImpl(app *configx.Application) (*TransactionRepoImpl, err
 	}, nil
 }
 
-// NewTransactionGetter is used to create a new TransactionGetter.
-func NewTransactionGetter(impl *TransactionRepoImpl) query.TransactionGetter {
-	return impl
-}
-
 func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
 	return i.getByHash(c, hash)
 }
