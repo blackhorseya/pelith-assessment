@@ -16,6 +16,7 @@ type RunBacktestHandler struct {
 	backtestService biz.BacktestService
 	campaignGetter  query.CampaignGetter
 	campaignUpdater CampaignUpdater
+	campaignDeleter CampaignDeleter
 }
 
 // NewRunBacktestHandler is used to create a new RunBacktestHandler.
@@ -23,11 +24,13 @@ func NewRunBacktestHandler(
 	backtestService biz.BacktestService,
 	campaignGetter query.CampaignGetter,
 	campaignUpdater CampaignUpdater,
+	campaignDeleter CampaignDeleter,
 ) *RunBacktestHandler {
 	return &RunBacktestHandler{
 		backtestService: backtestService,
 		campaignGetter:  campaignGetter,
 		campaignUpdater: campaignUpdater,
+		campaignDeleter: campaignDeleter,
 	}
 }
 
@@ -43,6 +46,13 @@ func (h *RunBacktestHandler) Handle(c context.Context, campaignID string, result
 	if campaign == nil {
 		ctx.Error("campaign not found", zap.String("campaign_id", campaignID))
 		return errors.New("campaign not found")
+	}
+
+	// clean existing rewards
+	err = h.campaignDeleter.CleanReward(c, campaignID)
+	if err != nil {
+		ctx.Error("failed to clean reward", zap.Error(err))
+		return err
 	}
 
 	rewards := make(chan *model.Reward)
