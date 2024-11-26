@@ -29,13 +29,3 @@ func NewUser(address string) (*User, error) {
 		},
 	}, nil
 }
-
-// CompleteTask updates the user's progress and awards points for a completed task.
-func (u *User) CompleteTask(taskID string, points int64) error {
-	if u.TaskProgress[taskID] {
-		return errors.New("task already completed")
-	}
-	u.TaskProgress[taskID] = true
-	u.Points += points
-	return nil
-}
