@@ -19,11 +19,14 @@ type (
 
 // RewardQueryStore is the store for reward query
 type RewardQueryStore struct {
+	rewardGetter RewardGetter
 }
 
 // NewRewardQueryStore is the constructor for RewardQueryStore
-func NewRewardQueryStore() *RewardQueryStore {
-	return &RewardQueryStore{}
+func NewRewardQueryStore(rewardGetter RewardGetter) *RewardQueryStore {
+	return &RewardQueryStore{
+		rewardGetter: rewardGetter,
+	}
 }
 
 // GetRewardHistoryByWalletAddress is used to get reward history by wallet address

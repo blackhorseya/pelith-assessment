@@ -129,13 +129,26 @@ func FromModelRewardToDAO(reward *model.Reward) *RewardDAO {
 	}
 }
 
-// ToBizModel 將 RewardDAO 轉換為 biz.Reward
-func (dao *RewardDAO) ToBizModel() *model.Reward {
+// ToModel 將 RewardDAO 轉換為 model.Reward
+func (dao *RewardDAO) ToModel() *model.Reward {
 	return &model.Reward{
 		Id:          dao.ID,
 		UserAddress: dao.UserAddress,
 		CampaignId:  dao.CampaignID,
 		Points:      dao.Points,
 		RedeemedAt:  timestamppb.New(*dao.RedeemedAt),
+	}
+}
+
+// ToAggregate 將 RewardDAO 轉換為 biz.Reward
+func (dao *RewardDAO) ToAggregate() *biz.Reward {
+	return &biz.Reward{
+		Reward: model.Reward{
+			Id:          dao.ID,
+			UserAddress: dao.UserAddress,
+			CampaignId:  dao.CampaignID,
+			Points:      dao.Points,
+			RedeemedAt:  timestamppb.New(*dao.RedeemedAt),
+		},
 	}
 }
