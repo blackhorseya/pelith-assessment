@@ -51,32 +51,14 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	rewardQueryStore := query.NewRewardQueryStore(rewardGetter)
-	userService := biz.NewUserService()
-	userQueryStore := query.NewUserQueryStore(userService)
-	queryController := http.NewQueryController(rewardQueryStore, userQueryStore)
-	initRoutes := http.NewInitUserRoutesFn(queryController)
-	ginServer, err := httpx.NewGinServer(application, initRoutes)
-	if err != nil {
-		return nil, nil, err
-	}
-	campaignService := biz.NewCampaignService()
 	campaignRepoImpl, err := pg.NewCampaignRepo(db)
 	if err != nil {
 		return nil, nil, err
 	}
-	campaignCreator, err := pg.NewCampaignCreator(campaignRepoImpl)
-	if err != nil {
-		return nil, nil, err
-	}
-	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
 	campaignGetter, err := pg.NewCampaignGetter(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
-	taskService := biz.NewTaskService()
-	taskRepoImpl := pg.NewTaskRepo(db)
-	taskCreator := pg.NewTaskCreator(taskRepoImpl)
-	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
 	transactionRepoImpl, err := pg.NewTransactionRepoImpl(db)
 	if err != nil {
 		return nil, nil, err
@@ -86,6 +68,25 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	transactionCompositeRepoImpl := composite.NewTransactionCompositeRepoImpl(transactionRepoImpl, etherscanTransactionRepoImpl)
+	transactionRepo := composite.NewTransactionRepoImpl(transactionCompositeRepoImpl)
+	userService := biz.NewUserService(campaignGetter, transactionRepo)
+	userQueryStore := query.NewUserQueryStore(userService)
+	queryController := http.NewQueryController(rewardQueryStore, userQueryStore)
+	initRoutes := http.NewInitUserRoutesFn(queryController)
+	ginServer, err := httpx.NewGinServer(application, initRoutes)
+	if err != nil {
+		return nil, nil, err
+	}
+	campaignService := biz.NewCampaignService()
+	campaignCreator, err := pg.NewCampaignCreator(campaignRepoImpl)
+	if err != nil {
+		return nil, nil, err
+	}
+	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
+	taskService := biz.NewTaskService()
+	taskRepoImpl := pg.NewTaskRepo(db)
+	taskCreator := pg.NewTaskCreator(taskRepoImpl)
+	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
 	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
 	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, backtestService)
 	campaignUpdater, err := pg.NewCampaignUpdater(campaignRepoImpl)

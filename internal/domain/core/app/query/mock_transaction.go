@@ -17,7 +17,7 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockTransactionAdapter is a mock of TransactionAdapter interface.
+// MockTransactionAdapter is a mock of TransactionRepo interface.
 type MockTransactionAdapter struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionAdapterMockRecorder
@@ -54,72 +54,16 @@ func (mr *MockTransactionAdapterMockRecorder) GetSwapTxByPoolAddress(c, address,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByPoolAddress", reflect.TypeOf((*MockTransactionAdapter)(nil).GetSwapTxByPoolAddress), c, address, cond, txCh)
 }
 
-// MockTransactionGetter is a mock of TransactionGetter interface.
-type MockTransactionGetter struct {
-	ctrl     *gomock.Controller
-	recorder *MockTransactionGetterMockRecorder
-}
-
-// MockTransactionGetterMockRecorder is the mock recorder for MockTransactionGetter.
-type MockTransactionGetterMockRecorder struct {
-	mock *MockTransactionGetter
-}
-
-// NewMockTransactionGetter creates a new mock instance.
-func NewMockTransactionGetter(ctrl *gomock.Controller) *MockTransactionGetter {
-	mock := &MockTransactionGetter{ctrl: ctrl}
-	mock.recorder = &MockTransactionGetterMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockTransactionGetter) EXPECT() *MockTransactionGetterMockRecorder {
-	return m.recorder
-}
-
-// GetByHash mocks base method.
-func (m *MockTransactionGetter) GetByHash(c context.Context, hash string) (*biz.Transaction, error) {
+// GetSwapTxByUserAddressAndPoolAddress mocks base method.
+func (m *MockTransactionAdapter) GetSwapTxByUserAddressAndPoolAddress(c context.Context, address, poolAddress string, cond ListTransactionCondition, txCh chan<- *biz.Transaction) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetByHash", c, hash)
-	ret0, _ := ret[0].(*biz.Transaction)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret := m.ctrl.Call(m, "GetSwapTxByUserAddressAndPoolAddress", c, address, poolAddress, cond, txCh)
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
-// GetByHash indicates an expected call of GetByHash.
-func (mr *MockTransactionGetterMockRecorder) GetByHash(c, hash any) *gomock.Call {
+// GetSwapTxByUserAddressAndPoolAddress indicates an expected call of GetSwapTxByUserAddressAndPoolAddress.
+func (mr *MockTransactionAdapterMockRecorder) GetSwapTxByUserAddressAndPoolAddress(c, address, poolAddress, cond, txCh any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByHash", reflect.TypeOf((*MockTransactionGetter)(nil).GetByHash), c, hash)
-}
-
-// GetLogsByAddress mocks base method.
-func (m *MockTransactionGetter) GetLogsByAddress(c context.Context, contractAddress string, cond GetLogsCondition) ([]string, int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetLogsByAddress", c, contractAddress, cond)
-	ret0, _ := ret[0].([]string)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// GetLogsByAddress indicates an expected call of GetLogsByAddress.
-func (mr *MockTransactionGetterMockRecorder) GetLogsByAddress(c, contractAddress, cond any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLogsByAddress", reflect.TypeOf((*MockTransactionGetter)(nil).GetLogsByAddress), c, contractAddress, cond)
-}
-
-// ListByAddress mocks base method.
-func (m *MockTransactionGetter) ListByAddress(c context.Context, address string, cond ListTransactionCondition) (biz.TransactionList, int, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListByAddress", c, address, cond)
-	ret0, _ := ret[0].(biz.TransactionList)
-	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-// ListByAddress indicates an expected call of ListByAddress.
-func (mr *MockTransactionGetterMockRecorder) ListByAddress(c, address, cond any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListByAddress", reflect.TypeOf((*MockTransactionGetter)(nil).ListByAddress), c, address, cond)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByUserAddressAndPoolAddress", reflect.TypeOf((*MockTransactionAdapter)(nil).GetSwapTxByUserAddressAndPoolAddress), c, address, poolAddress, cond, txCh)
 }
