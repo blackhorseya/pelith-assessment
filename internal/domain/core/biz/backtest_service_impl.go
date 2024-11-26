@@ -36,7 +36,7 @@ func (i *backtestServiceImpl) RunBacktest(
 	txCh := make(chan *biz.Transaction)
 	var err error
 	go func() {
-		err = i.txRepo.GetSwapTxByPoolAddress(c, campaign.PoolId, query.ListTransactionCondition{
+		err = i.txRepo.GetSwapTxByPoolAddress(ctx, campaign.PoolId, query.ListTransactionCondition{
 			StartTime: campaign.StartTime.AsTime(),
 			EndTime:   campaign.EndTime.AsTime(),
 		}, txCh)
@@ -75,19 +75,7 @@ func (i *backtestServiceImpl) RunBacktest(
 				}
 
 				// 發送到結果通道
-				select {
-				case resultCh <- reward:
-					ctx.Info(
-						"Onboarding Task reward sent",
-						zap.String("user", swapTx.GetTransaction().FromAddress),
-						zap.Any("reward", &reward),
-					)
-				default:
-					ctx.Error(
-						"resultCh is full, dropping onboarding reward",
-						zap.String("user", swapTx.GetTransaction().FromAddress),
-					)
-				}
+				resultCh <- reward
 			}
 		}
 	}
@@ -111,12 +99,7 @@ func (i *backtestServiceImpl) RunBacktest(
 		}
 
 		// 發送到結果通道
-		select {
-		case resultCh <- reward:
-			ctx.Info("Share Pool Task reward sent", zap.String("user", user), zap.Any("reward", &reward))
-		default:
-			ctx.Error("resultCh is full, dropping share pool reward", zap.String("user", user))
-		}
+		resultCh <- reward
 	}
 
 	return nil
