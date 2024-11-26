@@ -58,6 +58,14 @@ type (
 )
 
 type (
+	// RewardCreator is used to create a new reward.
+	RewardCreator interface {
+		// Create is used to create a new reward.
+		Create(c context.Context, reward *biz.Reward) error
+	}
+)
+
+type (
 	// TransactionCreator is used to create a new transaction.
 	TransactionCreator interface {
 		// Create is used to create a new transaction.
