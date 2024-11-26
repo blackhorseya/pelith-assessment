@@ -25,7 +25,7 @@ help: ## Show this help message
 .PHONY: run
 run: ## Run the application
 	@echo "Running the application..."
-	docker compose up
+	docker compose up --build
 
 # Build the application
 .PHONY: build
