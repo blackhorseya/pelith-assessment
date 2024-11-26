@@ -1,7 +1,6 @@
 package biz
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"math/big"
@@ -9,7 +8,6 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
-	"github.com/blackhorseya/pelith-assessment/pkg/eventx"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -132,17 +130,6 @@ func (x *Transaction) GetSwapAmountByTokenAddress(tokenAddress string) string {
 	}
 
 	return "0"
-}
-
-// Process is used to process the transaction.
-func (x *Transaction) Process(c context.Context) (eventx.DomainEvent, error) {
-	if x.IsSwapType() {
-		return NewSwapExecutedEvent(x.tx.Timestamp.AsTime(), SwapExecutedPayload{
-			TxID: x.tx.TxHash,
-		}), nil
-	}
-
-	return nil, errors.New("unsupported transaction type")
 }
 
 // TransactionList is a list of transactions.
