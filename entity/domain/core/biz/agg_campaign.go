@@ -142,3 +142,26 @@ func (c *Campaign) HasCompletedOnboardingTask(volume float64) bool {
 
 	return false
 }
+
+// GetSharePoolTaskReward returns the rewards for the share pool task.
+func (c *Campaign) GetSharePoolTaskReward() []*model.Reward {
+	var rewards []*model.Reward
+	for user, volume := range c.userSwapVolume {
+		if !c.HasCompletedOnboardingTask(volume) {
+			continue
+		}
+
+		points := int64((volume / c.totalSwapVolume) * 10000)
+
+		reward := &model.Reward{
+			Id:         "", // generate unique ID from repository
+			UserId:     user,
+			CampaignId: c.Id,
+			Points:     points,
+		}
+
+		rewards = append(rewards, reward)
+	}
+
+	return rewards
+}

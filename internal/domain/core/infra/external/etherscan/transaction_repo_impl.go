@@ -64,7 +64,7 @@ func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *b
 func (i *TransactionRepoImpl) GetByHashWithPool(c context.Context, hash, poolAddress string) (*biz.Transaction, error) {
 	ctx := contextx.WithContext(c)
 
-	tx, err := i.getByHash(c, hash)
+	tx, err := i.getByHash(ctx, hash)
 	if err != nil {
 		ctx.Error("failed to fetch transaction", zap.Error(err), zap.String("tx_hash", hash))
 		return nil, err

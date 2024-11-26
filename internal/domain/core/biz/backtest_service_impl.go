@@ -45,10 +45,6 @@ func (i *backtestServiceImpl) RunBacktest(
 		close(txCh)
 	}()
 
-	// 2. 準備累積數據
-	// userSwapVolume := make(map[string]float64) // 用戶的交易量 usdc
-	// totalSwapVolume := 0.0                     // 總交易量
-
 	// 3. 處理交易記錄
 	for swapTx := range txCh {
 		reward, err2 := campaign.OnSwapExecuted(swapTx)
@@ -56,30 +52,17 @@ func (i *backtestServiceImpl) RunBacktest(
 			ctx.Error("failed to handle swap executed", zap.Error(err2))
 			continue
 		}
+		if reward == nil {
+			continue
+		}
 		resultCh <- reward
 	}
 
 	// 4. 分配 Share Pool Task 獎勵
-	// for user, volume := range userSwapVolume {
-	// 	// 檢查用戶是否完成 Onboarding Task
-	// 	if !campaign.HasCompletedOnboardingTask(volume) {
-	// 		continue
-	// 	}
-	//
-	// 	// 計算用戶獎勵
-	// 	points := int64((volume / totalSwapVolume) * 10000) // 假設總分數為 10,000
-	//
-	// 	// 創建獎勵
-	// 	reward := &model.Reward{
-	// 		Id:         "", // 生成唯一 ID
-	// 		UserId:     user,
-	// 		CampaignId: campaign.Id,
-	// 		Points:     points,
-	// 	}
-	//
-	// 	// 發送到結果通道
-	// 	resultCh <- reward
-	// }
+	rewards := campaign.GetSharePoolTaskReward()
+	for _, reward := range rewards {
+		resultCh <- reward
+	}
 
 	return nil
 }
