@@ -9,7 +9,6 @@ import (
 
 type userServiceImpl struct {
 	campaignGetter query.CampaignGetter
-	txGetter       query.TransactionGetter
 }
 
 // NewUserService creates a new UserService instance.

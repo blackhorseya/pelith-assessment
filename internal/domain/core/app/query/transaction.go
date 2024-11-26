@@ -33,11 +33,13 @@ type TransactionAdapter interface {
 		cond ListTransactionCondition,
 		txCh chan<- *biz.Transaction,
 	) error
-}
 
-// TransactionGetter is used to get the transaction.
-type TransactionGetter interface {
-	GetSwapTxByUserAddressAndPoolAddress(c context.Context, address, poolAddress string) ([]*biz.Transaction, error)
+	GetSwapTxByUserAddressAndPoolAddress(
+		c context.Context,
+		address, poolAddress string,
+		cond ListTransactionCondition,
+		txCh chan<- *biz.Transaction,
+	) error
 }
 
 // // TransactionQueryService is the service for transaction query.
