@@ -93,6 +93,7 @@ func (i *CampaignRepoImpl) DistributeReward(c context.Context, reward *model.Rew
 		ctx.Error("failed to prepare named statement", zap.Error(err))
 		return err
 	}
+	defer stmt.Close()
 
 	params := FromModelRewardToDAO(reward)
 	var rewardID string
