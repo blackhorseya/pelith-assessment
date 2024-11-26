@@ -67,6 +67,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		pg.NewTaskCreator,
 		pg.NewTaskGetter,
 		pg.NewTransactionRepoImpl,
+		pg.NewCampaignUpdater,
 		etherscan.NewTransactionRepoImpl,
 		etherscan.NewTransactionGetter,
 		composite.NewTransactionCompositeRepoImpl,

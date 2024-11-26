@@ -15,16 +15,19 @@ import (
 type RunBacktestHandler struct {
 	backtestService biz.BacktestService
 	campaignGetter  query.CampaignGetter
+	campaignUpdater CampaignUpdater
 }
 
 // NewRunBacktestHandler is used to create a new RunBacktestHandler.
 func NewRunBacktestHandler(
 	backtestService biz.BacktestService,
 	campaignGetter query.CampaignGetter,
+	campaignUpdater CampaignUpdater,
 ) *RunBacktestHandler {
 	return &RunBacktestHandler{
 		backtestService: backtestService,
 		campaignGetter:  campaignGetter,
+		campaignUpdater: campaignUpdater,
 	}
 }
 
@@ -52,7 +55,10 @@ func (h *RunBacktestHandler) Handle(c context.Context, campaignID string, result
 	}()
 
 	for reward := range rewards {
-		ctx.Debug("backtest result", zap.Any("result", &reward))
+		err = h.campaignUpdater.DistributeReward(ctx, reward)
+		if err != nil {
+			ctx.Error("failed to distribute reward", zap.Error(err))
+		}
 		resultCh <- reward
 	}
 	if err != nil {
