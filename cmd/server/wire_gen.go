@@ -59,7 +59,8 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	}
 	transactionQueryService := query.NewTransactionQueryService(transactionGetter, campaignGetter)
 	taskQueryService := query.NewTaskQueryService(taskGetter, transactionQueryService)
-	queryController := http.NewQueryController(taskQueryService)
+	rewardQueryStore := query.NewRewardQueryStore()
+	queryController := http.NewQueryController(taskQueryService, rewardQueryStore)
 	initRoutes := http.NewInitUserRoutesFn(queryController)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)
 	if err != nil {

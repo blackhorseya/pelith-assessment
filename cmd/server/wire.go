@@ -53,6 +53,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		command.NewRunBacktestHandler,
 		query.NewTaskQueryService,
 		query.NewTransactionQueryService,
+		query.NewRewardQueryStore,
 
 		// entity layer
 		biz.NewCampaignService,

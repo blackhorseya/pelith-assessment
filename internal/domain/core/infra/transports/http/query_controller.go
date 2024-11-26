@@ -9,13 +9,15 @@ import (
 
 // QueryController is the controller for query
 type QueryController struct {
-	taskQuery *query.TaskQueryService
+	taskQuery   *query.TaskQueryService
+	rewardStore *query.RewardQueryStore
 }
 
 // NewQueryController is the constructor for QueryController
-func NewQueryController(taskQuery *query.TaskQueryService) *QueryController {
+func NewQueryController(taskQuery *query.TaskQueryService, rewardStore *query.RewardQueryStore) *QueryController {
 	return &QueryController{
-		taskQuery: taskQuery,
+		taskQuery:   taskQuery,
+		rewardStore: rewardStore,
 	}
 }
 
@@ -33,7 +35,7 @@ type GetTasksStatusQuery struct {
 // @Accept json
 // @Produce json
 // @Param address path string true "User address"
-// @Param query query GetTasksStatusQuery false "query string"
+// @Param params query GetTasksStatusQuery false "query string"
 // @Router /api/v1/users/{address}/tasks/status [get]
 func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
 	tasks, err := ctrl.taskQuery.GetTaskStatus(c.Request.Context(), c.Param("address"), c.Query("campaignID"))
@@ -58,8 +60,14 @@ type GetPointsHistoryQuery struct {
 // @Accept json
 // @Produce json
 // @Param address path string true "User address"
-// @Param query query GetPointsHistoryQuery false "query string"
+// @Param params query GetPointsHistoryQuery false "query string"
 // @Router /api/v1/users/{address}/points/history [get]
 func (ctrl *QueryController) GetPointsHistory(c *gin.Context) {
-	// TODO: 2024/11/22|sean|implement the handler
+	rewards, err := ctrl.rewardStore.GetRewardHistoryByWalletAddress(c.Request.Context(), c.Param("address"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"rewards": rewards})
 }
