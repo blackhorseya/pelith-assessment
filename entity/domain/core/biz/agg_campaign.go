@@ -13,8 +13,9 @@ import (
 type Campaign struct {
 	model.Campaign
 
-	tasks  []*Task
-	report *model.BacktestReport
+	tasks   []*Task
+	report  *model.BacktestReport
+	rewards []*model.Reward
 }
 
 // NewCampaign creates a new Campaign aggregate.
