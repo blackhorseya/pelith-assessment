@@ -1,19 +1,32 @@
+//go:generate mockgen -destination=./mock_${GOFILE} -package=${GOPACKAGE} -source=${GOFILE}
+
 package query
 
 import (
 	"context"
 	"errors"
 
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+)
+
+type (
+	// RewardGetter is the interface for reward getter
+	RewardGetter interface {
+		GetByAddress(c context.Context, address string) ([]*biz.Reward, error)
+	}
 )
 
 // RewardQueryStore is the store for reward query
 type RewardQueryStore struct {
+	rewardGetter RewardGetter
 }
 
 // NewRewardQueryStore is the constructor for RewardQueryStore
-func NewRewardQueryStore() *RewardQueryStore {
-	return &RewardQueryStore{}
+func NewRewardQueryStore(rewardGetter RewardGetter) *RewardQueryStore {
+	return &RewardQueryStore{
+		rewardGetter: rewardGetter,
+	}
 }
 
 // GetRewardHistoryByWalletAddress is used to get reward history by wallet address
