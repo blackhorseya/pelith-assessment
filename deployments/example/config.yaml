@@ -11,4 +11,4 @@ services:
       port: 50051
 
     storage:
-      dsn: "postgres://root:changeme@localhost:5432/pelith?sslmode=disable"
+      dsn: "postgres://root:changeme@db:5432/pelith?sslmode=disable"

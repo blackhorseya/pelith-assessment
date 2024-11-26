@@ -21,18 +21,18 @@ help: ## Show this help message
 	@grep -hE '^[ a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-17s\033[0m %s\n", $$1, $$2}'
 
+# Run the application
+.PHONY: run
+run: ## Run the application
+	@echo "Running the application..."
+	docker compose up
+
 # Build the application
 .PHONY: build
 build: ## Compile the application
 	@echo "Building the application..."
 	@mkdir -p $(BUILD_DIR)
 	$(GO) build -o $(BUILD_DIR)/$(APP_NAME) .
-
-# Run the application
-.PHONY: run
-run: build ## Run the compiled application
-	@echo "Running the application..."
-	./$(BUILD_DIR)/$(APP_NAME)
 
 # Run tests
 .PHONY: test
@@ -89,18 +89,6 @@ gen-swagger: ## Generate Swagger specification
 docker-build: ## Build the Docker image
 	@echo "Building Docker image..."
 	docker build -t $(DOCKER_IMAGE) .
-
-# Docker run
-.PHONY: docker-run
-docker-run: ## Run the Docker container
-	@echo "Running Docker container..."
-	docker run --rm --name $(CONTAINER_NAME) -p 8080:8080 $(DOCKER_IMAGE)
-
-# Docker stop
-.PHONY: docker-stop
-docker-stop: ## Stop the Docker container
-	@echo "Stopping Docker container..."
-	docker stop $(CONTAINER_NAME)
 
 # Docker clean
 .PHONY: docker-clean

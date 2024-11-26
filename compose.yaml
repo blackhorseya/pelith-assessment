@@ -12,8 +12,33 @@ services:
     build:
       context: .
       target: final
+    command:
+      - start
+      - server
     ports:
       - 8080:8080
+    volumes:
+      - ./deployments/example/config.yaml:/config.yaml
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=pelith
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=changeme
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -q -d pelith -U root" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
