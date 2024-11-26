@@ -23,7 +23,7 @@ func NewQueryController(rewardStore *query.RewardQueryStore, userStore *query.Us
 
 // GetTasksStatusQuery is the query to get tasks status
 type GetTasksStatusQuery struct {
-	CampaignID string `form:"campaignID"`
+	CampaignID string `form:"campaignID" binding:"required"`
 	Page       int64  `form:"page" default:"1" minimum:"1"`
 	Size       int64  `form:"size" default:"10" minimum:"1" maximum:"100"`
 }

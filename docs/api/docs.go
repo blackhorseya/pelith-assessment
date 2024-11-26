@@ -79,7 +79,8 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "campaignID",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "minimum": 1,
