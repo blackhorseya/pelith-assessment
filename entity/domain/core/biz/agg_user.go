@@ -10,9 +10,9 @@ import (
 type User struct {
 	model.User
 
-	tasks        []*Task
-	rewards      []*Reward
-	transactions TransactionList
+	Tasks        []*Task         `json:"tasks,omitempty"`
+	Rewards      []*Reward       `json:"rewards,omitempty"`
+	Transactions TransactionList `json:"transactions,omitempty"`
 }
 
 // NewUser creates a new User aggregate.
