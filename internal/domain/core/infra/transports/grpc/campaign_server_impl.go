@@ -132,7 +132,7 @@ func (i *campaignServerImpl) RunBacktestByCampaign(
 	req *core.GetCampaignRequest,
 	stream grpc.ServerStreamingServer[core.BacktestResultResponse],
 ) error {
-	resultCh := make(chan *model.BacktestResult)
+	resultCh := make(chan *model.Reward)
 	var err error
 	go func() {
 		err = i.runBacktestHandler.Handle(stream.Context(), req.Id, resultCh)
@@ -141,7 +141,7 @@ func (i *campaignServerImpl) RunBacktestByCampaign(
 
 	for result := range resultCh {
 		err = stream.Send(&core.BacktestResultResponse{
-			Result: result,
+			Reward: result,
 		})
 		if err != nil {
 			return err

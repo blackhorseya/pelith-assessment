@@ -56,7 +56,7 @@ message ListCampaignsRequest {}
 
 // BacktestResultResponse is the response for backtest result
 message BacktestResultResponse {
-  entity.domain.core.model.BacktestResult result = 1;
+  entity.domain.core.model.Reward reward = 1;
 }
 
 // CampaignService is the service for campaign

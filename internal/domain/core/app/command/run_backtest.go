@@ -29,7 +29,7 @@ func NewRunBacktestHandler(
 }
 
 // Handle is used to handle the run backtest.
-func (h *RunBacktestHandler) Handle(c context.Context, campaignID string, resultCh chan<- *model.BacktestResult) error {
+func (h *RunBacktestHandler) Handle(c context.Context, campaignID string, resultCh chan<- *model.Reward) error {
 	ctx := contextx.WithContext(c)
 
 	campaign, err := h.campaignGetter.GetByID(c, campaignID)
@@ -53,13 +53,7 @@ func (h *RunBacktestHandler) Handle(c context.Context, campaignID string, result
 
 	for reward := range rewards {
 		ctx.Debug("backtest result", zap.Any("result", &reward))
-		resultCh <- &model.BacktestResult{
-			UserId:       reward.UserId,
-			TotalSwaps:   0,
-			TotalVolume:  0,
-			PointsEarned: reward.Points,
-			TaskProgress: nil,
-		}
+		resultCh <- reward
 	}
 	if err != nil {
 		ctx.Error("failed to run backtest", zap.Error(err))
