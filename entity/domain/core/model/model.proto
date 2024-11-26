@@ -148,7 +148,7 @@ message Reward {
   string id = 1;
 
   // Associated user ID
-  string user_id = 2;
+  string user_address = 2;
 
   // Associated campaign ID
   string campaign_id = 3;

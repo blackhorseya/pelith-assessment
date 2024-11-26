@@ -115,10 +115,10 @@ func (c *Campaign) OnSwapExecuted(tx *Transaction) (*model.Reward, error) {
 		if c.HasCompletedOnboardingTask(totalAmount) {
 			c.userOnboardingReward[tx.GetTransaction().FromAddress] = true
 			reward = &model.Reward{
-				Id:         "", // generate unique ID from repository
-				UserId:     tx.GetTransaction().FromAddress,
-				CampaignId: c.Id,
-				Points:     100, // 固定獎勵點數
+				Id:          "", // generate unique ID from repository
+				UserAddress: tx.GetTransaction().FromAddress,
+				CampaignId:  c.Id,
+				Points:      100, // 固定獎勵點數
 			}
 
 			c.rewards = append(c.rewards, reward)
@@ -154,10 +154,10 @@ func (c *Campaign) GetSharePoolTaskReward() []*model.Reward {
 		points := int64((volume / c.totalSwapVolume) * 10000)
 
 		reward := &model.Reward{
-			Id:         "", // generate unique ID from repository
-			UserId:     user,
-			CampaignId: c.Id,
-			Points:     points,
+			Id:          "", // generate unique ID from repository
+			UserAddress: user,
+			CampaignId:  c.Id,
+			Points:      points,
 		}
 
 		rewards = append(rewards, reward)
