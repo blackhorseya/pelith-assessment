@@ -25,24 +25,21 @@ func NewUserService(
 	}
 }
 
-func (i *userServiceImpl) GetUserTaskListByAddress(c context.Context, address string) (*biz.User, error) {
+func (i *userServiceImpl) GetUserTaskListByAddress(c context.Context, address, campaignID string) (*biz.User, error) {
 	ctx := contextx.WithContext(c)
 
-	// campaigns, total, err := i.campaignGetter.List(ctx, query.ListCampaignCondition{})
-	// if err != nil {
-	// 	ctx.Error("failed to list campaigns", zap.Error(err))
-	// 	return nil, err
-	// }
-	// if total == 0 {
-	// 	ctx.Error("no campaigns found")
-	// 	return nil, errors.New("no campaigns found")
-	// }
+	campaign, err := i.campaignGetter.GetByID(ctx, campaignID)
+	if err != nil || campaign == nil {
+		ctx.Error("failed to fetch campaign", zap.Error(err), zap.String("campaign_id", campaignID))
+		return nil, err
+	}
 
 	user, err := biz.NewUser(address)
 	if err != nil {
 		ctx.Error("failed to create user", zap.Error(err))
 		return nil, err
 	}
+	user.Tasks = campaign.Tasks()
 
 	// TODO: 2024/11/26|sean|implement GetUserTaskListByAddress
 	return user, nil

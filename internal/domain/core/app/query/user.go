@@ -4,6 +4,7 @@ package query
 
 import (
 	"context"
+	"errors"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
@@ -38,6 +39,14 @@ func NewUserQueryStore(userService biz.UserService) *UserQueryStore {
 }
 
 // GetTasksStatus retrieves the status of tasks for a user.
-func (s *UserQueryStore) GetTasksStatus(c context.Context, address string) (*biz.User, error) {
-	return s.userService.GetUserTaskListByAddress(c, address)
+func (s *UserQueryStore) GetTasksStatus(c context.Context, address, campaignID string) (*biz.User, error) {
+	if address == "" {
+		return nil, errors.New("address cannot be empty")
+	}
+
+	if campaignID == "" {
+		return nil, errors.New("campaign ID cannot be empty")
+	}
+
+	return s.userService.GetUserTaskListByAddress(c, address, campaignID)
 }

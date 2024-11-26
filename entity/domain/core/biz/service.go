@@ -54,7 +54,7 @@ type RewardService interface {
 
 // UserService defines the domain logic for user management.
 type UserService interface {
-	GetUserTaskListByAddress(c context.Context, address string) (*User, error)
+	GetUserTaskListByAddress(c context.Context, address, campaignID string) (*User, error)
 }
 
 // BacktestService defines the domain logic for backtesting campaigns with historical data.
