@@ -2,9 +2,11 @@ package pg
 
 import (
 	"context"
+	"errors"
 	"sync"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
@@ -39,6 +41,39 @@ func NewCampaignCreator(impl *CampaignRepoImpl) (command.CampaignCreator, error)
 // NewCampaignGetter is used to create a new CampaignGetter.
 func NewCampaignGetter(impl *CampaignRepoImpl) (query.CampaignGetter, error) {
 	return impl, nil
+}
+
+// NewCampaignUpdater is used to create a new CampaignUpdater.
+func NewCampaignUpdater(impl *CampaignRepoImpl) (command.CampaignUpdater, error) {
+	return impl, nil
+}
+
+func (i *CampaignRepoImpl) DistributeReward(c context.Context, reward *model.Reward) error {
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
+	defer cancelFunc()
+
+	if reward == nil {
+		return errors.New("reward is nil")
+	}
+
+	stmt := `
+		INSERT INTO rewards (user_address, campaign_id, points, redeemed_at, created_at, updated_at)
+		VALUES (:user_address, :campaign_id, :points, :redeemed_at, NOW(), NOW())
+		RETURNING id
+	`
+
+	params := FromModelRewardToDAO(reward)
+	var rewardID string
+	err := i.rw.QueryRowxContext(timeout, stmt, params).Scan(&rewardID)
+	if err != nil {
+		ctx.Error("failed to insert reward", zap.Error(err), zap.Any("params", &params))
+		return err
+	}
+
+	reward.Id = rewardID
+	return nil
 }
 
 func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) error {
