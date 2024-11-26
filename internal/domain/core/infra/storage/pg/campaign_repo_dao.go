@@ -101,3 +101,41 @@ func FromBizTaskToDAO(task *biz.Task) (*TaskDAO, error) {
 		Status:      int32(task.Status),
 	}, nil
 }
+
+// RewardDAO 定義 rewards 表對應的結構
+type RewardDAO struct {
+	ID          string     `db:"id"`
+	UserAddress string     `db:"user_address"`
+	CampaignID  string     `db:"campaign_id"`
+	Points      int64      `db:"points"`
+	RedeemedAt  *time.Time `db:"redeemed_at"` // 可為 NULL
+	CreatedAt   time.Time  `db:"created_at"`
+	UpdatedAt   time.Time  `db:"updated_at"`
+}
+
+// FromModelRewardToDAO 將 biz.Reward 轉換為 DAO
+func FromModelRewardToDAO(reward *model.Reward) *RewardDAO {
+	redeemedAt := new(time.Time)
+	if !redeemedAt.IsZero() {
+		*redeemedAt = reward.RedeemedAt.AsTime()
+	}
+
+	return &RewardDAO{
+		ID:          reward.Id,
+		UserAddress: reward.UserAddress,
+		CampaignID:  reward.CampaignId,
+		Points:      reward.Points,
+		RedeemedAt:  redeemedAt,
+	}
+}
+
+// ToBizModel 將 RewardDAO 轉換為 biz.Reward
+func (dao *RewardDAO) ToBizModel() *model.Reward {
+	return &model.Reward{
+		Id:          dao.ID,
+		UserAddress: dao.UserAddress,
+		CampaignId:  dao.CampaignID,
+		Points:      dao.Points,
+		RedeemedAt:  timestamppb.New(*dao.RedeemedAt),
+	}
+}
