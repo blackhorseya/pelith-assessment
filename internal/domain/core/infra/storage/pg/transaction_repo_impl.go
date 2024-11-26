@@ -17,6 +17,18 @@ type TransactionRepoImpl struct {
 	rw *sqlx.DB
 }
 
+// NewTransactionRepoImpl creates a new TransactionRepoImpl.
+func NewTransactionRepoImpl(rw *sqlx.DB) (*TransactionRepoImpl, error) {
+	err := migrateUp(rw, "transaction")
+	if err != nil {
+		return nil, err
+	}
+
+	return &TransactionRepoImpl{
+		rw: rw,
+	}, nil
+}
+
 func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
 	// 設定上下文，支援超時與日誌記錄
 	ctx := contextx.WithContext(c)
@@ -53,18 +65,6 @@ func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *b
 	}
 
 	return transaction, nil
-}
-
-// NewTransactionRepoImpl creates a new TransactionRepoImpl.
-func NewTransactionRepoImpl(rw *sqlx.DB) (*TransactionRepoImpl, error) {
-	err := migrateUp(rw, "transaction")
-	if err != nil {
-		return nil, err
-	}
-
-	return &TransactionRepoImpl{
-		rw: rw,
-	}, nil
 }
 
 func (i *TransactionRepoImpl) ListByAddress(

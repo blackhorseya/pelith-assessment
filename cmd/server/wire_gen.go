@@ -85,7 +85,11 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	runBacktestHandler := command.NewRunBacktestHandler(backtestService, campaignGetter, campaignUpdater)
+	campaignDeleter, err := pg.NewCampaignDeleter(campaignRepoImpl)
+	if err != nil {
+		return nil, nil, err
+	}
+	runBacktestHandler := command.NewRunBacktestHandler(backtestService, campaignGetter, campaignUpdater, campaignDeleter)
 	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, addTaskHandler, startCampaignHandler, runBacktestHandler, campaignGetter)
 	initServers := grpc.NewInitServersFn(campaignServiceServer)
 	healthServer := grpc.NewHealthServer()

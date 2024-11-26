@@ -33,6 +33,11 @@ type (
 	CampaignUpdater interface {
 		DistributeReward(c context.Context, reward *model.Reward) error
 	}
+
+	// CampaignDeleter is used to delete the campaign.
+	CampaignDeleter interface {
+		CleanReward(c context.Context, campaignID string) error
+	}
 )
 
 type (

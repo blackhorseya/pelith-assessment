@@ -48,6 +48,31 @@ func NewCampaignUpdater(impl *CampaignRepoImpl) (command.CampaignUpdater, error)
 	return impl, nil
 }
 
+// NewCampaignDeleter is used to create a new CampaignDeleter.
+func NewCampaignDeleter(impl *CampaignRepoImpl) (command.CampaignDeleter, error) {
+	return impl, nil
+}
+
+func (i *CampaignRepoImpl) CleanReward(c context.Context, campaignID string) error {
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
+	defer cancelFunc()
+
+	stmt := `
+		DELETE FROM rewards
+		WHERE campaign_id = $1
+	`
+
+	_, err := i.rw.ExecContext(timeout, stmt, campaignID)
+	if err != nil {
+		ctx.Error("failed to clean rewards", zap.Error(err), zap.String("campaign_id", campaignID))
+		return err
+	}
+
+	return nil
+}
+
 func (i *CampaignRepoImpl) DistributeReward(c context.Context, reward *model.Reward) error {
 	ctx := contextx.WithContext(c)
 
@@ -58,15 +83,21 @@ func (i *CampaignRepoImpl) DistributeReward(c context.Context, reward *model.Rew
 		return errors.New("reward is nil")
 	}
 
-	stmt := `
+	rewardQuery := `
 		INSERT INTO rewards (user_address, campaign_id, points, redeemed_at, created_at, updated_at)
 		VALUES (:user_address, :campaign_id, :points, :redeemed_at, NOW(), NOW())
 		RETURNING id
 	`
+	stmt, err := i.rw.PrepareNamedContext(timeout, rewardQuery)
+	if err != nil {
+		ctx.Error("failed to prepare named statement", zap.Error(err))
+		return err
+	}
+	defer stmt.Close()
 
 	params := FromModelRewardToDAO(reward)
 	var rewardID string
-	err := i.rw.QueryRowxContext(timeout, stmt, params).Scan(&rewardID)
+	err = stmt.QueryRowxContext(timeout, params).Scan(&rewardID)
 	if err != nil {
 		ctx.Error("failed to insert reward", zap.Error(err), zap.Any("params", &params))
 		return err
