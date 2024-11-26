@@ -83,15 +83,20 @@ func (i *CampaignRepoImpl) DistributeReward(c context.Context, reward *model.Rew
 		return errors.New("reward is nil")
 	}
 
-	stmt := `
+	rewardQuery := `
 		INSERT INTO rewards (user_address, campaign_id, points, redeemed_at, created_at, updated_at)
 		VALUES (:user_address, :campaign_id, :points, :redeemed_at, NOW(), NOW())
 		RETURNING id
 	`
+	stmt, err := i.rw.PrepareNamedContext(timeout, rewardQuery)
+	if err != nil {
+		ctx.Error("failed to prepare named statement", zap.Error(err))
+		return err
+	}
 
 	params := FromModelRewardToDAO(reward)
 	var rewardID string
-	err := i.rw.QueryRowxContext(timeout, stmt, params).Scan(&rewardID)
+	err = stmt.QueryRowxContext(timeout, params).Scan(&rewardID)
 	if err != nil {
 		ctx.Error("failed to insert reward", zap.Error(err), zap.Any("params", &params))
 		return err
