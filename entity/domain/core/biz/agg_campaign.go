@@ -2,10 +2,10 @@ package biz
 
 import (
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
-	"github.com/blackhorseya/pelith-assessment/pkg/eventx"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -14,8 +14,12 @@ type Campaign struct {
 	model.Campaign
 
 	tasks   []*Task
-	report  *model.BacktestReport
 	rewards []*model.Reward
+
+	transactionList      TransactionList
+	userSwapVolume       map[string]float64
+	userOnboardingReward map[string]bool
+	totalSwapVolume      float64
 }
 
 // NewCampaign creates a new Campaign aggregate.
@@ -40,7 +44,8 @@ func NewCampaign(name string, startAt time.Time, poolID string) (*Campaign, erro
 			Status:      model.CampaignStatus_CAMPAIGN_STATUS_PENDING,
 			PoolId:      poolID,
 		},
-		report: new(model.BacktestReport),
+		userSwapVolume:       make(map[string]float64),
+		userOnboardingReward: make(map[string]bool),
 	}, nil
 }
 
@@ -58,11 +63,6 @@ func (c *Campaign) GetTaskByType(taskType model.TaskType) *Task {
 	}
 
 	return nil
-}
-
-// Report returns the backtest report for the campaign.
-func (c *Campaign) Report() *model.BacktestReport {
-	return c.report
 }
 
 // AddTask adds a task to the campaign.
@@ -99,9 +99,33 @@ func (c *Campaign) Complete() error {
 }
 
 // OnSwapExecuted handles the swap executed event.
-func (c *Campaign) OnSwapExecuted(tx *Transaction) (eventx.DomainEvent, error) {
-	// TODO: 2024/11/24|sean|Add swap logic
-	return nil, errors.New("implement OnSwapExecuted")
+func (c *Campaign) OnSwapExecuted(tx *Transaction) (*model.Reward, error) {
+	c.transactionList = append(c.transactionList, tx)
+
+	amount, err := strconv.ParseFloat(tx.GetSwapAmountByTokenAddress(c.PoolId), 64)
+	if err != nil {
+		return nil, err
+	}
+	c.userSwapVolume[tx.GetTransaction().FromAddress] += amount
+	c.totalSwapVolume += amount
+
+	var reward *model.Reward
+	if !c.userOnboardingReward[tx.GetTransaction().FromAddress] {
+		totalAmount := c.userSwapVolume[tx.GetTransaction().FromAddress]
+		if c.HasCompletedOnboardingTask(totalAmount) {
+			c.userOnboardingReward[tx.GetTransaction().FromAddress] = true
+			reward = &model.Reward{
+				Id:         "", // generate unique ID from repository
+				UserId:     tx.GetTransaction().FromAddress,
+				CampaignId: c.Id,
+				Points:     100, // 固定獎勵點數
+			}
+
+			c.rewards = append(c.rewards, reward)
+		}
+	}
+
+	return reward, nil
 }
 
 // HasCompletedOnboardingTask checks if the user has completed the onboarding task.

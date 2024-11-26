@@ -17,8 +17,7 @@ import (
 
 // Transaction is an aggregate root that represents the transaction.
 type Transaction struct {
-	tx *model.Transaction
-
+	tx      *model.Transaction
 	receipt *types.Receipt
 
 	SwapDetail *model.SwapDetail
