@@ -499,3 +499,5 @@ bin
 
 deployments/*
 !deployments/example
+
+.env
