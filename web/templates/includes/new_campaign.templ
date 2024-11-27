@@ -24,6 +24,21 @@
                placeholder="Enter pool ID" value="0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc" required>
     </div>
 
+    <!-- Mode -->
+    <div class="mb-4">
+        <label for="mode" class="block mb-2 text-sm font-medium">Mode:</label>
+        <select id="mode" name="mode" class="border rounded px-4 py-2 w-full">
+            <option value="2" selected>Backtest Mode</option>
+            <option value="1">Active Mode</option>
+        </select>
+    </div>
+
+    <!-- Minimum Transaction Amount -->
+    <div class="mb-4">
+        <label for="minAmount" class="block mb-2 text-sm font-medium">Minimum Transaction Amount:</label>
+        <input type="number" id="minAmount" name="minAmount" class="border rounded px-4 py-2 w-full" placeholder="Enter minimum amount" value="1000" required>
+    </div>
+
     <!-- Submit Button -->
     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save Campaign</button>
 </form>
