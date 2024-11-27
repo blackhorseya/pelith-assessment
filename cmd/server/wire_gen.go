@@ -80,7 +80,8 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	initRoutes := http.NewInitUserRoutesFn(queryController, campaignServiceClient)
+	commandController := http.NewCommandController(campaignServiceClient)
+	initRoutes := http.NewInitUserRoutesFn(queryController, commandController, campaignServiceClient)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)
 	if err != nil {
 		return nil, nil, err

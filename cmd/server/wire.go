@@ -42,6 +42,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		// adapter
 		http.NewInitUserRoutesFn,
 		http.NewQueryController,
+		http.NewCommandController,
 		grpc.NewInitServersFn,
 		grpc.NewHealthServer,
 		grpc.NewCampaignServer,
