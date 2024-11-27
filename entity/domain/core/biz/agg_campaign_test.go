@@ -42,7 +42,7 @@ func TestCampaign_AddTask(t *testing.T) {
 				},
 			},
 			args:    task,
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 
@@ -114,7 +114,7 @@ func TestCampaign_Start(t *testing.T) {
 					Status: model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE,
 				},
 			},
-			wantErr: true,
+			wantErr: false,
 		},
 	}
 

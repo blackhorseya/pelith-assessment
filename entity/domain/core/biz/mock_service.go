@@ -181,7 +181,7 @@ func (m *MockBacktestService) EXPECT() *MockBacktestServiceMockRecorder {
 // RunBacktest mocks base method.
 func (m *MockBacktestService) RunBacktest(c context.Context, campaign *Campaign, resultCh chan<- *model.Reward) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RunBacktest", c, campaign, resultCh)
+	ret := m.ctrl.Call(m, "StartCampaign", c, campaign, resultCh)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
@@ -189,7 +189,7 @@ func (m *MockBacktestService) RunBacktest(c context.Context, campaign *Campaign,
 // RunBacktest indicates an expected call of RunBacktest.
 func (mr *MockBacktestServiceMockRecorder) RunBacktest(c, campaign, resultCh any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RunBacktest", reflect.TypeOf((*MockBacktestService)(nil).RunBacktest), c, campaign, resultCh)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartCampaign", reflect.TypeOf((*MockBacktestService)(nil).RunBacktest), c, campaign, resultCh)
 }
 
 // MockTransactionService is a mock of TransactionService interface.

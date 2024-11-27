@@ -1,14 +1,12 @@
 package http
 
 import (
-	"context"
-	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"github.com/blackhorseya/pelith-assessment/proto/core"
 	"github.com/gin-gonic/gin"
@@ -18,13 +16,18 @@ import (
 
 // CommandController is the command controller.
 type CommandController struct {
-	campaignClient core.CampaignServiceClient
+	campaignClient       core.CampaignServiceClient
+	startCampaignHandler *command.StartCampaignHandler
 }
 
 // NewCommandController is used to create a new command controller.
-func NewCommandController(campaignClient core.CampaignServiceClient) *CommandController {
+func NewCommandController(
+	campaignClient core.CampaignServiceClient,
+	startCampaignHandler *command.StartCampaignHandler,
+) *CommandController {
 	return &CommandController{
-		campaignClient: campaignClient,
+		campaignClient:       campaignClient,
+		startCampaignHandler: startCampaignHandler,
 	}
 }
 
@@ -73,7 +76,7 @@ func (ctrl *CommandController) CreateCampaign(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
-func (ctrl *CommandController) RunBacktest(c *gin.Context) {
+func (ctrl *CommandController) StartCampaign(c *gin.Context) {
 	// 获取请求的上下文
 	ctx := contextx.WithContext(c.Request.Context())
 
@@ -84,50 +87,14 @@ func (ctrl *CommandController) RunBacktest(c *gin.Context) {
 		return
 	}
 
-	// 启动后台任务
-	go func(c context.Context, campaignID string) {
-		ctrl.runBacktestTask(c, campaignID)
-	}(context.Background(), campaignID)
-
-	// 返回 HTTP 响应，表示任务已启动
-	c.JSON(http.StatusAccepted, gin.H{"message": "backtest has been started"})
-}
-
-func (ctrl *CommandController) runBacktestTask(c context.Context, campaignID string) {
-	ctx := contextx.WithContext(c)
-
-	// 调用 gRPC 客户端获取流
-	stream, err := ctrl.campaignClient.RunBacktestByCampaign(ctx, &core.GetCampaignRequest{Id: campaignID})
+	// 调用 StartCampaignHandler 处理启动活动的请求
+	_, err := ctrl.startCampaignHandler.Handle(ctx, command.StartCampaignCommand{ID: campaignID})
 	if err != nil {
-		ctx.Error("failed to start backtest stream", zap.Error(err))
+		ctx.Error("failed to start campaign", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to start campaign"})
 		return
 	}
-	defer func() {
-		_ = stream.CloseSend()
-	}()
 
-	ctx.Info("backtest stream started")
-
-	// 处理流数据
-	for {
-		select {
-		case <-ctx.Done():
-			ctx.Warn("backtest stream canceled")
-			return
-		default:
-			// 从 gRPC 流中接收消息
-			message, err2 := stream.Recv()
-			if errors.Is(err2, io.EOF) {
-				ctx.Info("backtest stream completed")
-				return
-			}
-			if err2 != nil {
-				ctx.Error("error while receiving from backtest stream", zap.Error(err2))
-				return
-			}
-
-			// 处理接收到的消息
-			ctx.Info("received backtest message", zap.Any("message", &message))
-		}
-	}
+	// 返回 HTTP 响应，表示任务已启动
+	c.JSON(http.StatusAccepted, gin.H{"message": "campaign started"})
 }

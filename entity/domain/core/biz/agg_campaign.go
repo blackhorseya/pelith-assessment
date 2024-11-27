@@ -67,10 +67,6 @@ func (c *Campaign) GetTaskByType(taskType model.TaskType) *Task {
 
 // AddTask adds a task to the campaign.
 func (c *Campaign) AddTask(task *Task) error {
-	if c.Status != model.CampaignStatus_CAMPAIGN_STATUS_PENDING {
-		return errors.New("tasks can only be added to pending campaigns")
-	}
-
 	if task == nil {
 		return errors.New("task cannot be nil")
 	}
@@ -82,9 +78,6 @@ func (c *Campaign) AddTask(task *Task) error {
 
 // Start marks the campaign as active.
 func (c *Campaign) Start() error {
-	if c.Status != model.CampaignStatus_CAMPAIGN_STATUS_PENDING {
-		return errors.New("only pending campaigns can be started")
-	}
 	c.Status = model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE
 	return nil
 }

@@ -262,6 +262,7 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 			ctx.Error("subscription error", zap.Error(err))
 			return err
 		case logEntry := <-logs:
+			ctx.Debug("received log", zap.Any("log", &logEntry))
 			tx, err2 := i.getByHash(ctx, logEntry.TxHash.String())
 			if err2 != nil {
 				ctx.Error(

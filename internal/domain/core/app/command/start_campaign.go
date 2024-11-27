@@ -75,6 +75,7 @@ func (s *realTimeStrategy) Execute(c context.Context, campaign *biz.Campaign) er
 
 	txCh := make(chan *biz.Transaction)
 	go func() {
+		ctx.Info("start to get swapTx by pool address", zap.String("pool_id", campaign.PoolId))
 		err = s.transactionAdapter.GetSwapTxByPoolAddress(context.Background(), campaign.PoolId, txCh)
 		if err != nil {
 			ctx.Error("failed to get swapTx by pool address", zap.Error(err))

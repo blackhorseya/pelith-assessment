@@ -98,24 +98,6 @@ func Test_taskServiceImpl_CreateTask(t1 *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
-		{
-			name: "Invalid Task on Active Campaign",
-			args: args{
-				c: context.Background(),
-				campaign: &biz.Campaign{
-					Campaign: model.Campaign{
-						Status: model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE,
-					},
-				},
-				name:        "Task on Active Campaign",
-				description: "Description",
-				taskType:    model.TaskType_TASK_TYPE_ONBOARDING,
-				minAmount:   0,
-				poolID:      "",
-			},
-			want:    nil,
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {

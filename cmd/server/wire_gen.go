@@ -81,7 +81,14 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	commandController := http.NewCommandController(campaignServiceClient)
+	campaignUpdater, err := pg.NewCampaignUpdater(campaignRepoImpl)
+	if err != nil {
+		return nil, nil, err
+	}
+	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
+	transactionAdapter := etherscan.NewTransactionAdapter(etherscanTransactionRepoImpl)
+	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, campaignUpdater, backtestService, transactionAdapter)
+	commandController := http.NewCommandController(campaignServiceClient, startCampaignHandler)
 	initRoutes := http.NewInitUserRoutesFn(queryController, commandController, campaignServiceClient)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)
 	if err != nil {
@@ -97,13 +104,6 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	taskRepoImpl := pg.NewTaskRepo(db)
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
 	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
-	campaignUpdater, err := pg.NewCampaignUpdater(campaignRepoImpl)
-	if err != nil {
-		return nil, nil, err
-	}
-	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
-	transactionAdapter := etherscan.NewTransactionAdapter(etherscanTransactionRepoImpl)
-	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, campaignUpdater, backtestService, transactionAdapter)
 	campaignDeleter, err := pg.NewCampaignDeleter(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err

@@ -14,7 +14,7 @@
         </div>
         <div>
             <p class="text-sm font-medium text-gray-600">Mode:</p>
-            <p class="text-lg">{{ .Campaign.Mode.String }}</p>
+            <p class="text-lg">{{ if eq .Campaign.Mode 1 }}Active Mode{{ else }}Backtest Mode{{ end }}</p>
         </div>
         <div>
             <p class="text-sm font-medium text-gray-600">Start Time:</p>
@@ -27,26 +27,17 @@
     </div>
 </div>
 
-<!-- Buttons to Start Backtest and Activate Campaign -->
-<div class="mt-6 max-w-4xl mx-auto bg-white p-6 shadow rounded flex justify-between">
-    <!-- Start Backtest Button -->
+<!-- Start Button -->
+<div class="mt-6 max-w-4xl mx-auto bg-white p-6 shadow rounded text-center">
     <button
-        hx-post="/api/v1/campaigns/{{ .Campaign.Id }}/run-backtest"
+        hx-post="/api/v1/campaigns/{{ .Campaign.Id }}/start"
         hx-trigger="click"
         hx-target="#notification"
+        hx-headers='{"Content-Type": "application/json"}'
+        hx-vals='{"mode": {{ .Campaign.Mode }}}'
         class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
     >
-        Start Backtest
-    </button>
-
-    <!-- Start Active Mode Button -->
-    <button
-        hx-post="/api/v1/campaigns/{{ .Campaign.Id }}/start-active"
-        hx-trigger="click"
-        hx-target="#notification"
-        class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
-    >
-        Start Active Mode
+        Start {{ if eq .Campaign.Mode 1 }}Active Mode{{ else }}Backtest{{ end }}
     </button>
 </div>
 
@@ -80,7 +71,7 @@
             </tr>
             {{ else }}
             <tr>
-                <td colspan="4" class="py-4 text-center text-gray-600">No tasks associated with this campaign.</td>
+                <td colspan="3" class="py-4 text-center text-gray-600">No tasks associated with this campaign.</td>
             </tr>
             {{ end }}
         </tbody>

@@ -59,7 +59,7 @@ func NewInitUserRoutesFn(
 				campaigns := v1.Group("/campaigns")
 				{
 					campaigns.POST("", commandCtrl.CreateCampaign)
-					campaigns.POST("/:id/run-backtest", commandCtrl.RunBacktest)
+					campaigns.POST("/:id/start", commandCtrl.StartCampaign)
 				}
 			}
 		}
