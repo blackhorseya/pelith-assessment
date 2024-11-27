@@ -8,7 +8,8 @@
     <thead>
         <tr>
             <th class="py-2 px-4 border-b">Task Name</th>
-            <th class="py-2 px-4 border-b">Description</th>
+            <th class="py-2 px-4 border-b">Type</th>
+            <th class="py-2 px-4 border-b">Criteria</th>
             <th class="py-2 px-4 border-b">Status</th>
         </tr>
     </thead>
@@ -16,18 +17,29 @@
         {{ range .tasks }}
         <tr>
             <td class="py-2 px-4 border-b">{{ .Name }}</td>
-            <td class="py-2 px-4 border-b">{{ .Description }}</td>
             <td class="py-2 px-4 border-b">
-                {{ if .Completed }}
-                ✅ Completed
+                {{ if eq .Type 1 }}Onboarding
+                {{ else if eq .Type 2 }}Share Pool
+                {{ else }}Unknown{{ end }}
+            </td>
+            <td class="py-2 px-4 border-b">
+                {{ if .Criteria.MinTransactionAmount }}
+                    Min Transaction: {{ .Criteria.MinTransactionAmount }}
+                {{ end }}
+                <br>
+                Pool ID: {{ .Criteria.PoolId }}
+            </td>
+            <td class="py-2 px-4 border-b">
+                {{ if eq .Status 1 }}
+                ✅ Active
                 {{ else }}
-                ❌ Not Completed
+                ❌ Inactive
                 {{ end }}
             </td>
         </tr>
         {{ else }}
         <tr>
-            <td colspan="3" class="py-4 text-center text-gray-600">No tasks available.</td>
+            <td colspan="4" class="py-4 text-center text-gray-600">No tasks available.</td>
         </tr>
         {{ end }}
     </tbody>
