@@ -7,8 +7,13 @@
 <!-- Query Form -->
 <form
     id="queryForm"
+    hx-get="#placeholder"
+    hx-headers='{"Accept": "text/html"}'
+    hx-target="#tasks-status"
+    hx-trigger="submit"
+    hx-indicator="#loading"
     class="mt-6 max-w-xl mx-auto bg-white p-6 shadow rounded"
-    onsubmit="return submitHtmxRequest(event)"
+    onsubmit="updateHxGetUrl(event)"
 >
     <!-- User Address -->
     <div class="mb-4">
@@ -69,36 +74,39 @@
 </form>
 
 <!-- Tasks Status -->
-<div id="tasks-status" class="mt-6">
-    <!-- 后端返回的 HTML 表格会动态插入到这里 -->
-</div>
+<div id="tasks-status" class="mt-6"></div>
 
-<!-- JavaScript for Dynamic Submission -->
+<!-- JavaScript for Dynamic URL Update -->
 <script>
-    async function submitHtmxRequest(event) {
-        event.preventDefault(); // 阻止表单的默认提交行为
+    function updateHxGetUrl(event) {
+        event.preventDefault(); // Prevent default form submission
 
-        const address = document.getElementById("userAddress").value;
-        const campaignID = document.getElementById("campaignID").value;
-        const page = document.getElementById("page").value;
-        const size = document.getElementById("size").value;
+        const form = event.target;
+        const address = document.getElementById("userAddress").value.trim();
+        const campaignID = document.getElementById("campaignID").value.trim();
+        const page = document.getElementById("page").value.trim();
+        const size = document.getElementById("size").value.trim();
 
         if (!address) {
             alert("User Address is required.");
-            return false;
+            return;
         }
 
-        const hxGetUrl = `/api/v1/users/${encodeURIComponent(address)}/tasks/status?campaignID=${encodeURIComponent(campaignID)}&page=${encodeURIComponent(page)}&size=${encodeURIComponent(size)}`;
+        // Construct dynamic hx-get URL
+        let hxGetUrl = `/api/v1/users/${encodeURIComponent(address)}/tasks/status`;
+        const params = new URLSearchParams();
 
-        console.log("Constructed URL:", hxGetUrl); // 调试日志
+        if (campaignID) params.append("campaignID", campaignID);
+        params.append("page", page || 1);
+        params.append("size", size || 10);
 
-        // 使用 HTMX 手动发起请求
-        htmx.ajax('GET', hxGetUrl, {
-            target: "#tasks-status",
-            headers: { Accept: "text/html" }
-        });
+        if (params.toString()) {
+            hxGetUrl += `?${params.toString()}`;
+        }
 
-        return false; // 阻止默认提交
+        // Update the hx-get attribute dynamically
+        form.setAttribute("hx-get", hxGetUrl);
+        htmx.process(form);
     }
 </script>
 {{ end }}
