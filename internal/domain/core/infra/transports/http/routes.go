@@ -34,7 +34,8 @@ func NewInitUserRoutesFn(queryCtrl *QueryController, campaignClient core.Campaig
 		// frontend
 		web.SetHTMLTemplate(router)
 		router.GET("/", instance.index)
-		router.GET("/simulation", simulation)
+		router.GET("/tasks/status", instance.getTasksStatus)
+		router.GET("/points/history", instance.getPointsHistory)
 		router.POST("/campaigns", instance.createCampaign)
 		router.GET("/campaigns/new", instance.newCampaigns)
 
@@ -139,5 +140,10 @@ func (i *routesImpl) newCampaigns(c *gin.Context) {
 	c.HTML(http.StatusOK, "includes/new_campaign", nil)
 }
 
-func simulation(c *gin.Context) {
+func (i *routesImpl) getTasksStatus(c *gin.Context) {
+	c.HTML(http.StatusOK, "includes/tasks_status", nil)
+}
+
+func (i *routesImpl) getPointsHistory(c *gin.Context) {
+
 }

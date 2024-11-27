@@ -29,8 +29,14 @@ func SetHTMLTemplate(r *gin.Engine) {
 		relativePath := strings.TrimPrefix(templatePath, "templates/")
 		templateName := strings.TrimSuffix(relativePath, filepath.Ext(relativePath))
 
-		// 添加模板到 multitemplate
-		renderer.AddFromFS(templateName, f, baseTemplate, templatePath)
+		// 判断是否需要嵌套 base.templ
+		if strings.HasPrefix(templatePath, "templates/layout/") {
+			// 如果是部分模板（如 partials 文件夹中的模板），不嵌套 base.templ
+			renderer.AddFromFS(templateName, f, templatePath)
+		} else {
+			// 默认嵌套 base.templ
+			renderer.AddFromFS(templateName, f, baseTemplate, templatePath)
+		}
 	})
 	if err != nil {
 		panic("failed to walk through templates: " + err.Error())
