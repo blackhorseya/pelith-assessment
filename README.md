@@ -71,9 +71,9 @@ campaign management platform for Uniswap users, enabling them to complete tasks,
    make run
    ```
 
-2. Open the API documentation in your browser:
+2. Open the application in your browser at
 
-   [http://localhost:8080/api/docs/index.html](http://localhost:8080/api/docs/index.html)
+   [http://localhost:8080](http://localhost:8080)
 
 ---
 
