@@ -8,8 +8,20 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100 text-gray-800">
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-600 text-white py-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold">Pelith Assessment</a>
+            <ul class="flex space-x-4">
+                <li><a href="/" class="hover:underline">Home</a></li>
+                <li><a href="/simulation" class="hover:underline">User Simulation</a></li>
+                <li><a href="/tasks/config" class="hover:underline">Task Configuration</a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Main Content -->
     <div class="container mx-auto mt-10">
-        {{block "content" .}}{{end}}
+        {{ block "content" . }}{{ end }}
     </div>
 </body>
 </html>
