@@ -1,0 +1,43 @@
+{{ define "content" }}
+<div class="text-center">
+    <h1 class="text-4xl font-bold mb-4">Campaign Management</h1>
+    <p class="text-lg text-gray-700">View, create, and manage campaigns.</p>
+</div>
+
+<!-- Campaign List -->
+<div class="mt-6">
+    <table class="min-w-full bg-white border border-gray-300">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Campaign Name</th>
+                <th class="py-2 px-4 border-b">Start At</th>
+                <th class="py-2 px-4 border-b">Pool ID</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .campaigns }}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ .Name }}</td>
+                <td class="py-2 px-4 border-b">{{ .StartTime.AsTime }}</td>
+                <td class="py-2 px-4 border-b">{{ .PoolId }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="/campaigns/{{ .Id }}" class="text-blue-600 hover:underline">View</a>
+                </td>
+            </tr>
+            {{ else }}
+            <tr>
+                <td colspan="4" class="py-4 text-center text-gray-600">No campaigns available.</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+
+<!-- Add New Campaign Button -->
+<div class="mt-6 text-right">
+    <a href="/campaigns/new" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Add New Campaign
+    </a>
+</div>
+{{ end }}
