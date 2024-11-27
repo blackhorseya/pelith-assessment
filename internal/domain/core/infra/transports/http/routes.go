@@ -1,6 +1,7 @@
 package http
 
 import (
+	"errors"
 	"io"
 	"net/http"
 
@@ -67,12 +68,12 @@ func (i *routesImpl) index(c *gin.Context) {
 
 	var tasks []*model.Task
 	for {
-		resp, err := stream.Recv()
-		if err != nil {
-			if err == io.EOF {
+		resp, err2 := stream.Recv()
+		if err2 != nil {
+			if errors.Is(err2, io.EOF) {
 				break
 			}
-			ctx.Error("failed to get campaign", zap.Error(err))
+			ctx.Error("failed to get campaign", zap.Error(err2))
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get campaign"})
 			return
 		}
