@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//go:embed templates/*
+//go:embed templates/**/*
 var f embed.FS
 
-var templates = template.Must(template.ParseFS(f, "templates/*"))
+var templates = template.Must(template.ParseFS(f, "templates/**/*"))
 
 // SetHTMLTemplate set html template.
 func SetHTMLTemplate(r *gin.Engine) {
