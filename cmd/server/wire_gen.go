@@ -21,6 +21,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/shared/pgx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/spf13/viper"
+	"os"
 )
 
 // Injectors from wire.go:
@@ -128,5 +129,18 @@ func initConfigx(v *viper.Viper) (*configx.Configx, error) {
 }
 
 func initAPP(config *configx.Configx) (*configx.Application, error) {
-	return config.GetService(serviceName)
+	app, err := config.GetService(serviceName)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.Etherscan.APIKey == "" {
+		app.Etherscan.APIKey = os.Getenv("ETHERSCAN_API_KEY")
+	}
+
+	if app.Infura.ProjectID == "" {
+		app.Infura.ProjectID = os.Getenv("INFURA_PROJECT_ID")
+	}
+
+	return app, nil
 }

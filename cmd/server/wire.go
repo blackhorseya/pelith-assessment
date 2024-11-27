@@ -5,6 +5,8 @@
 package server
 
 import (
+	"os"
+
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/biz"
@@ -29,7 +31,20 @@ func initConfigx(v *viper.Viper) (*configx.Configx, error) {
 }
 
 func initAPP(config *configx.Configx) (*configx.Application, error) {
-	return config.GetService(serviceName)
+	app, err := config.GetService(serviceName)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.Etherscan.APIKey == "" {
+		app.Etherscan.APIKey = os.Getenv("ETHERSCAN_API_KEY")
+	}
+
+	if app.Infura.ProjectID == "" {
+		app.Infura.ProjectID = os.Getenv("INFURA_PROJECT_ID")
+	}
+
+	return app, nil
 }
 
 func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
