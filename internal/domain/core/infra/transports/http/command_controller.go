@@ -124,7 +124,7 @@ func (ctrl *CommandController) runBacktestTask(c context.Context, campaignID str
 			}
 
 			// 处理接收到的消息
-			ctx.Info("received backtest message", zap.Any("message", message))
+			ctx.Info("received backtest message", zap.Any("message", &message))
 		}
 	}
 }
