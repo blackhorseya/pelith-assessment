@@ -73,6 +73,34 @@ func (i *CampaignRepoImpl) CleanReward(c context.Context, campaignID string) err
 	return nil
 }
 
+func (i *CampaignRepoImpl) UpdateStatus(c context.Context, campaign *biz.Campaign, status model.CampaignStatus) error {
+	ctx := contextx.WithContext(c)
+
+	timeout, cancelFunc := context.WithTimeout(c, defaultTimeout)
+	defer cancelFunc()
+
+	// Query to update the campaign status
+	const updateStatusSQL = `
+		UPDATE campaigns
+		SET status = $1, updated_at = NOW()
+		WHERE id = $2 AND status = $3
+	`
+
+	// Execute the update query
+	_, err := i.rw.ExecContext(timeout, updateStatusSQL, status, campaign.Id, campaign.Status)
+	if err != nil {
+		ctx.Error(
+			"failed to update campaign status",
+			zap.Error(err),
+			zap.String("id", campaign.Id),
+			zap.String("status", string(status)),
+		)
+		return err
+	}
+
+	return nil
+}
+
 func (i *CampaignRepoImpl) DistributeReward(c context.Context, reward *model.Reward) error {
 	ctx := contextx.WithContext(c)
 

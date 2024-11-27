@@ -32,6 +32,7 @@ type (
 	// CampaignUpdater is used to update the campaign.
 	CampaignUpdater interface {
 		DistributeReward(c context.Context, reward *model.Reward) error
+		UpdateStatus(c context.Context, campaign *biz.Campaign, status model.CampaignStatus) error
 	}
 
 	// CampaignDeleter is used to delete the campaign.

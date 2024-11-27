@@ -166,6 +166,20 @@ func (mr *MockCampaignUpdaterMockRecorder) DistributeReward(c, reward any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DistributeReward", reflect.TypeOf((*MockCampaignUpdater)(nil).DistributeReward), c, reward)
 }
 
+// UpdateStatus mocks base method.
+func (m *MockCampaignUpdater) UpdateStatus(c context.Context, campaign *biz.Campaign, status model.CampaignStatus) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateStatus", c, campaign, status)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateStatus indicates an expected call of UpdateStatus.
+func (mr *MockCampaignUpdaterMockRecorder) UpdateStatus(c, campaign, status any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockCampaignUpdater)(nil).UpdateStatus), c, campaign, status)
+}
+
 // MockCampaignDeleter is a mock of CampaignDeleter interface.
 type MockCampaignDeleter struct {
 	ctrl     *gomock.Controller
@@ -289,6 +303,43 @@ func (m *MockUserUpdater) Update(c context.Context, user *model.User) error {
 func (mr *MockUserUpdaterMockRecorder) Update(c, user any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockUserUpdater)(nil).Update), c, user)
+}
+
+// MockRewardCreator is a mock of RewardCreator interface.
+type MockRewardCreator struct {
+	ctrl     *gomock.Controller
+	recorder *MockRewardCreatorMockRecorder
+}
+
+// MockRewardCreatorMockRecorder is the mock recorder for MockRewardCreator.
+type MockRewardCreatorMockRecorder struct {
+	mock *MockRewardCreator
+}
+
+// NewMockRewardCreator creates a new mock instance.
+func NewMockRewardCreator(ctrl *gomock.Controller) *MockRewardCreator {
+	mock := &MockRewardCreator{ctrl: ctrl}
+	mock.recorder = &MockRewardCreatorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockRewardCreator) EXPECT() *MockRewardCreatorMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockRewardCreator) Create(c context.Context, reward *biz.Reward) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", c, reward)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockRewardCreatorMockRecorder) Create(c, reward any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRewardCreator)(nil).Create), c, reward)
 }
 
 // MockTransactionCreator is a mock of TransactionCreator interface.
