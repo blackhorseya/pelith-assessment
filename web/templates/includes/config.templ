@@ -1,0 +1,22 @@
+{{ define "content" }}
+<div class="text-center">
+    <h1 class="text-4xl font-bold mb-4">Task Configuration</h1>
+    <p class="text-lg text-gray-700">Configure tasks dynamically. Add or update task settings below:</p>
+</div>
+
+<form action="/tasks/config" method="POST" class="mt-6 max-w-xl mx-auto bg-white p-6 shadow rounded">
+    <div class="mb-4">
+        <label for="taskName" class="block mb-2 text-sm font-medium">Task Name:</label>
+        <input type="text" id="taskName" name="taskName" class="border rounded px-4 py-2 w-full" placeholder="Enter task name" required>
+    </div>
+    <div class="mb-4">
+        <label for="threshold" class="block mb-2 text-sm font-medium">Transaction Threshold:</label>
+        <input type="number" id="threshold" name="threshold" class="border rounded px-4 py-2 w-full" placeholder="Enter transaction threshold" required>
+    </div>
+    <div class="mb-4">
+        <label for="points" class="block mb-2 text-sm font-medium">Total Pool Points:</label>
+        <input type="number" id="points" name="points" class="border rounded px-4 py-2 w-full" placeholder="Enter total points" required>
+    </div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save Configuration</button>
+</form>
+{{ end }}

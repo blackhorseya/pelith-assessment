@@ -17,6 +17,9 @@ func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 		// frontend
 		web.SetHTMLTemplate(router)
 		router.GET("/", index)
+		router.GET("/simulation", simulation)
+		router.GET("/tasks/config", tasksConfig)
+		router.POST("/tasks/config", saveTaskConfig)
 
 		// restful api
 		docs.SwaggerInfo.BasePath = "/api"
@@ -39,5 +42,40 @@ func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 }
 
 func index(c *gin.Context) {
-	c.HTML(http.StatusOK, "base.templ", nil)
+	c.HTML(http.StatusOK, "includes/tasks", gin.H{
+		"title": "Home Page",
+	})
+}
+
+func simulation(c *gin.Context) {
+}
+
+// TaskConfig represents the structure of a task configuration
+type TaskConfig struct {
+	TaskName    string `form:"taskName" binding:"required"`
+	Threshold   int    `form:"threshold" binding:"required"`
+	TotalPoints int    `form:"points" binding:"required"`
+}
+
+// In-memory storage for task configurations
+var taskConfigs []TaskConfig
+
+// Handle GET request to render task configuration page
+func tasksConfig(c *gin.Context) {
+	c.HTML(http.StatusOK, "includes/config", gin.H{
+		"title": "Task Configuration",
+	})
+}
+
+// Handle POST request to save a new task configuration
+func saveTaskConfig(c *gin.Context) {
+	var newConfig TaskConfig
+	if err := c.ShouldBind(&newConfig); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Save the new configuration
+	taskConfigs = append(taskConfigs, newConfig)
+	c.Redirect(http.StatusSeeOther, "/tasks/config")
 }

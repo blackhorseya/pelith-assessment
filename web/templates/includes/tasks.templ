@@ -1,0 +1,35 @@
+{{ define "content" }}
+<div class="text-center">
+    <h1 class="text-4xl font-bold mb-4">Task List</h1>
+    <p class="text-lg text-gray-700">Here are the tasks currently available:</p>
+</div>
+
+<table class="min-w-full bg-white border border-gray-300 mt-6">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">Task Name</th>
+            <th class="py-2 px-4 border-b">Description</th>
+            <th class="py-2 px-4 border-b">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .tasks }}
+        <tr>
+            <td class="py-2 px-4 border-b">{{ .Name }}</td>
+            <td class="py-2 px-4 border-b">{{ .Description }}</td>
+            <td class="py-2 px-4 border-b">
+                {{ if .Completed }}
+                ✅ Completed
+                {{ else }}
+                ❌ Not Completed
+                {{ end }}
+            </td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="3" class="py-4 text-center text-gray-600">No tasks available.</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+{{ end }}
