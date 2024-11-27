@@ -15,6 +15,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/core/app/query"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
+	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -28,6 +29,7 @@ import (
 type TransactionRepoImpl struct {
 	etherscanAPI *etherscan.Client
 	ethclientAPI *ethclient.Client
+	ws           *ethclient.Client
 
 	mu sync.Mutex
 
@@ -43,12 +45,23 @@ func NewTransactionRepoImpl(app *configx.Application) (*TransactionRepoImpl, err
 		return nil, err
 	}
 
+	ws, err := ethclient.Dial("wss://mainnet.infura.io/ws/v3/" + app.Infura.ProjectID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &TransactionRepoImpl{
 		etherscanAPI: etherscanAPI,
 		ethclientAPI: ethclientAPI,
+		ws:           ws,
 		mu:           sync.Mutex{},
 		abis:         make(map[string]abi.ABI),
 	}, nil
+}
+
+// NewTransactionAdapter is used to create a new TransactionAdapter.
+func NewTransactionAdapter(impl *TransactionRepoImpl) *TransactionRepoImpl {
+	return impl
 }
 
 func (i *TransactionRepoImpl) GetByHash(c context.Context, hash string) (item *biz.Transaction, err error) {
@@ -219,26 +232,9 @@ func (i *TransactionRepoImpl) GetLogsByAddress(
 func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 	c context.Context,
 	contractAddress string,
-	cond query.ListTransactionCondition,
 	txCh chan<- *biz.Transaction,
 ) error {
 	ctx := contextx.WithContext(c)
-
-	// 获取区块范围
-	startBlock, err := i.etherscanAPI.BlockNumber(cond.StartTime.Unix(), "after")
-	if err != nil {
-		ctx.Error("failed to fetch start block", zap.Error(err), zap.Time("start_time", cond.StartTime))
-		return err
-	}
-
-	if cond.EndTime.After(time.Now()) {
-		cond.EndTime = time.Now()
-	}
-	endBlock, err := i.etherscanAPI.BlockNumber(cond.EndTime.Unix(), "before")
-	if err != nil {
-		ctx.Error("failed to fetch end block", zap.Error(err), zap.Time("end_time", cond.EndTime))
-		return err
-	}
 
 	parsedABI, err := i.getABI(contractAddress)
 	if err != nil {
@@ -247,36 +243,40 @@ func (i *TransactionRepoImpl) GetSwapTxByPoolAddress(
 	}
 	swapEventHash := parsedABI.Events["Swap"].ID
 
-	logs, err := i.etherscanAPI.GetLogs(startBlock, endBlock, contractAddress, swapEventHash.Hex())
+	filterQuery := ethereum.FilterQuery{
+		Addresses: []common.Address{common.HexToAddress(contractAddress)},
+		Topics:    [][]common.Hash{{swapEventHash}},
+	}
+
+	logs := make(chan types.Log)
+	sub, err := i.ws.SubscribeFilterLogs(context.Background(), filterQuery, logs)
 	if err != nil {
-		ctx.Error("failed to fetch logs", zap.Error(err))
+		ctx.Error("failed to subscribe filter logs", zap.Error(err))
 		return err
 	}
+	defer sub.Unsubscribe()
 
-	for _, logEntry := range logs {
-		tx, err2 := i.getByHash(ctx, logEntry.TransactionHash)
-		if err2 != nil || tx == nil {
-			ctx.Error("failed to fetch transaction", zap.Error(err2), zap.String("tx_hash", logEntry.TransactionHash))
-			return err2
-		}
+	for {
+		select {
+		case err = <-sub.Err():
+			ctx.Error("subscription error", zap.Error(err))
+			return err
+		case logEntry := <-logs:
+			tx, err2 := i.getByHash(ctx, logEntry.TxHash.String())
+			if err2 != nil {
+				ctx.Error(
+					"failed to fetch transaction",
+					zap.Error(err2),
+					zap.String("tx_hash", logEntry.TxHash.String()),
+				)
+				continue
+			}
 
-		swapDetail, err2 := tx.GetSwapForPool(common.HexToAddress(contractAddress), swapEventHash)
-		if err2 != nil || swapDetail == nil {
-			ctx.Debug(
-				"the tx is not a swap tx",
-				zap.String("tx_hash", tx.GetTransaction().TxHash),
-				zap.String("pool_address", contractAddress),
-				zap.Error(err2),
-			)
-			continue
-		}
-
-		if txCh != nil {
-			txCh <- tx
+			if txCh != nil {
+				txCh <- tx
+			}
 		}
 	}
-
-	return nil
 }
 
 func (i *TransactionRepoImpl) getABI(contractAddress string) (abi.ABI, error) {

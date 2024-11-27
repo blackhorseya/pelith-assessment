@@ -42,6 +42,15 @@ type TransactionRepo interface {
 	) error
 }
 
+// TransactionAdapter is the adapter for transaction.
+type TransactionAdapter interface {
+	GetSwapTxByPoolAddress(
+		c context.Context,
+		contractAddress string,
+		txCh chan<- *biz.Transaction,
+	) error
+}
+
 // // TransactionQueryService is the service for transaction query.
 // type TransactionQueryService struct {
 // 	txGetter       TransactionGetter

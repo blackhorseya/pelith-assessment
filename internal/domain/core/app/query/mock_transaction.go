@@ -17,7 +17,58 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// MockTransactionAdapter is a mock of TransactionRepo interface.
+// MockTransactionRepo is a mock of TransactionRepo interface.
+type MockTransactionRepo struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionRepoMockRecorder
+}
+
+// MockTransactionRepoMockRecorder is the mock recorder for MockTransactionRepo.
+type MockTransactionRepoMockRecorder struct {
+	mock *MockTransactionRepo
+}
+
+// NewMockTransactionRepo creates a new mock instance.
+func NewMockTransactionRepo(ctrl *gomock.Controller) *MockTransactionRepo {
+	mock := &MockTransactionRepo{ctrl: ctrl}
+	mock.recorder = &MockTransactionRepoMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransactionRepo) EXPECT() *MockTransactionRepoMockRecorder {
+	return m.recorder
+}
+
+// GetSwapTxByPoolAddress mocks base method.
+func (m *MockTransactionRepo) GetSwapTxByPoolAddress(c context.Context, address string, cond ListTransactionCondition, txCh chan<- *biz.Transaction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSwapTxByPoolAddress", c, address, cond, txCh)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetSwapTxByPoolAddress indicates an expected call of GetSwapTxByPoolAddress.
+func (mr *MockTransactionRepoMockRecorder) GetSwapTxByPoolAddress(c, address, cond, txCh any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByPoolAddress", reflect.TypeOf((*MockTransactionRepo)(nil).GetSwapTxByPoolAddress), c, address, cond, txCh)
+}
+
+// GetSwapTxByUserAddressAndPoolAddress mocks base method.
+func (m *MockTransactionRepo) GetSwapTxByUserAddressAndPoolAddress(c context.Context, address, poolAddress string, cond ListTransactionCondition, txCh chan<- *biz.Transaction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSwapTxByUserAddressAndPoolAddress", c, address, poolAddress, cond, txCh)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetSwapTxByUserAddressAndPoolAddress indicates an expected call of GetSwapTxByUserAddressAndPoolAddress.
+func (mr *MockTransactionRepoMockRecorder) GetSwapTxByUserAddressAndPoolAddress(c, address, poolAddress, cond, txCh any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByUserAddressAndPoolAddress", reflect.TypeOf((*MockTransactionRepo)(nil).GetSwapTxByUserAddressAndPoolAddress), c, address, poolAddress, cond, txCh)
+}
+
+// MockTransactionAdapter is a mock of TransactionAdapter interface.
 type MockTransactionAdapter struct {
 	ctrl     *gomock.Controller
 	recorder *MockTransactionAdapterMockRecorder
@@ -41,29 +92,15 @@ func (m *MockTransactionAdapter) EXPECT() *MockTransactionAdapterMockRecorder {
 }
 
 // GetSwapTxByPoolAddress mocks base method.
-func (m *MockTransactionAdapter) GetSwapTxByPoolAddress(c context.Context, address string, cond ListTransactionCondition, txCh chan<- *biz.Transaction) error {
+func (m *MockTransactionAdapter) GetSwapTxByPoolAddress(c context.Context, contractAddress string, txCh chan<- *biz.Transaction) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSwapTxByPoolAddress", c, address, cond, txCh)
+	ret := m.ctrl.Call(m, "GetSwapTxByPoolAddress", c, contractAddress, txCh)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // GetSwapTxByPoolAddress indicates an expected call of GetSwapTxByPoolAddress.
-func (mr *MockTransactionAdapterMockRecorder) GetSwapTxByPoolAddress(c, address, cond, txCh any) *gomock.Call {
+func (mr *MockTransactionAdapterMockRecorder) GetSwapTxByPoolAddress(c, contractAddress, txCh any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByPoolAddress", reflect.TypeOf((*MockTransactionAdapter)(nil).GetSwapTxByPoolAddress), c, address, cond, txCh)
-}
-
-// GetSwapTxByUserAddressAndPoolAddress mocks base method.
-func (m *MockTransactionAdapter) GetSwapTxByUserAddressAndPoolAddress(c context.Context, address, poolAddress string, cond ListTransactionCondition, txCh chan<- *biz.Transaction) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSwapTxByUserAddressAndPoolAddress", c, address, poolAddress, cond, txCh)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// GetSwapTxByUserAddressAndPoolAddress indicates an expected call of GetSwapTxByUserAddressAndPoolAddress.
-func (mr *MockTransactionAdapterMockRecorder) GetSwapTxByUserAddressAndPoolAddress(c, address, poolAddress, cond, txCh any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByUserAddressAndPoolAddress", reflect.TypeOf((*MockTransactionAdapter)(nil).GetSwapTxByUserAddressAndPoolAddress), c, address, poolAddress, cond, txCh)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSwapTxByPoolAddress", reflect.TypeOf((*MockTransactionAdapter)(nil).GetSwapTxByPoolAddress), c, contractAddress, txCh)
 }
