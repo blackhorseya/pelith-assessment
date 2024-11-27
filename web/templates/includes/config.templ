@@ -4,19 +4,27 @@
     <p class="text-lg text-gray-700">Configure tasks dynamically. Add or update task settings below:</p>
 </div>
 
-<form action="/tasks/config" method="POST" class="mt-6 max-w-xl mx-auto bg-white p-6 shadow rounded">
+<form action="/campaigns" method="POST" class="mt-6 max-w-xl mx-auto bg-white p-6 shadow rounded">
+    <!-- Campaign Name -->
     <div class="mb-4">
-        <label for="taskName" class="block mb-2 text-sm font-medium">Task Name:</label>
-        <input type="text" id="taskName" name="taskName" class="border rounded px-4 py-2 w-full" placeholder="Enter task name" required>
+        <label for="name" class="block mb-2 text-sm font-medium">Campaign Name:</label>
+        <input type="text" id="name" name="name" class="border rounded px-4 py-2 w-full" placeholder="Enter campaign name" required>
     </div>
+
+    <!-- Start At -->
     <div class="mb-4">
-        <label for="threshold" class="block mb-2 text-sm font-medium">Transaction Threshold:</label>
-        <input type="number" id="threshold" name="threshold" class="border rounded px-4 py-2 w-full" placeholder="Enter transaction threshold" required>
+        <label for="startAt" class="block mb-2 text-sm font-medium">Start At:</label>
+        <input type="datetime-local" id="startAt" name="startAt" class="border rounded px-4 py-2 w-full" required>
     </div>
+
+    <!-- Pool ID -->
     <div class="mb-4">
-        <label for="points" class="block mb-2 text-sm font-medium">Total Pool Points:</label>
-        <input type="number" id="points" name="points" class="border rounded px-4 py-2 w-full" placeholder="Enter total points" required>
+        <label for="poolID" class="block mb-2 text-sm font-medium">Pool ID:</label>
+        <input type="text" id="poolID" name="poolID" class="border rounded px-4 py-2 w-full"
+               placeholder="Enter pool ID" value="0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc" required>
     </div>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save Configuration</button>
+
+    <!-- Submit Button -->
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Save Campaign</button>
 </form>
 {{ end }}
