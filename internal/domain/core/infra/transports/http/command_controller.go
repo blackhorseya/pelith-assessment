@@ -30,9 +30,11 @@ func NewCommandController(campaignClient core.CampaignServiceClient) *CommandCon
 
 // CampaignRequest represents the structure of a campaign request
 type CampaignRequest struct {
-	Name    string `form:"name" binding:"required"`
-	StartAt string `form:"startAt" binding:"required"`
-	PoolID  string `form:"poolID" binding:"required"`
+	Name      string  `form:"name" binding:"required"`
+	StartAt   string  `form:"startAt" binding:"required"`
+	PoolID    string  `form:"poolID" binding:"required"`
+	Mode      int32   `form:"mode" default:"2"`
+	MinAmount float64 `form:"minAmount" default:"1000"`
 }
 
 func (ctrl *CommandController) CreateCampaign(c *gin.Context) {
@@ -57,9 +59,9 @@ func (ctrl *CommandController) CreateCampaign(c *gin.Context) {
 	campaign, err := ctrl.campaignClient.CreateCampaign(ctx, &core.CreateCampaignRequest{
 		Name:       req.Name,
 		StartTime:  timestamppb.New(startAt),
-		Mode:       model.CampaignMode_CAMPAIGN_MODE_BACKTEST,
+		Mode:       model.CampaignMode(req.Mode),
 		TargetPool: req.PoolID,
-		MinAmount:  1000,
+		MinAmount:  req.MinAmount,
 	})
 	if err != nil {
 		ctx.Error("failed to create campaign", zap.Error(err))
