@@ -8,6 +8,7 @@ services:
       port: 8080
 
     grpc:
+      url: localhost
       port: 50051
 
     storage:

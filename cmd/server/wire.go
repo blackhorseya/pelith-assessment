@@ -79,6 +79,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		// infra
 		httpx.NewGinServer,
 		grpcx.NewServer,
+		grpcx.NewClient,
 		pgx.NewClient,
 	))
 }

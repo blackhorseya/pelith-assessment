@@ -1,15 +1,20 @@
 package http
 
 import (
+	"errors"
+	"io"
 	"net/http"
 
 	docs "github.com/blackhorseya/pelith-assessment/docs/api"
+	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
+	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
 	"github.com/blackhorseya/pelith-assessment/proto/core"
 	"github.com/blackhorseya/pelith-assessment/web"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.uber.org/zap"
 )
 
 type routesImpl struct {
@@ -51,8 +56,36 @@ func NewInitUserRoutesFn(queryCtrl *QueryController, campaignClient core.Campaig
 }
 
 func (i *routesImpl) index(c *gin.Context) {
+	ctx := contextx.WithContext(c.Request.Context())
+
+	// Get all campaigns
+	stream, err := i.campaignClient.ListCampaigns(ctx, &core.ListCampaignsRequest{})
+	if err != nil {
+		ctx.Error("failed to get campaigns", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get campaigns"})
+		return
+	}
+
+	var tasks []*model.Task
+	for {
+		resp, err2 := stream.Recv()
+		if err2 != nil {
+			if errors.Is(err2, io.EOF) {
+				break
+			}
+			ctx.Error("failed to get campaign", zap.Error(err2))
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get campaign"})
+			return
+		}
+
+		tasks = append(tasks, resp.Tasks...)
+	}
+
+	ctx.Debug("get all tasks", zap.Any("tasks", tasks))
+
 	c.HTML(http.StatusOK, "includes/tasks", gin.H{
 		"title": "Home Page",
+		"tasks": tasks,
 	})
 }
 

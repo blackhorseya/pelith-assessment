@@ -49,7 +49,8 @@ type TransactionRepo interface {
 // }
 
 // // GetTotalSwapAmount calculates the total swap amount for a given address and campaign ID.
-// func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address, campaignID string) (float64, error) {
+// func (s *TransactionQueryService) GetTotalSwapAmount(c context.Context, address,
+// campaignID string) (float64, error) {
 // 	ctx := contextx.WithContext(c)
 //
 // 	// Retrieve the campaign by ID
@@ -85,7 +86,8 @@ type TransactionRepo interface {
 // }
 //
 // // calculateTotalUSDC computes the total amount of USDC from swap transactions.
-// func calculateTotalUSDC(ctx contextx.Contextx, transactions []*biz.Transaction, usdcAddress string) (float64, error) {
+// func calculateTotalUSDC(ctx contextx.Contextx, transactions []*biz.Transaction,
+// usdcAddress string) (float64, error) {
 // 	var totalAmount float64
 //
 // 	for _, tx := range transactions {
