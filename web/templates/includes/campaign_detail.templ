@@ -31,7 +31,7 @@
 <div class="mt-6 max-w-4xl mx-auto bg-white p-6 shadow rounded flex justify-between">
     <!-- Start Backtest Button -->
     <button
-        hx-post="/api/v1/campaigns/{{ .Campaign.Id }}/start-backtest"
+        hx-post="/api/v1/campaigns/{{ .Campaign.Id }}/run-backtest"
         hx-trigger="click"
         hx-target="#notification"
         class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
