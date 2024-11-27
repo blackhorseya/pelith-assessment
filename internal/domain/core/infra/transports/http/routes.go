@@ -42,7 +42,7 @@ func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 }
 
 func index(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.templ", gin.H{
+	c.HTML(http.StatusOK, "includes/tasks", gin.H{
 		"title": "Home Page",
 	})
 }
@@ -62,7 +62,7 @@ var taskConfigs []TaskConfig
 
 // Handle GET request to render task configuration page
 func tasksConfig(c *gin.Context) {
-	c.HTML(http.StatusOK, "config.templ", gin.H{
+	c.HTML(http.StatusOK, "includes/config", gin.H{
 		"title": "Task Configuration",
 	})
 }
