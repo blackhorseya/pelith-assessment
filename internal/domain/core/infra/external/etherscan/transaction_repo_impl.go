@@ -60,7 +60,7 @@ func NewTransactionRepoImpl(app *configx.Application) (*TransactionRepoImpl, err
 }
 
 // NewTransactionAdapter is used to create a new TransactionAdapter.
-func NewTransactionAdapter(impl *TransactionRepoImpl) *TransactionRepoImpl {
+func NewTransactionAdapter(impl *TransactionRepoImpl) query.TransactionAdapter {
 	return impl
 }
 

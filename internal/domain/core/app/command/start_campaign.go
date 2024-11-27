@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
@@ -26,47 +25,98 @@ func (s *emptyStrategy) Execute(c context.Context, campaign *biz.Campaign) error
 
 type backtestStrategy struct {
 	backtestService biz.BacktestService
+	campaignUpdater CampaignUpdater
 }
 
 func (s *backtestStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
 	ctx := contextx.WithContext(c)
 
-	resultCh := make(chan *model.Reward)
-	var err error
+	err := campaign.Start()
+	if err != nil {
+		ctx.Error("failed to start campaign", zap.Error(err), zap.Any("campaign", &campaign))
+		return err
+	}
+
+	rewardCh := make(chan *model.Reward)
 	go func() {
-		err = s.backtestService.RunBacktest(ctx, campaign, resultCh)
+		err = s.backtestService.RunBacktest(context.Background(), campaign, rewardCh)
 		if err != nil {
 			ctx.Error("failed to run backtest", zap.Error(err))
 		}
-		close(resultCh)
+		close(rewardCh)
 	}()
 
-	for result := range resultCh {
-		ctx.Debug("backtest result", zap.Any("result", &result))
-	}
+	go func() {
+		for reward := range rewardCh {
+			err = s.campaignUpdater.DistributeReward(context.Background(), reward)
+			if err != nil {
+				ctx.Error("failed to distribute reward", zap.Error(err))
+				continue
+			}
+		}
+	}()
 
-	return err
+	return nil
 }
 
-type realTimeStrategy struct{}
+type realTimeStrategy struct {
+	transactionAdapter query.TransactionAdapter
+	campaignUpdater    CampaignUpdater
+}
 
 func (s *realTimeStrategy) Execute(c context.Context, campaign *biz.Campaign) error {
-	// TODO: 2024/11/24|sean|Implement the Execute method
 	ctx := contextx.WithContext(c)
-	ctx.Debug("real time strategy not implemented", zap.Any("campaign", &campaign))
-	return fmt.Errorf("not implemented")
+
+	err := campaign.Start()
+	if err != nil {
+		ctx.Error("failed to start campaign", zap.Error(err), zap.Any("campaign", &campaign))
+		return err
+	}
+
+	txCh := make(chan *biz.Transaction)
+	go func() {
+		err = s.transactionAdapter.GetSwapTxByPoolAddress(context.Background(), campaign.PoolId, txCh)
+		if err != nil {
+			ctx.Error("failed to get swapTx by pool address", zap.Error(err))
+		}
+		close(txCh)
+	}()
+
+	go func() {
+		for tx := range txCh {
+			reward, err2 := campaign.OnSwapExecuted(tx)
+			if err2 != nil {
+				ctx.Error("failed to handle swap executed", zap.Error(err2))
+				continue
+			}
+			if reward == nil {
+				continue
+			}
+
+			err = s.campaignUpdater.DistributeReward(context.Background(), reward)
+			if err != nil {
+				ctx.Error("failed to distribute reward", zap.Error(err))
+				continue
+			}
+		}
+	}()
+
+	return nil
 }
 
 // StartCampaignHandler is the handler for starting a campaign.
 type StartCampaignHandler struct {
-	strategies     map[model.CampaignMode]CampaignStrategy
-	campaignGetter query.CampaignGetter
+	strategies      map[model.CampaignMode]CampaignStrategy
+	campaignGetter  query.CampaignGetter
+	campaignUpdater CampaignUpdater
 }
 
 // NewStartCampaignHandler creates a new StartCampaignHandler instance.
 func NewStartCampaignHandler(
 	campaignGetter query.CampaignGetter,
+	campaignUpdater CampaignUpdater,
 	backtestService biz.BacktestService,
+	transactionAdapter query.TransactionAdapter,
 ) *StartCampaignHandler {
 	return &StartCampaignHandler{
 		strategies: map[model.CampaignMode]CampaignStrategy{
@@ -74,9 +124,13 @@ func NewStartCampaignHandler(
 			model.CampaignMode_CAMPAIGN_MODE_BACKTEST: &backtestStrategy{
 				backtestService: backtestService,
 			},
-			model.CampaignMode_CAMPAIGN_MODE_REAL_TIME: &realTimeStrategy{},
+			model.CampaignMode_CAMPAIGN_MODE_REAL_TIME: &realTimeStrategy{
+				transactionAdapter: transactionAdapter,
+				campaignUpdater:    campaignUpdater,
+			},
 		},
-		campaignGetter: campaignGetter,
+		campaignGetter:  campaignGetter,
+		campaignUpdater: campaignUpdater,
 	}
 }
 
@@ -110,7 +164,11 @@ func (h StartCampaignHandler) Handle(c context.Context, msg usecase.Message) (st
 		return "", err
 	}
 
-	// TODO: 2024/11/24|sean|save the campaign report to the database
+	err = h.campaignUpdater.UpdateStatus(ctx, campaign, model.CampaignStatus_CAMPAIGN_STATUS_ACTIVE)
+	if err != nil {
+		ctx.Error("failed to update campaign status", zap.Error(err))
+		return "", err
+	}
 
 	return campaign.Id, nil
 }

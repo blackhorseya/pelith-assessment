@@ -97,12 +97,13 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	taskRepoImpl := pg.NewTaskRepo(db)
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)
 	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
-	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
-	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, backtestService)
 	campaignUpdater, err := pg.NewCampaignUpdater(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
+	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
+	transactionAdapter := etherscan.NewTransactionAdapter(etherscanTransactionRepoImpl)
+	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, campaignUpdater, backtestService, transactionAdapter)
 	campaignDeleter, err := pg.NewCampaignDeleter(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
