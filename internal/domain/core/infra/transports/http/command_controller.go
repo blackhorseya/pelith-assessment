@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -113,13 +114,13 @@ func (ctrl *CommandController) runBacktestTask(c context.Context, campaignID str
 			return
 		default:
 			// 从 gRPC 流中接收消息
-			message, err := stream.Recv()
-			if err == io.EOF {
+			message, err2 := stream.Recv()
+			if errors.Is(err2, io.EOF) {
 				ctx.Info("backtest stream completed")
 				return
 			}
-			if err != nil {
-				ctx.Error("error while receiving from backtest stream", zap.Error(err))
+			if err2 != nil {
+				ctx.Error("error while receiving from backtest stream", zap.Error(err2))
 				return
 			}
 

@@ -58,18 +58,12 @@ func (x *User) OnSwapExecuted(ctx contextx.Contextx, tx *Transaction) error {
 	// Update the user's task progress
 	for _, task := range x.Tasks {
 		totalAmount := x.totalSwapAmount[task.Criteria.PoolId]
-
-		switch task.Type {
-		case model.TaskType_TASK_TYPE_ONBOARDING:
+		if task.Type == model.TaskType_TASK_TYPE_ONBOARDING {
 			if totalAmount >= task.Criteria.MinTransactionAmount {
 				task.Progress = 100
 			} else {
 				task.Progress = int((totalAmount / task.Criteria.MinTransactionAmount) * 100)
 			}
-		case model.TaskType_TASK_TYPE_SHARE_POOL:
-		default:
-			ctx.Warn("unknown task type", zap.String("task_type", task.Type.String()))
-			continue
 		}
 	}
 
