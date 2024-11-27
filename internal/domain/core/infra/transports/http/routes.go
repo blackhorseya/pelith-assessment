@@ -17,6 +17,8 @@ func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 		// frontend
 		web.SetHTMLTemplate(router)
 		router.GET("/", index)
+		router.GET("/simulation", simulation)
+		router.GET("/tasks/config", tasksConfig)
 
 		// restful api
 		docs.SwaggerInfo.BasePath = "/api"
@@ -40,4 +42,12 @@ func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 
 func index(c *gin.Context) {
 	c.HTML(http.StatusOK, "base.templ", nil)
+}
+
+func tasksConfig(c *gin.Context) {
+
+}
+
+func simulation(c *gin.Context) {
+
 }
