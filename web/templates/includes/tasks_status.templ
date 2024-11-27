@@ -7,6 +7,7 @@
 <!-- Query Form -->
 <form
     hx-get="/api/v1/users/{userAddress}/tasks/status"
+    hx-headers='{"Accept": "text/html"}'
     hx-target="#tasks-status"
     hx-trigger="submit"
     hx-indicator="#loading"
@@ -44,52 +45,7 @@
 </form>
 
 <!-- Tasks Status -->
-<div id="tasks-status">
-    {{ if .tasks }}
-    <h2 class="text-2xl font-bold mb-4">Tasks List</h2>
-    <table class="min-w-full bg-white border border-gray-300">
-        <thead>
-            <tr>
-                <th class="py-2 px-4 border-b">Task ID</th>
-                <th class="py-2 px-4 border-b">Task Name</th>
-                <th class="py-2 px-4 border-b">Task Type</th>
-                <th class="py-2 px-4 border-b">Campaign ID</th>
-                <th class="py-2 px-4 border-b">Progress</th>
-                <th class="py-2 px-4 border-b">Status</th>
-                <th class="py-2 px-4 border-b">Criteria</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{ range .tasks }}
-            <tr>
-                <td class="py-2 px-4 border-b">{{ .id }}</td>
-                <td class="py-2 px-4 border-b">{{ .name }}</td>
-                <td class="py-2 px-4 border-b">
-                    {{ if eq .type 1 }}Onboarding
-                    {{ else if eq .type 2 }}Share Pool
-                    {{ else }}Unknown
-                    {{ end }}
-                </td>
-                <td class="py-2 px-4 border-b">{{ .CampaignID }}</td>
-                <td class="py-2 px-4 border-b">{{ .Progress }}%</td>
-                <td class="py-2 px-4 border-b">
-                    {{ if eq .status 1 }}Active
-                    {{ else if eq .status 0 }}Inactive
-                    {{ else }}Unknown
-                    {{ end }}
-                </td>
-                <td class="py-2 px-4 border-b">
-                    {{ if .criteria.min_transaction_amount }}
-                    Min Tx: {{ .criteria.min_transaction_amount }}<br>
-                    {{ end }}
-                    Pool ID: {{ .criteria.pool_id }}
-                </td>
-            </tr>
-            {{ end }}
-        </tbody>
-    </table>
-    {{ else }}
-    <p class="text-gray-600">No tasks found for the provided address and campaign ID.</p>
-    {{ end }}
+<div id="tasks-status" class="mt-6">
+    <!-- 后端返回的 HTML 表格会动态插入到这里 -->
 </div>
 {{ end }}
