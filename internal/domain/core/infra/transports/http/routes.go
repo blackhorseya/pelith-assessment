@@ -5,18 +5,27 @@ import (
 
 	docs "github.com/blackhorseya/pelith-assessment/docs/api"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
+	"github.com/blackhorseya/pelith-assessment/proto/core"
 	"github.com/blackhorseya/pelith-assessment/web"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+type routesImpl struct {
+	campaignClient core.CampaignServiceClient
+}
+
 // NewInitUserRoutesFn is the function to init user routes
-func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
+func NewInitUserRoutesFn(queryCtrl *QueryController, campaignClient core.CampaignServiceClient) httpx.InitRoutes {
+	instance := &routesImpl{
+		campaignClient: campaignClient,
+	}
+
 	return func(router *gin.Engine) {
 		// frontend
 		web.SetHTMLTemplate(router)
-		router.GET("/", index)
+		router.GET("/", instance.index)
 		router.GET("/simulation", simulation)
 		router.GET("/tasks/config", tasksConfig)
 		router.POST("/tasks/config", saveTaskConfig)
@@ -41,7 +50,7 @@ func NewInitUserRoutesFn(queryCtrl *QueryController) httpx.InitRoutes {
 	}
 }
 
-func index(c *gin.Context) {
+func (i *routesImpl) index(c *gin.Context) {
 	c.HTML(http.StatusOK, "includes/tasks", gin.H{
 		"title": "Home Page",
 	})

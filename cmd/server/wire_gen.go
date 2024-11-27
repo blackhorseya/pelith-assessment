@@ -72,7 +72,11 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	userService := biz.NewUserService(campaignGetter, transactionRepo)
 	userQueryStore := query.NewUserQueryStore(userService)
 	queryController := http.NewQueryController(rewardQueryStore, userQueryStore)
-	initRoutes := http.NewInitUserRoutesFn(queryController)
+	campaignServiceClient, err := grpc.NewCampaignServiceClient()
+	if err != nil {
+		return nil, nil, err
+	}
+	initRoutes := http.NewInitUserRoutesFn(queryController, campaignServiceClient)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)
 	if err != nil {
 		return nil, nil, err
