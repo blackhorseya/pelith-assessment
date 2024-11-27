@@ -19,10 +19,12 @@ const docTemplate = `{
             "get": {
                 "description": "Get points history by address",
                 "consumes": [
-                    "application/json"
+                    "application/json",
+                    "text/html"
                 ],
                 "produces": [
-                    "application/json"
+                    "application/json",
+                    "text/html"
                 ],
                 "tags": [
                     "users"
@@ -59,10 +61,12 @@ const docTemplate = `{
             "get": {
                 "description": "Get tasks status by address",
                 "consumes": [
-                    "application/json"
+                    "application/json",
+                    "text/html"
                 ],
                 "produces": [
-                    "application/json"
+                    "application/json",
+                    "text/html"
                 ],
                 "tags": [
                     "users"

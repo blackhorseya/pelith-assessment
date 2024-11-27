@@ -32,8 +32,8 @@ type GetTasksStatusQuery struct {
 // @Summary Get tasks status
 // @Description Get tasks status by address
 // @Tags users
-// @Accept json
-// @Produce json
+// @Accept json,html
+// @Produce json,html
 // @Param address path string true "User address"
 // @Param params query GetTasksStatusQuery false "query string"
 // @Router /v1/users/{address}/tasks/status [get]
@@ -64,8 +64,8 @@ type GetPointsHistoryQuery struct {
 // @Summary Get points history
 // @Description Get points history by address
 // @Tags users
-// @Accept json
-// @Produce json
+// @Accept json,html
+// @Produce json,html
 // @Param address path string true "User address"
 // @Param params query GetPointsHistoryQuery false "query string"
 // @Router /v1/users/{address}/points/history [get]
@@ -73,6 +73,14 @@ func (ctrl *QueryController) GetPointsHistory(c *gin.Context) {
 	rewards, err := ctrl.rewardStore.GetRewardHistoryByWalletAddress(c.Request.Context(), c.Param("address"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if c.Request.Header.Get("Accept") == "text/html" {
+		c.HTML(http.StatusOK, "layout/points_history", gin.H{
+			"title":   "Points History",
+			"rewards": rewards,
+		})
 		return
 	}
 
