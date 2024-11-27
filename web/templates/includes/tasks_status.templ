@@ -28,16 +28,17 @@
         >
     </div>
 
-    <!-- Campaign ID -->
+    <!-- Campaign ID (Dropdown) -->
     <div class="mb-4">
         <label for="campaignID" class="block mb-2 text-sm font-medium">Campaign ID:</label>
-        <input
-            type="text"
-            id="campaignID"
-            name="campaignID"
-            class="border rounded px-4 py-2 w-full"
-            placeholder="Enter campaign ID"
-        >
+        <select id="campaignID" name="campaignID" class="border rounded px-4 py-2 w-full">
+            <option value="" selected>Select a campaign</option>
+            {{ range .campaigns }}
+            <option value="{{ .Id }}">{{ .Name }}</option>
+            {{ else }}
+            <option value="" disabled>No campaigns available</option>
+            {{ end }}
+        </select>
     </div>
 
     <!-- Pagination -->

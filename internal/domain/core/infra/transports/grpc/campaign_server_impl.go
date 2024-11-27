@@ -98,9 +98,7 @@ func (i *campaignServerImpl) ListCampaigns(
 	req *core.ListCampaignsRequest,
 	stream grpc.ServerStreamingServer[core.GetCampaignResponse],
 ) error {
-	items, total, err := i.campaignGetter.List(stream.Context(), query.ListCampaignCondition{
-		// TODO: 2024/11/24|sean|pass the condition
-	})
+	items, total, err := i.campaignGetter.List(stream.Context(), query.ListCampaignCondition{})
 	if err != nil {
 		return err
 	}

@@ -105,7 +105,30 @@ func (i *routesImpl) newCampaigns(c *gin.Context) {
 }
 
 func (i *routesImpl) getTasksStatus(c *gin.Context) {
-	c.HTML(http.StatusOK, "includes/tasks_status", nil)
+	stream, err := i.campaignClient.ListCampaigns(c.Request.Context(), &core.ListCampaignsRequest{})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get campaigns"})
+		return
+	}
+
+	var campaigns []*model.Campaign
+	for {
+		resp, err2 := stream.Recv()
+		if err2 != nil {
+			if errors.Is(err2, io.EOF) {
+				break
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get campaign"})
+			return
+		}
+
+		campaigns = append(campaigns, resp.Campaign)
+	}
+
+	c.HTML(http.StatusOK, "includes/tasks_status", gin.H{
+		"title":     "Tasks Status",
+		"campaigns": campaigns,
+	})
 }
 
 func (i *routesImpl) getPointsHistory(c *gin.Context) {
