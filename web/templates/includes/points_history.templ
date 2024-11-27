@@ -1,0 +1,45 @@
+{{ define "content" }}
+<div class="text-center">
+    <h1 class="text-4xl font-bold mb-4">User Points History</h1>
+    <p class="text-lg text-gray-700">View the history of points earned by the user.</p>
+</div>
+
+<!-- Query Form -->
+<form
+    hx-get="/api/v1/users/{userAddress}/points/history"
+    hx-headers='{"Accept": "text/html"}'
+    hx-target="#points-history"
+    hx-trigger="submit"
+    hx-indicator="#loading"
+    class="mt-6 max-w-xl mx-auto bg-white p-6 shadow rounded"
+>
+    <!-- User Address -->
+    <div class="mb-4">
+        <label for="userAddress" class="block mb-2 text-sm font-medium">User Address:</label>
+        <input type="text" id="userAddress" name="address" class="border rounded px-4 py-2 w-full" placeholder="Enter user address" required>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mb-4 grid grid-cols-2 gap-4">
+        <div>
+            <label for="page" class="block mb-2 text-sm font-medium">Page:</label>
+            <input type="number" id="page" name="page" class="border rounded px-4 py-2 w-full" value="1" required>
+        </div>
+        <div>
+            <label for="size" class="block mb-2 text-sm font-medium">Size:</label>
+            <input type="number" id="size" name="size" class="border rounded px-4 py-2 w-full" value="10" required>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex items-center space-x-4">
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Query</button>
+        <div id="loading" class="hidden">Loading...</div>
+    </div>
+</form>
+
+<!-- Points History -->
+<div id="points-history" class="mt-6">
+    <!-- Points history table will be dynamically inserted here -->
+</div>
+{{ end }}

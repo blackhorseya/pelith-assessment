@@ -145,5 +145,5 @@ func (i *routesImpl) getTasksStatus(c *gin.Context) {
 }
 
 func (i *routesImpl) getPointsHistory(c *gin.Context) {
-
+	c.HTML(http.StatusOK, "includes/points_history", nil)
 }
