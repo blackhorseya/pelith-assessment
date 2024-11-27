@@ -38,6 +38,7 @@ func NewInitUserRoutesFn(
 		router.GET("/tasks/status", instance.getTasksStatus)
 		router.GET("/points/history", instance.getPointsHistory)
 		router.GET("/campaigns/new", instance.newCampaigns)
+		router.GET("/campaigns/:id", instance.getCampaignByID)
 
 		// restful api
 		docs.SwaggerInfo.BasePath = "/api"
@@ -108,4 +109,22 @@ func (i *routesImpl) getTasksStatus(c *gin.Context) {
 
 func (i *routesImpl) getPointsHistory(c *gin.Context) {
 	c.HTML(http.StatusOK, "includes/points_history", nil)
+}
+
+func (i *routesImpl) getCampaignByID(c *gin.Context) {
+	ctx := contextx.WithContext(c.Request.Context())
+
+	campaign, err := i.campaignClient.GetCampaign(ctx, &core.GetCampaignRequest{Id: c.Param("id")})
+	if err != nil {
+		ctx.Error("failed to get campaign", zap.Error(err))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get campaign"})
+		return
+	}
+
+	ctx.Debug("get campaign", zap.Any("campaign", &campaign))
+	c.HTML(http.StatusOK, "includes/campaign_detail", gin.H{
+		"title":    campaign.Campaign.Name,
+		"Campaign": campaign.Campaign,
+		"Tasks":    campaign.Tasks,
+	})
 }

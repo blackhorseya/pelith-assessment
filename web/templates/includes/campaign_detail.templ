@@ -1,0 +1,116 @@
+{{ define "content" }}
+<div class="text-center">
+    <h1 class="text-4xl font-bold mb-4">Campaign Details</h1>
+    <p class="text-lg text-gray-700">View detailed information about the campaign and its related tasks.</p>
+</div>
+
+<!-- Campaign Details -->
+<div class="mt-6 max-w-4xl mx-auto bg-white p-6 shadow rounded">
+    <h2 class="text-2xl font-bold mb-4">Campaign Information</h2>
+    <div class="grid grid-cols-2 gap-4">
+        <div>
+            <p class="text-sm font-medium text-gray-600">Campaign Name:</p>
+            <p class="text-lg">{{ .Campaign.Name }}</p>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-600">Mode:</p>
+            <p class="text-lg">{{ .Campaign.Mode.String }}</p>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-600">Start Time:</p>
+            <p class="text-lg">{{ .Campaign.StartTime.AsTime }}</p>
+        </div>
+        <div>
+            <p class="text-sm font-medium text-gray-600">End Time:</p>
+            <p class="text-lg">{{ .Campaign.EndTime.AsTime }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Buttons to Start Backtest and Activate Campaign -->
+<div class="mt-6 max-w-4xl mx-auto bg-white p-6 shadow rounded flex justify-between">
+    <!-- Start Backtest Button -->
+    <button
+        hx-post="/api/v1/campaigns/{{ .Campaign.Id }}/start-backtest"
+        hx-trigger="click"
+        hx-target="#notification"
+        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+    >
+        Start Backtest
+    </button>
+
+    <!-- Start Active Mode Button -->
+    <button
+        hx-post="/api/v1/campaigns/{{ .Campaign.Id }}/start-active"
+        hx-trigger="click"
+        hx-target="#notification"
+        class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
+    >
+        Start Active Mode
+    </button>
+</div>
+
+<!-- Notification Area -->
+<div id="notification" class="mt-4 text-center"></div>
+
+<!-- Tasks Associated with the Campaign -->
+<div class="mt-8 max-w-4xl mx-auto bg-white p-6 shadow rounded">
+    <h2 class="text-2xl font-bold mb-4">Associated Tasks</h2>
+    <table class="min-w-full bg-white border border-gray-300">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Task Name</th>
+                <th class="py-2 px-4 border-b">Criteria</th>
+                <th class="py-2 px-4 border-b">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Tasks }}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ .Name }}</td>
+                <td class="py-2 px-4 border-b">
+                    {{ if .Criteria.MinTransactionAmount }}
+                    Min Tx: {{ .Criteria.MinTransactionAmount }}<br>
+                    {{ end }}
+                    Pool ID: {{ .Criteria.PoolId }}
+                </td>
+                <td class="py-2 px-4 border-b">
+                    {{ if eq .Status 1 }}Active{{ else }}Inactive{{ end }}
+                </td>
+            </tr>
+            {{ else }}
+            <tr>
+                <td colspan="4" class="py-4 text-center text-gray-600">No tasks associated with this campaign.</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+
+<!-- Participating Users -->
+<div class="mt-8 max-w-4xl mx-auto bg-white p-6 shadow rounded">
+    <h2 class="text-2xl font-bold mb-4">Participating Users</h2>
+    <table class="min-w-full bg-white border border-gray-300">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">User Address</th>
+                <th class="py-2 px-4 border-b">Points Earned</th>
+                <th class="py-2 px-4 border-b">Tasks Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Users }}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ .Address }}</td>
+                <td class="py-2 px-4 border-b">{{ .Points }}</td>
+                <td class="py-2 px-4 border-b">{{ .TasksCompleted }}</td>
+            </tr>
+            {{ else }}
+            <tr>
+                <td colspan="3" class="py-4 text-center text-gray-600">No users have participated in this campaign.</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
+{{ end }}
