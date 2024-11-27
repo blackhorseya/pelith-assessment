@@ -35,8 +35,8 @@ func NewInitUserRoutesFn(queryCtrl *QueryController, campaignClient core.Campaig
 		web.SetHTMLTemplate(router)
 		router.GET("/", instance.index)
 		router.GET("/simulation", simulation)
-		router.GET("/tasks/config", tasksConfig)
 		router.POST("/campaigns", instance.createCampaign)
+		router.GET("/campaigns/new", instance.newCampaigns)
 
 		// restful api
 		docs.SwaggerInfo.BasePath = "/api"
@@ -69,7 +69,7 @@ func (i *routesImpl) index(c *gin.Context) {
 		return
 	}
 
-	var tasks []*model.Task
+	var campaigns []*model.Campaign
 	for {
 		resp, err2 := stream.Recv()
 		if err2 != nil {
@@ -81,14 +81,14 @@ func (i *routesImpl) index(c *gin.Context) {
 			return
 		}
 
-		tasks = append(tasks, resp.Tasks...)
+		campaigns = append(campaigns, resp.Campaign)
 	}
 
-	ctx.Debug("get all tasks", zap.Any("tasks", tasks))
+	ctx.Debug("get campaigns", zap.Any("campaigns", campaigns))
 
-	c.HTML(http.StatusOK, "includes/tasks", gin.H{
-		"title": "Home Page",
-		"tasks": tasks,
+	c.HTML(http.StatusOK, "includes/campaigns", gin.H{
+		"title":     "Home Page",
+		"campaigns": campaigns,
 	})
 }
 
@@ -135,35 +135,9 @@ func (i *routesImpl) createCampaign(c *gin.Context) {
 	c.Redirect(http.StatusSeeOther, "/")
 }
 
+func (i *routesImpl) newCampaigns(c *gin.Context) {
+	c.HTML(http.StatusOK, "includes/new_campaign", nil)
+}
+
 func simulation(c *gin.Context) {
-}
-
-// TaskConfig represents the structure of a task configuration
-type TaskConfig struct {
-	TaskName    string `form:"taskName" binding:"required"`
-	Threshold   int    `form:"threshold" binding:"required"`
-	TotalPoints int    `form:"points" binding:"required"`
-}
-
-// In-memory storage for task configurations
-var taskConfigs []TaskConfig
-
-// Handle GET request to render task configuration page
-func tasksConfig(c *gin.Context) {
-	c.HTML(http.StatusOK, "includes/config", gin.H{
-		"title": "Task Configuration",
-	})
-}
-
-// Handle POST request to save a new task configuration
-func saveTaskConfig(c *gin.Context) {
-	var newConfig TaskConfig
-	if err := c.ShouldBind(&newConfig); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Save the new configuration
-	taskConfigs = append(taskConfigs, newConfig)
-	c.Redirect(http.StatusSeeOther, "/tasks/config")
 }
