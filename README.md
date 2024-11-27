@@ -47,52 +47,35 @@ campaign management platform for Uniswap users, enabling them to complete tasks,
 - Introduce CI/CD pipelines for automated testing and deployment.
 - Optimize system performance for large-scale data processing.
 
+---
+
 ## How to Use
 
 ### Prerequisites
 
-1. **Docker** and **Docker Compose** installed.
-2. **Go** environment set up (if required).
+1. Install **Docker** and **Docker Compose**.
+2. Create a `.env` file in the project root directory with the following content:
 
-### Running the Application
-
-#### Using Makefile
-
-1. **Build the Application**:
    ```bash
-   make build
+   ETHERSCAN_API_KEY=your_etherscan_api_key
+   INFURA_PROJECT_ID=your_infura_project_id
    ```
-   Compiles the application and outputs the binary to the `build` directory.
 
-2. **Run the Application**:
+---
+
+### Start the Application
+
+1. Start the application and its related services:
+
    ```bash
    make run
    ```
-   Starts the compiled application.
 
-3. **Test the Application**:
-   ```bash
-   make test
-   ```
-   Runs all test cases.
+2. Open the API documentation in your browser:
 
-4. **Lint the Code**:
-   ```bash
-   make lint
-   ```
-   Checks for linting issues using `golangci-lint`.
+   [http://localhost:8080/api/docs/index.html](http://localhost:8080/api/docs/index.html)
 
-5. **Clean Up Build Artifacts**:
-   ```bash
-   make clean
-   ```
-   Removes all files in the `build` directory.
-
-6. **Help**:
-   To see all available Makefile commands:
-   ```bash
-   make help
-   ```
+---
 
 ## Documentation
 
