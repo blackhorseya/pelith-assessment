@@ -77,9 +77,9 @@ func (ctrl *QueryController) GetPointsHistory(c *gin.Context) {
 	}
 
 	if c.Request.Header.Get("Accept") == "text/html" {
-		c.HTML(http.StatusOK, "layout/points_history", gin.H{
+		c.HTML(http.StatusOK, "layout/rewards_table", gin.H{
 			"title":   "Points History",
-			"rewards": rewards,
+			"Rewards": rewards,
 		})
 		return
 	}

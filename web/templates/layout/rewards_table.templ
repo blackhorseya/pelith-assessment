@@ -1,0 +1,42 @@
+<!-- Rewards Table -->
+<div class="mt-6 max-w-4xl mx-auto bg-white p-6 shadow rounded">
+    <h2 class="text-2xl font-bold mb-4">User Rewards</h2>
+    <table class="min-w-full bg-white border border-gray-300">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b text-left">Reward ID</th>
+                <th class="py-2 px-4 border-b text-left">Campaign ID</th>
+                <th class="py-2 px-4 border-b text-right">Points</th>
+                <th class="py-2 px-4 border-b text-left">Status</th>
+                <th class="py-2 px-4 border-b text-left">Redeemed At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ range .Rewards }}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ .Id }}</td>
+                <td class="py-2 px-4 border-b">{{ .CampaignId }}</td>
+                <td class="py-2 px-4 border-b text-right">{{ .Points }}</td>
+                <td class="py-2 px-4 border-b">
+                    {{ if .RedeemedAt }}
+                    <span class="text-green-500 font-bold">Redeemed</span>
+                    {{ else }}
+                    <span class="text-yellow-500 font-bold">Pending</span>
+                    {{ end }}
+                </td>
+                <td class="py-2 px-4 border-b">
+                    {{ if not .RedeemedAt.IsZero }}
+                    {{ .RedeemedAt.AsTime.Format "2006-01-02 15:04:05" }}
+                    {{ else }}
+                    <span class="text-gray-500">Not Redeemed</span>
+                    {{ end }}
+                </td>
+            </tr>
+            {{ else }}
+            <tr>
+                <td colspan="5" class="py-4 text-center text-gray-600">No rewards found.</td>
+            </tr>
+            {{ end }}
+        </tbody>
+    </table>
+</div>
