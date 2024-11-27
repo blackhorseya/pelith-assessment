@@ -41,6 +41,36 @@ func (i *userServiceImpl) GetUserTaskListByAddress(c context.Context, address, c
 	}
 	user.Tasks = campaign.Tasks()
 
-	// TODO: 2024/11/26|sean|implement GetUserTaskListByAddress
+	txCh := make(chan *biz.Transaction)
+	go func() {
+		err = i.txRepo.GetSwapTxByUserAddressAndPoolAddress(
+			ctx,
+			address,
+			campaign.PoolId,
+			query.ListTransactionCondition{
+				PoolAddress: campaign.PoolId,
+				StartTime:   campaign.StartTime.AsTime(),
+				EndTime:     campaign.EndTime.AsTime(),
+			},
+			txCh,
+		)
+		if err != nil {
+			ctx.Error("failed to fetch swap transactions", zap.Error(err))
+		}
+		close(txCh)
+	}()
+	if err != nil {
+		ctx.Error("failed to fetch swap transactions", zap.Error(err))
+		return nil, err
+	}
+
+	for tx := range txCh {
+		err = user.OnSwapExecuted(ctx, tx)
+		if err != nil {
+			ctx.Error("failed to process swap transaction", zap.Error(err))
+			return nil, err
+		}
+	}
+
 	return user, nil
 }

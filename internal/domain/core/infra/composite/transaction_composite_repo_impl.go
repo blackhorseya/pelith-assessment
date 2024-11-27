@@ -52,6 +52,7 @@ func (i *TransactionCompositeRepoImpl) GetSwapTxByUserAddressAndPoolAddress(
 		return err
 	}
 	if total == 0 {
+		ctx.Warn("no transaction found", zap.String("address", address), zap.Any("condition", &cond))
 		return errors.New("no transaction found")
 	}
 

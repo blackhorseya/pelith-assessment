@@ -2,8 +2,11 @@ package biz
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
+	"go.uber.org/zap"
 )
 
 // User is an aggregate root that represents the user.
@@ -13,6 +16,8 @@ type User struct {
 	Tasks        []*Task         `json:"tasks,omitempty"`
 	Rewards      []*Reward       `json:"rewards,omitempty"`
 	Transactions TransactionList `json:"transactions,omitempty"`
+
+	totalSwapAmount map[string]float64
 }
 
 // NewUser creates a new User aggregate.
@@ -27,5 +32,46 @@ func NewUser(address string) (*User, error) {
 			Address:      address,
 			TaskProgress: make(map[string]int64),
 		},
+		totalSwapAmount: make(map[string]float64),
 	}, nil
+}
+
+// OnSwapExecuted is called when a swap transaction is executed.
+func (x *User) OnSwapExecuted(ctx contextx.Contextx, tx *Transaction) error {
+	x.Transactions = append(x.Transactions, tx)
+
+	// Update the user's total swap amount
+	fromAmount, err := strconv.ParseFloat(tx.SwapDetail.FromTokenAmount, 64)
+	if err != nil {
+		ctx.Error("failed to parse from amount", zap.Error(err))
+		return err
+	}
+	x.totalSwapAmount[tx.SwapDetail.FromTokenAddress] += fromAmount
+
+	toAmount, err := strconv.ParseFloat(tx.SwapDetail.ToTokenAmount, 64)
+	if err != nil {
+		ctx.Error("failed to parse to amount", zap.Error(err))
+		return err
+	}
+	x.totalSwapAmount[tx.SwapDetail.ToTokenAddress] += toAmount
+
+	// Update the user's task progress
+	for _, task := range x.Tasks {
+		totalAmount := x.totalSwapAmount[task.Criteria.PoolId]
+
+		switch task.Type {
+		case model.TaskType_TASK_TYPE_ONBOARDING:
+			if totalAmount >= task.Criteria.MinTransactionAmount {
+				task.Progress = 100
+			} else {
+				task.Progress = int((totalAmount / task.Criteria.MinTransactionAmount) * 100)
+			}
+		case model.TaskType_TASK_TYPE_SHARE_POOL:
+		default:
+			ctx.Warn("unknown task type", zap.String("task_type", task.Type.String()))
+			continue
+		}
+	}
+
+	return nil
 }

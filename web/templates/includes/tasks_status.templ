@@ -6,34 +6,58 @@
 
 <!-- Query Form -->
 <form
-    hx-get="/api/v1/users/{userAddress}/tasks/status"
-    hx-headers='{"Accept": "text/html"}'
-    hx-target="#tasks-status"
-    hx-trigger="submit"
-    hx-indicator="#loading"
+    id="queryForm"
     class="mt-6 max-w-xl mx-auto bg-white p-6 shadow rounded"
+    onsubmit="return submitHtmxRequest(event)"
 >
     <!-- User Address -->
     <div class="mb-4">
         <label for="userAddress" class="block mb-2 text-sm font-medium">User Address:</label>
-        <input type="text" id="userAddress" name="address" class="border rounded px-4 py-2 w-full" placeholder="Enter user address" required>
+        <input
+            type="text"
+            id="userAddress"
+            name="address"
+            class="border rounded px-4 py-2 w-full"
+            placeholder="Enter user address"
+            required
+        >
     </div>
 
     <!-- Campaign ID -->
     <div class="mb-4">
         <label for="campaignID" class="block mb-2 text-sm font-medium">Campaign ID:</label>
-        <input type="text" id="campaignID" name="campaignID" class="border rounded px-4 py-2 w-full" placeholder="Enter campaign ID" required>
+        <input
+            type="text"
+            id="campaignID"
+            name="campaignID"
+            class="border rounded px-4 py-2 w-full"
+            placeholder="Enter campaign ID"
+        >
     </div>
 
     <!-- Pagination -->
     <div class="mb-4 grid grid-cols-2 gap-4">
         <div>
             <label for="page" class="block mb-2 text-sm font-medium">Page:</label>
-            <input type="number" id="page" name="page" class="border rounded px-4 py-2 w-full" value="1" required>
+            <input
+                type="number"
+                id="page"
+                name="page"
+                class="border rounded px-4 py-2 w-full"
+                value="1"
+                required
+            >
         </div>
         <div>
             <label for="size" class="block mb-2 text-sm font-medium">Size:</label>
-            <input type="number" id="size" name="size" class="border rounded px-4 py-2 w-full" value="10" required>
+            <input
+                type="number"
+                id="size"
+                name="size"
+                class="border rounded px-4 py-2 w-full"
+                value="10"
+                required
+            >
         </div>
     </div>
 
@@ -48,4 +72,33 @@
 <div id="tasks-status" class="mt-6">
     <!-- 后端返回的 HTML 表格会动态插入到这里 -->
 </div>
+
+<!-- JavaScript for Dynamic Submission -->
+<script>
+    async function submitHtmxRequest(event) {
+        event.preventDefault(); // 阻止表单的默认提交行为
+
+        const address = document.getElementById("userAddress").value;
+        const campaignID = document.getElementById("campaignID").value;
+        const page = document.getElementById("page").value;
+        const size = document.getElementById("size").value;
+
+        if (!address) {
+            alert("User Address is required.");
+            return false;
+        }
+
+        const hxGetUrl = `/api/v1/users/${encodeURIComponent(address)}/tasks/status?campaignID=${encodeURIComponent(campaignID)}&page=${encodeURIComponent(page)}&size=${encodeURIComponent(size)}`;
+
+        console.log("Constructed URL:", hxGetUrl); // 调试日志
+
+        // 使用 HTMX 手动发起请求
+        htmx.ajax('GET', hxGetUrl, {
+            target: "#tasks-status",
+            headers: { Accept: "text/html" }
+        });
+
+        return false; // 阻止默认提交
+    }
+</script>
 {{ end }}
