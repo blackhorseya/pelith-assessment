@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	usdcTokenAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+	usdcTokenAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48" //nolint:gosec // it's a constant
 )
 
 // Transaction is an aggregate root that represents the transaction.
