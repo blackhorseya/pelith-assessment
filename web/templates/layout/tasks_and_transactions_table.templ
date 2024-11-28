@@ -1,0 +1,73 @@
+<table class="min-w-full bg-white border border-gray-300">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">Task ID</th>
+            <th class="py-2 px-4 border-b">Task Name</th>
+            <th class="py-2 px-4 border-b">Task Type</th>
+            <th class="py-2 px-4 border-b">Campaign ID</th>
+            <th class="py-2 px-4 border-b">Progress</th>
+            <th class="py-2 px-4 border-b">Status</th>
+            <th class="py-2 px-4 border-b">Criteria</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .tasks }}
+        <tr>
+            <td class="py-2 px-4 border-b">{{ .Id }}</td>
+            <td class="py-2 px-4 border-b">{{ .Name }}</td>
+            <td class="py-2 px-4 border-b">
+                {{ if eq .Type 1 }}Onboarding{{ else if eq .Type 2 }}Share Pool{{ else }}Unknown{{ end }}
+            </td>
+            <td class="py-2 px-4 border-b">{{ .CampaignID }}</td>
+            <td class="py-2 px-4 border-b">{{ .Progress }}%</td>
+            <td class="py-2 px-4 border-b">
+                {{ if eq .Status 1 }}Active{{ else }}Inactive{{ end }}
+            </td>
+            <td class="py-2 px-4 border-b">
+                {{ if .Criteria.MinTransactionAmount }}
+                Min Tx: {{ .Criteria.MinTransactionAmount }}<br>
+                {{ end }}
+                Pool ID: {{ .Criteria.PoolId }}
+            </td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+
+<!-- Transactions Table -->
+<h2 class="text-2xl font-bold mb-4">Transactions</h2>
+<table class="min-w-full bg-white border border-gray-300">
+    <thead>
+        <tr>
+            <th class="py-2 px-4 border-b">Transaction Hash</th>
+            <th class="py-2 px-4 border-b">From Token Address</th>
+            <th class="py-2 px-4 border-b">To Token Address</th>
+            <th class="py-2 px-4 border-b">From Token Amount</th>
+            <th class="py-2 px-4 border-b">To Token Amount</th>
+            <th class="py-2 px-4 border-b">Pool Address</th>
+            <th class="py-2 px-4 border-b">Timestamp</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{ range .transactions }}
+        <tr>
+            <td class="py-2 px-4 border-b">
+                <a href="https://etherscan.io/tx/{{ .TxHash }}" target="_blank" class="text-blue-500 hover:underline">
+                    {{ .TxHash }}
+                </a>
+            </td>
+            <td class="py-2 px-4 border-b">{{ .SwapDetail.FromTokenAddress }}</td>
+            <td class="py-2 px-4 border-b">{{ .SwapDetail.ToTokenAddress }}</td>
+            <td class="py-2 px-4 border-b">{{ .SwapDetail.FromTokenAmount }}</td>
+            <td class="py-2 px-4 border-b">{{ .SwapDetail.ToTokenAmount }}</td>
+            <td class="py-2 px-4 border-b">{{ .SwapDetail.PoolAddress }}</td>
+            <td class="py-2 px-4 border-b">{{ .Timestamp }}</td>
+        </tr>
+        {{ else }}
+        <tr>
+            <td colspan="7" class="py-4 text-center text-gray-600">No transactions found.</td>
+        </tr>
+        {{ end }}
+    </tbody>
+</table>
+

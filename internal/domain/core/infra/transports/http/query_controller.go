@@ -45,8 +45,9 @@ func (ctrl *QueryController) GetTasksStatus(c *gin.Context) {
 	}
 
 	if c.Request.Header.Get("Accept") == "text/html" {
-		c.HTML(http.StatusOK, "layout/tasks_table", gin.H{
-			"tasks": user.Tasks,
+		c.HTML(http.StatusOK, "layout/tasks_and_transactions_table", gin.H{
+			"tasks":        user.Tasks,
+			"transactions": user.Transactions,
 		})
 		return
 	}

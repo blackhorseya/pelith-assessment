@@ -40,6 +40,16 @@ func NewTransaction(txHash, from, to string, blockNumber int64, ts time.Time) *T
 	}
 }
 
+// TxHash is used to get the transaction hash.
+func (x *Transaction) TxHash() string {
+	return x.tx.TxHash
+}
+
+// Timestamp is used to get the timestamp.
+func (x *Transaction) Timestamp() time.Time {
+	return x.tx.Timestamp.AsTime()
+}
+
 // WithReceipt is used to set the receipt.
 func (x *Transaction) WithReceipt(receipt *types.Receipt) *Transaction {
 	x.receipt = receipt
