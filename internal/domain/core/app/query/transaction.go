@@ -9,9 +9,6 @@ import (
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 )
 
-// Constant for the USDC token address
-const usdcAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-
 // ListTransactionCondition is the condition for list transaction.
 type ListTransactionCondition struct {
 	PoolAddress string

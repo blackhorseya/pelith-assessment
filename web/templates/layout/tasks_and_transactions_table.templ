@@ -40,12 +40,9 @@
     <thead>
         <tr>
             <th class="py-2 px-4 border-b">Transaction Hash</th>
-            <th class="py-2 px-4 border-b">From Token Address</th>
-            <th class="py-2 px-4 border-b">To Token Address</th>
-            <th class="py-2 px-4 border-b">From Token Amount</th>
-            <th class="py-2 px-4 border-b">To Token Amount</th>
-            <th class="py-2 px-4 border-b">Pool Address</th>
             <th class="py-2 px-4 border-b">Timestamp</th>
+            <th class="py-2 px-4 border-b">Pool Address</th>
+            <th class="py-2 px-4 border-b">USDC Amount</th>
         </tr>
     </thead>
     <tbody>
@@ -56,12 +53,9 @@
                     {{ .TxHash }}
                 </a>
             </td>
-            <td class="py-2 px-4 border-b">{{ .SwapDetail.FromTokenAddress }}</td>
-            <td class="py-2 px-4 border-b">{{ .SwapDetail.ToTokenAddress }}</td>
-            <td class="py-2 px-4 border-b">{{ .SwapDetail.FromTokenAmount }}</td>
-            <td class="py-2 px-4 border-b">{{ .SwapDetail.ToTokenAmount }}</td>
-            <td class="py-2 px-4 border-b">{{ .SwapDetail.PoolAddress }}</td>
             <td class="py-2 px-4 border-b">{{ .Timestamp }}</td>
+            <td class="py-2 px-4 border-b">{{ .SwapDetail.PoolAddress }}</td>
+            <td class="py-2 px-4 border-b">{{ .SwapUSDCAmount }}</td>
         </tr>
         {{ else }}
         <tr>

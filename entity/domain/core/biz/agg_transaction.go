@@ -13,6 +13,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+const (
+	usdcTokenAddress = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+)
+
 // Transaction is an aggregate root that represents the transaction.
 type Transaction struct {
 	tx      *model.Transaction
@@ -38,6 +42,23 @@ func NewTransaction(txHash, from, to string, blockNumber int64, ts time.Time) *T
 			SwapDetails: nil,
 		},
 	}
+}
+
+// SwapUSDCAmount is used to get the swap usdc amount.
+func (x *Transaction) SwapUSDCAmount() string {
+	if x.SwapDetail == nil {
+		return "0"
+	}
+
+	if strings.EqualFold(x.SwapDetail.FromTokenAddress, usdcTokenAddress) {
+		return x.SwapDetail.FromTokenAmount
+	}
+
+	if strings.EqualFold(x.SwapDetail.ToTokenAddress, usdcTokenAddress) {
+		return x.SwapDetail.ToTokenAmount
+	}
+
+	return "0"
 }
 
 // TxHash is used to get the transaction hash.
