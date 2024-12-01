@@ -2,12 +2,14 @@ package mongodb
 
 import (
 	"context"
+	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/mongodbx"
 	"github.com/stretchr/testify/suite"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -74,6 +76,49 @@ func (s *suiteCampaignRepoImpl) TestCampaignRepoImpl_Create() {
 
 			if err := s.repo.Create(tt.args.c, tt.args.campaign); (err != nil) != tt.wantErr {
 				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func (s *suiteCampaignRepoImpl) TestCampaignRepoImpl_GetByID() {
+	campaign, _ := biz.NewCampaign("test", time.Now(), "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc")
+	campaign.Id = primitive.NewObjectID().Hex()
+
+	type args struct {
+		c    context.Context
+		id   string
+		mock func()
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *biz.Campaign
+		wantErr bool
+	}{
+		{
+			name: "get by id success",
+			args: args{id: campaign.Id, mock: func() {
+				_, _ = s.repo.coll.InsertOne(context.Background(), campaign)
+			}},
+			want:    campaign,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		s.T().Run(tt.name, func(t *testing.T) {
+			tt.args.c = context.Background()
+			if tt.args.mock != nil {
+				tt.args.mock()
+			}
+
+			got, err := s.repo.GetByID(tt.args.c, tt.args.id)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetByID() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got.Id, tt.want.Id) {
+				t.Errorf("GetByID() got = %v, want %v", got, tt.want)
 			}
 		})
 	}

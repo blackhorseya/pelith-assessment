@@ -71,38 +71,39 @@ message TaskResult {
 // Campaign entity
 message Campaign {
   // Campaign ID
-  // @gotags: db:"id"
+  // @gotags: db:"id" bson:"_id"
   string id = 1;
 
   // Campaign name
-  // @gotags: db:"name"
+  // @gotags: db:"name" bson:"name"
   string name = 2;
 
   // Campaign description
-  // @gotags: db:"description"
+  // @gotags: db:"description" bson:"description"
   string description = 3;
 
   // Campaign start time
-  // @gotags: db:"start_time"
+  // @gotags: db:"start_time" bson:"start_time"
   google.protobuf.Timestamp start_time = 4;
 
   // Campaign end time
-  // @gotags: db:"end_time"
+  // @gotags: db:"end_time" bson:"end_time"
   google.protobuf.Timestamp end_time = 5;
 
   // Associated tasks
-  // @gotags: db:"tasks"
+  // @gotags: db:"tasks" bson:"tasks"
   repeated Task tasks = 6;
 
   // Campaign mode
-  // @gotags: db:"mode"
+  // @gotags: db:"mode" bson:"mode"
   CampaignMode mode = 7;
 
   // Campaign status
-  // @gotags: db:"status"
+  // @gotags: db:"status" bson:"status"
   CampaignStatus status = 8;
 
   // Pool ID (if applicable)
+  // @gotags: db:"pool_id" bson:"pool_id"
   string pool_id = 9;
 }
 

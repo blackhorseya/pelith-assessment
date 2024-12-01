@@ -11,7 +11,7 @@ import (
 
 // Campaign represents the aggregate root for campaigns.
 type Campaign struct {
-	model.Campaign
+	model.Campaign `bson:",inline"`
 
 	tasks   []*Task
 	rewards []*model.Reward

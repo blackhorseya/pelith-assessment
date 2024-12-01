@@ -556,31 +556,32 @@ type Campaign struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Campaign ID
-	// @gotags: db:"id"
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" db:"id"`
+	// @gotags: db:"id" bson:"_id"
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" db:"id" bson:"_id"`
 	// Campaign name
-	// @gotags: db:"name"
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" db:"name"`
+	// @gotags: db:"name" bson:"name"
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" db:"name" bson:"name"`
 	// Campaign description
-	// @gotags: db:"description"
-	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" db:"description"`
+	// @gotags: db:"description" bson:"description"
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" db:"description" bson:"description"`
 	// Campaign start time
-	// @gotags: db:"start_time"
-	StartTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty" db:"start_time"`
+	// @gotags: db:"start_time" bson:"start_time"
+	StartTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty" db:"start_time" bson:"start_time"`
 	// Campaign end time
-	// @gotags: db:"end_time"
-	EndTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty" db:"end_time"`
+	// @gotags: db:"end_time" bson:"end_time"
+	EndTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty" db:"end_time" bson:"end_time"`
 	// Associated tasks
-	// @gotags: db:"tasks"
-	Tasks []*Task `protobuf:"bytes,6,rep,name=tasks,proto3" json:"tasks,omitempty" db:"tasks"`
+	// @gotags: db:"tasks" bson:"tasks"
+	Tasks []*Task `protobuf:"bytes,6,rep,name=tasks,proto3" json:"tasks,omitempty" db:"tasks" bson:"tasks"`
 	// Campaign mode
-	// @gotags: db:"mode"
-	Mode CampaignMode `protobuf:"varint,7,opt,name=mode,proto3,enum=entity.domain.core.model.CampaignMode" json:"mode,omitempty" db:"mode"`
+	// @gotags: db:"mode" bson:"mode"
+	Mode CampaignMode `protobuf:"varint,7,opt,name=mode,proto3,enum=entity.domain.core.model.CampaignMode" json:"mode,omitempty" db:"mode" bson:"mode"`
 	// Campaign status
-	// @gotags: db:"status"
-	Status CampaignStatus `protobuf:"varint,8,opt,name=status,proto3,enum=entity.domain.core.model.CampaignStatus" json:"status,omitempty" db:"status"`
+	// @gotags: db:"status" bson:"status"
+	Status CampaignStatus `protobuf:"varint,8,opt,name=status,proto3,enum=entity.domain.core.model.CampaignStatus" json:"status,omitempty" db:"status" bson:"status"`
 	// Pool ID (if applicable)
-	PoolId string `protobuf:"bytes,9,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	// @gotags: db:"pool_id" bson:"pool_id"
+	PoolId string `protobuf:"bytes,9,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty" db:"pool_id" bson:"pool_id"`
 }
 
 func (x *Campaign) Reset() {

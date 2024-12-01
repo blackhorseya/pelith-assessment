@@ -11,6 +11,8 @@ import (
 
 // ListCampaignCondition is a struct to define the condition of list campaign
 type ListCampaignCondition struct {
+	Limit  int64
+	Offset int64
 }
 
 type (
