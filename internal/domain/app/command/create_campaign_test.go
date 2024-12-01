@@ -16,21 +16,19 @@ import (
 type suiteCampaignCommandTester struct {
 	suite.Suite
 
-	ctrl            *gomock.Controller
-	repo            *MockCampaignCreator
-	service         *biz.MockCampaignService
-	campaignCreator *repo.MockCampaignCreator
-	handler         usecase.Handler
+	ctrl    *gomock.Controller
+	service *biz.MockCampaignService
+	repo    *repo.MockCampaignCreator
+	handler usecase.Handler
 }
 
 func (s *suiteCampaignCommandTester) SetupTest() {
 	s.ctrl = gomock.NewController(s.T())
 
-	s.repo = NewMockCampaignCreator(s.ctrl)
 	s.service = biz.NewMockCampaignService(s.ctrl)
-	s.campaignCreator = repo.NewMockCampaignCreator(s.ctrl)
+	s.repo = repo.NewMockCampaignCreator(s.ctrl)
 
-	s.handler = NewCreateCampaignHandler(s.service, s.repo, s.campaignCreator)
+	s.handler = NewCreateCampaignHandler(s.service, s.repo)
 }
 
 func (s *suiteCampaignCommandTester) TearDownTest() {

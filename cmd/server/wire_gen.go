@@ -97,17 +97,13 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		return nil, nil, err
 	}
 	campaignService := biz.NewCampaignService()
-	campaignCreator, err := pg.NewCampaignCreator(campaignRepoImpl)
-	if err != nil {
-		return nil, nil, err
-	}
 	mongoClient, cleanup, err := mongodbx.NewClient(application)
 	if err != nil {
 		return nil, nil, err
 	}
 	mongodbCampaignRepoImpl := mongodb.NewCampaignRepoImpl(mongoClient)
-	repoCampaignCreator := mongodb.NewCampaignCreator(mongodbCampaignRepoImpl)
-	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator, repoCampaignCreator)
+	campaignCreator := mongodb.NewCampaignCreator(mongodbCampaignRepoImpl)
+	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator)
 	taskService := biz.NewTaskService()
 	taskRepoImpl := pg.NewTaskRepo(db)
 	taskCreator := pg.NewTaskCreator(taskRepoImpl)

@@ -12,19 +12,16 @@ import (
 // CreateCampaignHandler handles the creation of a new campaign.
 type CreateCampaignHandler struct {
 	service         biz.CampaignService
-	repo            CampaignCreator
 	campaignCreator repo.CampaignCreator
 }
 
 // NewCreateCampaignHandler is used to create a new CreateCampaignHandler.
 func NewCreateCampaignHandler(
 	service biz.CampaignService,
-	repo CampaignCreator,
 	campaignCreator repo.CampaignCreator,
 ) *CreateCampaignHandler {
 	return &CreateCampaignHandler{
 		service:         service,
-		repo:            repo,
 		campaignCreator: campaignCreator,
 	}
 }
@@ -45,7 +42,7 @@ func (h *CreateCampaignHandler) Handle(c context.Context, msg usecase.Message) (
 		return "", err
 	}
 
-	err = h.repo.Create(c, campaign)
+	err = h.campaignCreator.Create(c, campaign)
 	if err != nil {
 		return "", err
 	}
