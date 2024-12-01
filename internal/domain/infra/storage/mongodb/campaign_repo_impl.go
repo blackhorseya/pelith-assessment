@@ -6,6 +6,7 @@ import (
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/repo"
 	"github.com/blackhorseya/pelith-assessment/pkg/contextx"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -29,6 +30,7 @@ func NewCampaignCreator(impl *CampaignRepoImpl) repo.CampaignCreator {
 func (i *CampaignRepoImpl) Create(c context.Context, campaign *biz.Campaign) error {
 	ctx := contextx.WithContext(c)
 
+	campaign.Id = primitive.NewObjectID().Hex()
 	_, err := i.coll.InsertOne(ctx, campaign)
 	return err
 }
