@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/repo"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/mongodbx"
 	"github.com/stretchr/testify/suite"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -119,6 +120,54 @@ func (s *suiteCampaignRepoImpl) TestCampaignRepoImpl_GetByID() {
 			}
 			if !reflect.DeepEqual(got.Id, tt.want.Id) {
 				t.Errorf("GetByID() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func (s *suiteCampaignRepoImpl) TestCampaignRepoImpl_List() {
+	campaign, _ := biz.NewCampaign("test", time.Now(), "0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc")
+	campaign.Id = primitive.NewObjectID().Hex()
+
+	type args struct {
+		c    context.Context
+		cond repo.ListCampaignCondition
+		mock func()
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    []*biz.Campaign
+		want1   int64
+		wantErr bool
+	}{
+		{
+			name: "list success",
+			args: args{mock: func() {
+				_, _ = s.repo.coll.InsertOne(context.Background(), campaign)
+			}},
+			want:    []*biz.Campaign{campaign},
+			want1:   1,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		s.T().Run(tt.name, func(t *testing.T) {
+			tt.args.c = context.Background()
+			if tt.args.mock != nil {
+				tt.args.mock()
+			}
+
+			got, got1, err := s.repo.List(tt.args.c, tt.args.cond)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("List() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got[0].Id, tt.want[0].Id) {
+				t.Errorf("List() got = %v, want %v", got, tt.want)
+			}
+			if got1 != tt.want1 {
+				t.Errorf("List() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
