@@ -14,6 +14,9 @@ type Application struct {
 	GRPC GRPC `json:"grpc" yaml:"grpc" mapstructure:"grpc"`
 
 	Storage struct {
+		Mongodb struct {
+			DSN string `json:"dsn" yaml:"dsn" mapstructure:"dsn"`
+		} `json:"mongodb" yaml:"mongodb" mapstructure:"mongodb"`
 		DSN string `json:"dsn" yaml:"dsn" mapstructure:"dsn"`
 	} `json:"storage" yaml:"storage" mapstructure:"storage"`
 
