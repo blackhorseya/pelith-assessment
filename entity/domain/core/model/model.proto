@@ -9,50 +9,52 @@ option go_package = "github.com/blackhorseya/pelith-assessment/entity/domain/cor
 // Task entity
 message Task {
   // Unique identifier for the task
-  // @gotags: db:"id"
+  // @gotags: db:"id" bson:"_id"
   string id = 1;
 
   // Task name (e.g., "Onboarding Task")
-  // @gotags: db:"name"
+  // @gotags: db:"name" bson:"name"
   string name = 2;
 
   // Task description
-  // @gotags: db:"description"
+  // @gotags: db:"description" bson:"description"
   string description = 3;
 
   // Task type
-  // @gotags: db:"type"
+  // @gotags: db:"type" bson:"type"
   TaskType type = 4;
 
   // Criteria for task completion
-  // @gotags: db:"criteria"
+  // @gotags: db:"criteria" bson:"criteria"
   TaskCriteria criteria = 5;
 
   // Task status
-  // @gotags: db:"status"
+  // @gotags: db:"status" bson:"status"
   TaskStatus status = 6;
 }
 
 // Enum for task types
 enum TaskType {
-  TASK_TYPE_UNSPECIFIED = 0;  // Default value
-  TASK_TYPE_ONBOARDING = 1;   // Onboarding task
-  TASK_TYPE_SHARE_POOL = 2;   // Share pool task
+  TASK_TYPE_UNSPECIFIED = 0; // Default value
+  TASK_TYPE_ONBOARDING = 1; // Onboarding task
+  TASK_TYPE_SHARE_POOL = 2; // Share pool task
 }
 
 // Enum for task statuses
 enum TaskStatus {
   TASK_STATUS_UNSPECIFIED = 0; // Default value
-  TASK_STATUS_ACTIVE = 1;      // Task is active
-  TASK_STATUS_INACTIVE = 2;    // Task is inactive
+  TASK_STATUS_ACTIVE = 1; // Task is active
+  TASK_STATUS_INACTIVE = 2; // Task is inactive
 }
 
 // Task criteria
 message TaskCriteria {
   // Minimum transaction amount to complete the task
+  // @gotags: db:"min_transaction_amount" bson:"min_transaction_amount"
   double min_transaction_amount = 1;
 
   // Optional pool ID for pool-specific tasks
+  // @gotags: db:"pool_id" bson:"pool_id"
   string pool_id = 2;
 }
 
@@ -109,17 +111,17 @@ message Campaign {
 
 // Enum for campaign modes
 enum CampaignMode {
-  CAMPAIGN_MODE_UNSPECIFIED = 0;  // Default value
-  CAMPAIGN_MODE_REAL_TIME = 1;    // Real-time campaign
-  CAMPAIGN_MODE_BACKTEST = 2;     // Backtest campaign
+  CAMPAIGN_MODE_UNSPECIFIED = 0; // Default value
+  CAMPAIGN_MODE_REAL_TIME = 1; // Real-time campaign
+  CAMPAIGN_MODE_BACKTEST = 2; // Backtest campaign
 }
 
 // Enum for campaign statuses
 enum CampaignStatus {
   CAMPAIGN_STATUS_UNSPECIFIED = 0; // Default value
-  CAMPAIGN_STATUS_PENDING = 1;     // Campaign pending
-  CAMPAIGN_STATUS_ACTIVE = 2;      // Campaign active
-  CAMPAIGN_STATUS_COMPLETED = 3;   // Campaign completed
+  CAMPAIGN_STATUS_PENDING = 1; // Campaign pending
+  CAMPAIGN_STATUS_ACTIVE = 2; // Campaign active
+  CAMPAIGN_STATUS_COMPLETED = 3; // Campaign completed
 }
 
 // User entity
@@ -209,17 +211,17 @@ message Transaction {
 // Enum for transaction statuses
 enum TransactionStatus {
   TRANSACTION_STATUS_UNSPECIFIED = 0; // Default value
-  TRANSACTION_STATUS_PENDING = 1;     // Transaction pending
-  TRANSACTION_STATUS_COMPLETED = 2;   // Transaction completed
-  TRANSACTION_STATUS_FAILED = 3;      // Transaction failed
+  TRANSACTION_STATUS_PENDING = 1; // Transaction pending
+  TRANSACTION_STATUS_COMPLETED = 2; // Transaction completed
+  TRANSACTION_STATUS_FAILED = 3; // Transaction failed
 }
 
 // Enum for transaction types
 enum TransactionType {
-  TRANSACTION_TYPE_UNSPECIFIED = 0;  // Default value
-  TRANSACTION_TYPE_TRANSFER = 1;     // Transfer
-  TRANSACTION_TYPE_SWAP = 2;         // Swap
-  TRANSACTION_TYPE_OTHER = 3;        // Other
+  TRANSACTION_TYPE_UNSPECIFIED = 0; // Default value
+  TRANSACTION_TYPE_TRANSFER = 1; // Transfer
+  TRANSACTION_TYPE_SWAP = 2; // Swap
+  TRANSACTION_TYPE_OTHER = 3; // Other
 }
 
 // Swap details
@@ -255,7 +257,7 @@ message BacktestResult {
   int64 points_earned = 4;
 
   // Task completion status
-  map<string, int64 > task_progress = 5;
+  map<string, int64> task_progress = 5;
 }
 
 // Backtest report for a campaign

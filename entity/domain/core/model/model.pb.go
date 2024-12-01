@@ -337,23 +337,23 @@ type Task struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Unique identifier for the task
-	// @gotags: db:"id"
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" db:"id"`
+	// @gotags: db:"id" bson:"_id"
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" db:"id" bson:"_id"`
 	// Task name (e.g., "Onboarding Task")
-	// @gotags: db:"name"
-	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" db:"name"`
+	// @gotags: db:"name" bson:"name"
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" db:"name" bson:"name"`
 	// Task description
-	// @gotags: db:"description"
-	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" db:"description"`
+	// @gotags: db:"description" bson:"description"
+	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty" db:"description" bson:"description"`
 	// Task type
-	// @gotags: db:"type"
-	Type TaskType `protobuf:"varint,4,opt,name=type,proto3,enum=entity.domain.core.model.TaskType" json:"type,omitempty" db:"type"`
+	// @gotags: db:"type" bson:"type"
+	Type TaskType `protobuf:"varint,4,opt,name=type,proto3,enum=entity.domain.core.model.TaskType" json:"type,omitempty" db:"type" bson:"type"`
 	// Criteria for task completion
-	// @gotags: db:"criteria"
-	Criteria *TaskCriteria `protobuf:"bytes,5,opt,name=criteria,proto3" json:"criteria,omitempty" db:"criteria"`
+	// @gotags: db:"criteria" bson:"criteria"
+	Criteria *TaskCriteria `protobuf:"bytes,5,opt,name=criteria,proto3" json:"criteria,omitempty" db:"criteria" bson:"criteria"`
 	// Task status
-	// @gotags: db:"status"
-	Status TaskStatus `protobuf:"varint,6,opt,name=status,proto3,enum=entity.domain.core.model.TaskStatus" json:"status,omitempty" db:"status"`
+	// @gotags: db:"status" bson:"status"
+	Status TaskStatus `protobuf:"varint,6,opt,name=status,proto3,enum=entity.domain.core.model.TaskStatus" json:"status,omitempty" db:"status" bson:"status"`
 }
 
 func (x *Task) Reset() {
@@ -435,9 +435,11 @@ type TaskCriteria struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Minimum transaction amount to complete the task
-	MinTransactionAmount float64 `protobuf:"fixed64,1,opt,name=min_transaction_amount,json=minTransactionAmount,proto3" json:"min_transaction_amount,omitempty"`
+	// @gotags: db:"min_transaction_amount" bson:"min_transaction_amount"
+	MinTransactionAmount float64 `protobuf:"fixed64,1,opt,name=min_transaction_amount,json=minTransactionAmount,proto3" json:"min_transaction_amount,omitempty" db:"min_transaction_amount" bson:"min_transaction_amount"`
 	// Optional pool ID for pool-specific tasks
-	PoolId string `protobuf:"bytes,2,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	// @gotags: db:"pool_id" bson:"pool_id"
+	PoolId string `protobuf:"bytes,2,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty" db:"pool_id" bson:"pool_id"`
 }
 
 func (x *TaskCriteria) Reset() {

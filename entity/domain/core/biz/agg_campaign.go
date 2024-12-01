@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
+	"go.mongodb.org/mongo-driver/bson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -20,6 +21,37 @@ type Campaign struct {
 	userSwapVolume       map[string]float64
 	userOnboardingReward map[string]bool
 	totalSwapVolume      float64
+}
+
+func (c *Campaign) MarshalBSON() ([]byte, error) {
+	type Alias Campaign
+	alias := &struct {
+		*Alias `bson:",inline"`
+		Tasks  []*Task `bson:"tasks"`
+	}{
+		Alias: (*Alias)(c),
+		Tasks: c.tasks,
+	}
+
+	return bson.Marshal(alias)
+}
+
+func (c *Campaign) UnmarshalBSON(bytes []byte) error {
+	type Alias Campaign
+	alias := &struct {
+		*Alias `bson:",inline"`
+		Tasks  []*Task `bson:"tasks"`
+	}{
+		Alias: (*Alias)(c),
+	}
+
+	err := bson.Unmarshal(bytes, alias)
+	if err != nil {
+		return err
+	}
+
+	c.tasks = alias.Tasks
+	return nil
 }
 
 // NewCampaign creates a new Campaign aggregate.

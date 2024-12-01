@@ -8,10 +8,10 @@ import (
 
 // Task is an aggregate root that represents the task.
 type Task struct {
-	model.Task
+	model.Task `bson:",inline"`
 
-	CampaignID string
-	Progress   int
+	CampaignID string `bson:"campaign_id"`
+	Progress   int    `bson:"progress"`
 }
 
 // NewTask creates a new Task aggregate.
