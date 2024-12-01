@@ -12,12 +12,14 @@ import (
 	"github.com/blackhorseya/pelith-assessment/internal/domain/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/composite"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/external/etherscan"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/storage/mongodb"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/storage/pg"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/grpc"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/mongodbx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/pgx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/google/wire"
@@ -92,11 +94,14 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		etherscan.NewTransactionAdapter,
 		composite.NewTransactionCompositeRepoImpl,
 		composite.NewTransactionRepoImpl,
+		mongodb.NewCampaignCreator,
+		mongodb.NewCampaignRepoImpl,
 
 		// infra
 		httpx.NewGinServer,
 		grpcx.NewServer,
 		grpcx.NewClient,
 		pgx.NewClient,
+		mongodbx.NewClient,
 	))
 }

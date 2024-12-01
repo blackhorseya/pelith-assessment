@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/repo"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/usecase"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
@@ -15,10 +16,11 @@ import (
 type suiteCampaignCommandTester struct {
 	suite.Suite
 
-	ctrl    *gomock.Controller
-	repo    *MockCampaignCreator
-	service *biz.MockCampaignService
-	handler usecase.Handler
+	ctrl            *gomock.Controller
+	repo            *MockCampaignCreator
+	service         *biz.MockCampaignService
+	campaignCreator *repo.MockCampaignCreator
+	handler         usecase.Handler
 }
 
 func (s *suiteCampaignCommandTester) SetupTest() {
@@ -26,8 +28,9 @@ func (s *suiteCampaignCommandTester) SetupTest() {
 
 	s.repo = NewMockCampaignCreator(s.ctrl)
 	s.service = biz.NewMockCampaignService(s.ctrl)
+	s.campaignCreator = repo.NewMockCampaignCreator(s.ctrl)
 
-	s.handler = NewCreateCampaignHandler(s.service, s.repo)
+	s.handler = NewCreateCampaignHandler(s.service, s.repo, s.campaignCreator)
 }
 
 func (s *suiteCampaignCommandTester) TearDownTest() {

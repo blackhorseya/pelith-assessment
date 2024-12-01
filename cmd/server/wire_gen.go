@@ -7,22 +7,23 @@
 package server
 
 import (
-	"os"
-
-	command2 "github.com/blackhorseya/pelith-assessment/internal/domain/app/command"
-	query2 "github.com/blackhorseya/pelith-assessment/internal/domain/app/query"
-	biz2 "github.com/blackhorseya/pelith-assessment/internal/domain/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/app/query"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/composite"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/external/etherscan"
-	pg2 "github.com/blackhorseya/pelith-assessment/internal/domain/infra/storage/pg"
-	grpc2 "github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/grpc"
-	http2 "github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/http"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/storage/mongodb"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/storage/pg"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/grpc"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
+	"github.com/blackhorseya/pelith-assessment/internal/shared/mongodbx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/pgx"
 	"github.com/blackhorseya/pelith-assessment/pkg/adapterx"
 	"github.com/spf13/viper"
+	"os"
 )
 
 // Injectors from wire.go:
@@ -44,24 +45,24 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	rewardRepoImpl, err := pg2.NewRewardRepo(db)
+	rewardRepoImpl, err := pg.NewRewardRepo(db)
 	if err != nil {
 		return nil, nil, err
 	}
-	rewardGetter, err := pg2.NewRewardGetter(rewardRepoImpl)
+	rewardGetter, err := pg.NewRewardGetter(rewardRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
-	rewardQueryStore := query2.NewRewardQueryStore(rewardGetter)
-	campaignRepoImpl, err := pg2.NewCampaignRepo(db)
+	rewardQueryStore := query.NewRewardQueryStore(rewardGetter)
+	campaignRepoImpl, err := pg.NewCampaignRepo(db)
 	if err != nil {
 		return nil, nil, err
 	}
-	campaignGetter, err := pg2.NewCampaignGetter(campaignRepoImpl)
+	campaignGetter, err := pg.NewCampaignGetter(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
-	transactionRepoImpl, err := pg2.NewTransactionRepoImpl(db)
+	transactionRepoImpl, err := pg.NewTransactionRepoImpl(db)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -71,54 +72,63 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 	}
 	transactionCompositeRepoImpl := composite.NewTransactionCompositeRepoImpl(transactionRepoImpl, etherscanTransactionRepoImpl)
 	transactionRepo := composite.NewTransactionRepoImpl(transactionCompositeRepoImpl)
-	userService := biz2.NewUserService(campaignGetter, transactionRepo)
-	userQueryStore := query2.NewUserQueryStore(userService)
-	queryController := http2.NewQueryController(rewardQueryStore, userQueryStore)
+	userService := biz.NewUserService(campaignGetter, transactionRepo)
+	userQueryStore := query.NewUserQueryStore(userService)
+	queryController := http.NewQueryController(rewardQueryStore, userQueryStore)
 	client, err := grpcx.NewClient(configx)
 	if err != nil {
 		return nil, nil, err
 	}
-	campaignServiceClient, err := grpc2.NewCampaignServiceClient(client)
+	campaignServiceClient, err := grpc.NewCampaignServiceClient(client)
 	if err != nil {
 		return nil, nil, err
 	}
-	campaignUpdater, err := pg2.NewCampaignUpdater(campaignRepoImpl)
+	campaignUpdater, err := pg.NewCampaignUpdater(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
-	backtestService := biz2.NewBacktestService(transactionCompositeRepoImpl)
+	backtestService := biz.NewBacktestService(transactionCompositeRepoImpl)
 	transactionAdapter := etherscan.NewTransactionAdapter(etherscanTransactionRepoImpl)
-	startCampaignHandler := command2.NewStartCampaignHandler(campaignGetter, campaignUpdater, backtestService, transactionAdapter)
-	commandController := http2.NewCommandController(campaignServiceClient, startCampaignHandler)
-	initRoutes := http2.NewInitUserRoutesFn(queryController, commandController, campaignServiceClient)
+	startCampaignHandler := command.NewStartCampaignHandler(campaignGetter, campaignUpdater, backtestService, transactionAdapter)
+	commandController := http.NewCommandController(campaignServiceClient, startCampaignHandler)
+	initRoutes := http.NewInitUserRoutesFn(queryController, commandController, campaignServiceClient)
 	ginServer, err := httpx.NewGinServer(application, initRoutes)
 	if err != nil {
 		return nil, nil, err
 	}
-	campaignService := biz2.NewCampaignService()
-	campaignCreator, err := pg2.NewCampaignCreator(campaignRepoImpl)
+	campaignService := biz.NewCampaignService()
+	campaignCreator, err := pg.NewCampaignCreator(campaignRepoImpl)
 	if err != nil {
 		return nil, nil, err
 	}
-	createCampaignHandler := command2.NewCreateCampaignHandler(campaignService, campaignCreator)
-	taskService := biz2.NewTaskService()
-	taskRepoImpl := pg2.NewTaskRepo(db)
-	taskCreator := pg2.NewTaskCreator(taskRepoImpl)
-	addTaskHandler := command2.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
-	campaignDeleter, err := pg2.NewCampaignDeleter(campaignRepoImpl)
+	mongoClient, cleanup, err := mongodbx.NewClient(application)
 	if err != nil {
 		return nil, nil, err
 	}
-	runBacktestHandler := command2.NewRunBacktestHandler(backtestService, campaignGetter, campaignUpdater, campaignDeleter)
-	campaignServiceServer := grpc2.NewCampaignServer(createCampaignHandler, addTaskHandler, startCampaignHandler, runBacktestHandler, campaignGetter)
-	initServers := grpc2.NewInitServersFn(campaignServiceServer)
-	healthServer := grpc2.NewHealthServer()
+	mongodbCampaignRepoImpl := mongodb.NewCampaignRepoImpl(mongoClient)
+	repoCampaignCreator := mongodb.NewCampaignCreator(mongodbCampaignRepoImpl)
+	createCampaignHandler := command.NewCreateCampaignHandler(campaignService, campaignCreator, repoCampaignCreator)
+	taskService := biz.NewTaskService()
+	taskRepoImpl := pg.NewTaskRepo(db)
+	taskCreator := pg.NewTaskCreator(taskRepoImpl)
+	addTaskHandler := command.NewAddTaskHandler(campaignService, campaignGetter, taskService, taskCreator)
+	campaignDeleter, err := pg.NewCampaignDeleter(campaignRepoImpl)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	runBacktestHandler := command.NewRunBacktestHandler(backtestService, campaignGetter, campaignUpdater, campaignDeleter)
+	campaignServiceServer := grpc.NewCampaignServer(createCampaignHandler, addTaskHandler, startCampaignHandler, runBacktestHandler, campaignGetter)
+	initServers := grpc.NewInitServersFn(campaignServiceServer)
+	healthServer := grpc.NewHealthServer()
 	server, err := grpcx.NewServer(application, initServers, healthServer)
 	if err != nil {
+		cleanup()
 		return nil, nil, err
 	}
 	adapterxServer := newImpl(injector, ginServer, server)
 	return adapterxServer, func() {
+		cleanup()
 	}, nil
 }
 
