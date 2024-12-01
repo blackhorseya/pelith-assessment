@@ -1,0 +1,366 @@
+## 0.1.0 (2024-12-01)
+
+### Feat
+
+- implement USDC amount handling in transactions
+- enhance transaction retrieval and display features
+- enhance campaign management and error handling
+- refactor campaign management to enhance functionality
+- improve transaction settings UI and user experience
+- enhance CampaignRequest with new fields and logic
+- enhance transaction handling and campaign updates
+- implement campaign status update functionality
+- refactor rewards display and enhance user interface
+- track total swap amounts in user transactions
+- implement backtest functionality in command controller
+- add campaign detail retrieval and display features (#61)
+- add campaign detail retrieval and display features
+- implement CommandController for campaign management
+- add user points history template and query form
+- add HTML support to API and update documentation (#60)
+- add HTML support to API and update documentation
+- implement task status routing and UI updates (#59)
+- implement task status routing and UI updates
+- add campaign management template and features (#58)
+- refactor task management to use campaigns instead
+- add campaign management template and features
+- refactor campaign creation process and UI elements
+- enhance campaign retrieval and update task display (#57)
+- enhance campaign retrieval and update task display
+- add gRPC service URL configuration entry
+- integrate gRPC client for campaign service setup
+- implement gRPC client with Prometheus integration
+- integrate Campaign Service Client for gRPC support
+- implement multitemplate rendering for HTML pages (#56)
+- implement multitemplate rendering for HTML pages
+- refactor template structure and content definitions
+- refactor task templates and configuration settings
+- refactor task management and enhance home page templates
+- enhance simulation and tasks API routes and docs
+- enhance frontend navigation and API configuration
+- add HTML templating system for dynamic content
+- refactor API routes and update Swagger configuration
+- enhance task retrieval with campaign ID support
+- enhance transaction retrieval with improved error handling
+- refactor transaction handling and repository integration (#55)
+- refactor transaction handling and repository integration
+- refactor user service and task retrieval logic
+- refactor reward retrieval logic in the wallet service
+- implement reward repository and enhance data handling (#54)
+- implement reward repository and enhance data handling
+- implement reward creation and testing interfaces
+- add Reward aggregate and creation function
+- integrate RewardQueryStore for enhanced query management
+- enhance backtest handler with reward cleanup feature (#53)
+- enhance backtest handler with reward cleanup feature
+- implement campaign deletion management features
+- integrate campaign updater into server functionality (#52)
+- integrate campaign updater into server functionality
+- enhance reward distribution with campaign updater
+- refactor reward distribution and database integration (#51)
+- refactor reward distribution and database integration
+- implement rewards table with optimization indexes (#50)
+- implement rewards table with optimization indexes
+- rename UserId to UserAddress and add rewards table
+- implement reward retrieval for share pool task
+- enhance campaign struct for transactions and rewards
+- add rewards functionality to Campaign struct
+- enhance user onboarding rewards and log handling
+- enhance transaction retrieval with pool address support
+- refactor transaction retrieval logic and error handling
+- improve thread safety and error handling in swaps
+- refactor transaction handling and improve task retrieval (#49)
+- refactor transaction handling and improve task retrieval
+- enhance transaction data handling and retrieval logic
+- enhance transaction retrieval and error handling
+- refactor transaction handling to improve swap detection (#48)
+- refactor transaction handling to improve swap detection
+- add mock implementation for TransactionAdapter interface
+- enforce NOT NULL constraints in database schema
+- improve error handling and SQL file organization
+- enhance context handling and parameter management
+- enhance transaction query handling and management (#47)
+- enhance transaction query handling and management
+- enhance transaction log querying and processing logic (#46)
+- enhance transaction log querying and processing logic
+- implement transaction handling and database management (#45)
+- implement transaction handling and database management
+- enhance DAOs with new fields and conversion methods
+- enhance transaction handling in protocol buffers
+- add data access objects for transactions and swaps
+- enhance transaction repository with error handling (#44)
+- enhance transaction repository with error handling
+- integrate backtest handler into campaign server logic (#43)
+- integrate backtest handler into campaign server logic
+- implement backtesting functionality in CampaignService
+- implement thread-safe locking for transaction methods (#42)
+- implement thread-safe locking for transaction methods
+- refactor transaction handling with composite repository
+- implement transaction repository functionality
+- add transaction creation interface and mock implementation
+- refactor transaction repository implementations
+- create migration for transactions table setup
+- enhance onboarding rewards and transaction handling
+- improve swap transaction handling in backtest service
+- implement event handling for swap execution
+- define RewardRedeemedEvent structure and type
+- enhance contract log fetching and error handling
+- refactor backtest to use Reward results and improve logging
+- add pool_id support to campaign management system
+- add PoolID support to campaign management functions
+- implement campaign report and backtest result handling
+- enhance concurrent execution of backtest functionality
+- add report field to Campaign struct
+- add BacktestResult and BacktestReport messages
+- integrate BacktestService into campaign handling system
+- refactor campaign services and introduce backtest service
+- refactor reward service and enhance message clarity (#40)
+- refactor reward service and enhance message clarity
+- implement transaction processing and error handling
+- add SwapExecutedEvent for handling swap executions
+- implement event handling architecture and interfaces
+- implement start campaign functionality in server
+- implement campaign listing and response enhancements
+- enhance campaign management with new features and logic (#39)
+- enhance campaign management with new features and logic
+- add command handling for starting campaigns (#37)
+- add command handling for starting campaigns
+- add empty strategy type for campaign execution
+- introduce campaign strategy interface and handler
+- implement ListCampaigns functionality in gRPC service
+- add start_campaign command implementation
+- set CampaignID for tasks and ensure proper closure
+- enhance CreateCampaign with new parameters and logic
+- implement CreateCampaign functionality in gRPC service
+- implement campaign creation functionality in service
+- implement log fetching functionality in transaction module
+- enhance swap detail formatting and log initialization (#36)
+- enhance swap detail formatting and log initialization
+- refactor token amount handling in swap functionality
+- enhance transaction fetching and context management (#34)
+- enhance transaction fetching and context management
+- enhance transaction repository with Etherscan integration (#33)
+- add ContractAddress field to transaction conditions
+- enhance transaction processing and clean up logging
+- enhance transaction repository with Etherscan integration
+- refactor campaign handling and improve error logging
+- filter active tasks in GetTaskStatus function
+- enhance task listing with dynamic context and queries (#32)
+- add campaignGetter to TransactionQueryService initialization
+- enhance task listing with dynamic context and queries
+- integrate Etherscan transaction functionality into service (#31)
+- integrate Etherscan transaction functionality into service
+- enhance transaction processing with error handling (#30)
+- enhance transaction processing with error handling
+- enhance transaction management with new listing method
+- implement mock for TransactionService interface
+- implement mock for TransactionGetter interface
+- add CampaignID support to task management system (#29)
+- add CampaignID support to task management system
+- refactor task retrieval methods and parameters
+- enhance task management with progress tracking
+- add token support for Etherscan API in startCmd
+- implement swap transaction support and queries
+- refactor Task creation and progress calculation logic
+- introduce transaction management in user model
+- enhance user-task relationship in data structures
+- implement Swagger documentation for task status API
+- add points history handler and routing functionality
+- implement task management and querying functionalities
+- enhance transaction model with new fields and validation
+- refactor campaign handling in task management system
+- enhance task management with campaign integration
+- refactor task handling to utilize new service integration
+- refactor task service implementation with campaign support
+- refactor task management and enhance database handling
+- implement task management for campaign handling
+- implement AddTasksForCampaign functionality in service
+- consolidate task command logic into new structure
+- implement AddTasks method in campaign services
+- implement DAO layer for campaigns and tasks
+- implement campaign management and migration utilities
+- implement campaign fetching with error handling
+- implement GetCampaign RPC in CampaignService
+- refactor campaign request handling for improved type safety
+- standardize database field attributes across models
+- implement campaign creation with transaction handling
+- implement database schema for campaigns and tasks (#27)
+- implement database schema for campaigns and tasks
+- configure storage service with PostgreSQL settings
+- refactor database client integration to use pgx
+- refactor campaign creation logic and tests
+- refactor StartCampaign to handle tasks parameter
+- integrate campaign service into gRPC setup
+- implement gRPC server in application architecture
+- configure gRPC server settings for enhanced communication
+- implement gRPC campaign server infrastructure (#26)
+- implement gRPC campaign server infrastructure
+- implement gRPC middleware with OpenTelemetry support (#25)
+- implement gRPC middleware with OpenTelemetry support
+- implement gRPC server initialization and dependencies
+- implement gRPC campaign service with protocol buffers (#24)
+- implement gRPC campaign service with protocol buffers
+- enhance campaign creation with structured error handling
+- refactor campaign creation logic and error handling
+- implement campaign service structure and functionality
+- refactor user routing and introduce UserController (#22)
+- refactor user routing and introduce UserController
+- refactor user registration to simplify parameters
+- implement user data management with migrations (#21)
+- implement user data management with migrations
+- refactor user table migration logic
+- implement user registration handler structure
+- refactor user service implementation and structure
+- refactor mock services for parameterized methods
+- implement user management interfaces and mocks (#20)
+- implement user management interfaces and mocks
+- implement TaskCreator and TaskGetter interfaces (#19)
+- implement mock for TaskCreator interface
+- implement TaskCreator and TaskGetter interfaces
+- implement PostgreSQL campaign repository integration
+- add campaign querying functionality and tests (#18)
+- implement CampaignCreator and Mock implementations
+- add campaign querying functionality and tests
+- implement User aggregate root and reward management (#17)
+- implement Campaign aggregate root and lifecycle management
+- implement User aggregate root and reward management
+- establish biz domain structure with aggregate root and events (#16)
+- implement mock services for enhanced testing capabilities
+- enhance task evaluation and management methods
+- refactor task management with new Task type
+- establish biz domain structure with aggregate root and events
+- define new messaging structure for task and campaign system (#15)
+- define new messaging structure for task and campaign system
+- refactor dependency injection for API routing (#13)
+- refactor dependency injection for API routing
+- implement new HTTP server with dependency injection (#12)
+- upgrade dependencies and introduce pgx client setup (#11)
+- implement server functionality with dependency injection
+- upgrade dependencies and introduce pgx client setup
+- enhance error handling and context management
+- implement new HTTP server with dependency injection
+- implement new server architecture with dependency injection (#10)
+- implement new server architecture with dependency injection
+- update Go module dependencies and server initialization (#8)
+- enhance GinServer with improved lifecycle management
+- update Go module dependencies and server initialization
+- implement server package with new struct definition
+- configure server with enhanced logging and settings
+- implement server and command interface packages (#9)
+- implement server and command interface packages
+- add configuration support for application settings (#7)
+- enhance configuration with new services field
+- add configuration support for application settings
+- implement gRPC and HTTP server architectures
+- refactor command handling and server initiation (#6)
+- refactor command handling and server initiation
+- enhance logging configuration for better debugging
+- add configuration management with logging support (#5)
+- enhance configuration management with YAML support
+- add configuration management with logging support
+- add logging support with context extension package (#4)
+- add port management functionality and retrieval logic
+- add customizable logging package and setup options
+- add logging support with context extension package
+- implement business logic for core functionality
+- implement command management for application behavior (#3)
+- implement error logging for command execution
+- implement command management for application behavior
+- enhance Docker support with new build and management targets
+
+### Fix
+
+- configure environment variables for API keys
+- update campaign UI to reflect mode terminology
+- close prepared statements in DistributeReward function
+- remove swap log decoding functionality from repo
+- fix nil pointer and enhance transaction model
+- improve error handling and query logic for campaigns
+- validate address presence when creating a user
+- refactor HTTP status code handling and imports
+- refactor address column data type and constraints
+- improve error handling for HTTP server startup
+
+### Refactor
+
+- refactor transaction adapter and implement WebSocket logs
+- refactor onboarding task validation and error handling
+- optimize logging message handling by reference
+- refactor form submission for improved data handling
+- enhance task status retrieval and template structure
+- enhance error handling and improve code readability
+- refactor template structure and update embedded patterns
+- refactor transaction handling and interface updates
+- refactor transaction retrieval methods and interfaces
+- refactor campaign and user service initialization
+- capitalize JSON field names for proper serialization
+- refactor query services to use user query store
+- refactor user initialization and task handling logic
+- refactor User struct and registration logic
+- refactor transaction and campaign repository logic
+- refactor CampaignUpdater interface for clarity
+- refactor reward handling and clean up transaction code
+- simplify reward sending logic in transaction retrieval
+- refactor BacktestResult to Reward across components
+- refactor logging to enhance reward structure handling
+- refactor GetSwapForPool parameter type to address
+- refactor log retrieval and improve async processing
+- refactor Transaction struct to use single SwapDetail
+- refactor transaction repository for improved clarity
+- refactor transaction retrieval methods and types
+- enhance transaction handling and creation efficiency
+- refactor TransactionGetter implementation and cleanup
+- refactor transaction handling and improve error logging
+- refactor Transaction creation and enhance logging
+- refactor transaction handling and data structure usage
+- enhance SQL insert statement readability
+- refactor transaction data handling and migrations
+- enhance error handling and locking mechanisms
+- refactor test result handling and clean up code
+- refactor Campaign struct to standardize tasks access (#41)
+- refactor Campaign struct to standardize tasks access
+- refactor SwapExecutedEvent for improved clarity
+- refactor campaign retrieval query parameters
+- refine StartCampaignRequest protocol structure (#38)
+- refine StartCampaignRequest protocol structure
+- refactor RunBacktest method for improved parameter handling
+- remove AddTasksForCampaign functionality from service
+- refactor `StartCampaign` to use `Campaign` object
+- refactor campaign and user interface organization
+- refactor transaction handling for USDC token logic
+- improve error handling and enhance USDC calculations
+- refactor amount calculations to use float64 type
+- refactor swap calculations to use int64 types
+- clean up code and prepare for future enhancements
+- refactor transaction conditions to enhance flexibility
+- refactor amount handling to use int64 type
+- refactor transaction calculation logic and naming
+- refactor cmdx package structure and imports (#28)
+- refactor code to enhance initialization and cleanup
+- refactor cmdx package structure and imports
+- enhance task fetching and error handling mechanisms
+- refactor task handling and improve error management
+- refactor task creation to enhance campaign integration
+- refactor task handling to use biz package
+- refactor task creation to simplify parameters and validation
+- refactor campaign and task test cases for clarity
+- refactor DAO models and streamline task creation process
+- refactor campaign model to use biz package
+- refactor user registration handler interface
+- refactor Handle method to return campaign ID
+- refactor migration folder path handling
+- refactor campaign handling to use biz package
+- standardize naming conventions and add constants
+- standardize campaign command naming and handling
+- refactor campaign creation handling and validation logic (#23)
+- refactor campaign creation handling and validation logic
+- refactor user registration handling and command structure
+- rename `name` parameter to `username` consistently
+- refactor dependency management for injector implementation
+- refactor HTTP routing and handler organization
+- refactor task handling in service and aggregation files
+- refactor config handling for improved performance
+
+### Perf
+
+- optimize string comparison for improved performance
