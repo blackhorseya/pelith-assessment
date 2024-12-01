@@ -6,8 +6,9 @@ import (
 	"strconv"
 
 	"github.com/blackhorseya/pelith-assessment/entity/domain/core/model"
-	command2 "github.com/blackhorseya/pelith-assessment/internal/domain/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/app/command"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/app/query"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/repo"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/proto/core"
 	"google.golang.org/grpc"
@@ -26,21 +27,23 @@ func NewCampaignServiceClient(client *grpcx.Client) (core.CampaignServiceClient,
 }
 
 type campaignServerImpl struct {
-	createCampaignHandler *command2.CreateCampaignHandler
-	addTaskHandler        *command2.AddTaskHandler
-	startCampaignHandler  *command2.StartCampaignHandler
-	runBacktestHandler    *command2.RunBacktestHandler
+	createCampaignHandler *command.CreateCampaignHandler
+	addTaskHandler        *command.AddTaskHandler
+	startCampaignHandler  *command.StartCampaignHandler
+	runBacktestHandler    *command.RunBacktestHandler
 
 	campaignGetter query.CampaignGetter
+	campaignFinder repo.CampaignFinder
 }
 
 // NewCampaignServer is used to create a new campaign server.
 func NewCampaignServer(
-	createCampaignHandler *command2.CreateCampaignHandler,
-	addTaskHandler *command2.AddTaskHandler,
-	startCampaignHandler *command2.StartCampaignHandler,
-	runBacktestHandler *command2.RunBacktestHandler,
+	createCampaignHandler *command.CreateCampaignHandler,
+	addTaskHandler *command.AddTaskHandler,
+	startCampaignHandler *command.StartCampaignHandler,
+	runBacktestHandler *command.RunBacktestHandler,
 	campaignGetter query.CampaignGetter,
+	campaignFinder repo.CampaignFinder,
 ) core.CampaignServiceServer {
 	return &campaignServerImpl{
 		createCampaignHandler: createCampaignHandler,
@@ -48,6 +51,7 @@ func NewCampaignServer(
 		startCampaignHandler:  startCampaignHandler,
 		runBacktestHandler:    runBacktestHandler,
 		campaignGetter:        campaignGetter,
+		campaignFinder:        campaignFinder,
 	}
 }
 
@@ -55,7 +59,7 @@ func (i *campaignServerImpl) CreateCampaign(
 	c context.Context,
 	req *core.CreateCampaignRequest,
 ) (*core.CreateCampaignResponse, error) {
-	id, err := i.createCampaignHandler.Handle(c, command2.CreateCampaignCommand{
+	id, err := i.createCampaignHandler.Handle(c, command.CreateCampaignCommand{
 		Name:       req.Name,
 		StartTime:  req.StartTime.AsTime(),
 		Mode:       req.Mode,
@@ -75,7 +79,7 @@ func (i *campaignServerImpl) StartCampaign(
 	c context.Context,
 	req *core.StartCampaignRequest,
 ) (*core.StartCampaignResponse, error) {
-	id, err := i.startCampaignHandler.Handle(c, command2.StartCampaignCommand{
+	id, err := i.startCampaignHandler.Handle(c, command.StartCampaignCommand{
 		ID: req.Id,
 	})
 	if err != nil {
@@ -111,12 +115,12 @@ func (i *campaignServerImpl) ListCampaigns(
 	req *core.ListCampaignsRequest,
 	stream grpc.ServerStreamingServer[core.GetCampaignResponse],
 ) error {
-	items, total, err := i.campaignGetter.List(stream.Context(), query.ListCampaignCondition{})
+	items, total, err := i.campaignFinder.List(stream.Context(), repo.ListCampaignCondition{})
 	if err != nil {
 		return err
 	}
 
-	err = stream.SendHeader(metadata.New(map[string]string{"total": strconv.Itoa(total)}))
+	err = stream.SendHeader(metadata.New(map[string]string{"total": strconv.Itoa(int(total))}))
 	if err != nil {
 		return err
 	}

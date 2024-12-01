@@ -94,6 +94,7 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		composite.NewTransactionCompositeRepoImpl,
 		composite.NewTransactionRepoImpl,
 		mongodb.NewCampaignCreator,
+		mongodb.NewCampaignFinder,
 		mongodb.NewCampaignRepoImpl,
 
 		// infra
