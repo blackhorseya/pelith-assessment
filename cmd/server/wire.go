@@ -7,14 +7,14 @@ package server
 import (
 	"os"
 
-	command2 "github.com/blackhorseya/pelith-assessment/internal/domain/app/command"
-	query2 "github.com/blackhorseya/pelith-assessment/internal/domain/app/query"
-	biz2 "github.com/blackhorseya/pelith-assessment/internal/domain/biz"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/app/command"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/app/query"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/biz"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/composite"
 	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/external/etherscan"
-	pg2 "github.com/blackhorseya/pelith-assessment/internal/domain/infra/storage/pg"
-	grpc2 "github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/grpc"
-	http2 "github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/http"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/storage/pg"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/grpc"
+	"github.com/blackhorseya/pelith-assessment/internal/domain/infra/transports/http"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/configx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/grpcx"
 	"github.com/blackhorseya/pelith-assessment/internal/shared/httpx"
@@ -55,39 +55,39 @@ func NewCmd(v *viper.Viper) (adapterx.Server, func(), error) {
 		initAPP,
 
 		// adapter
-		http2.NewInitUserRoutesFn,
-		http2.NewQueryController,
-		http2.NewCommandController,
-		grpc2.NewInitServersFn,
-		grpc2.NewHealthServer,
-		grpc2.NewCampaignServer,
+		http.NewInitUserRoutesFn,
+		http.NewQueryController,
+		http.NewCommandController,
+		grpc.NewInitServersFn,
+		grpc.NewHealthServer,
+		grpc.NewCampaignServer,
 
 		// app layer
-		command2.NewCreateCampaignHandler,
-		command2.NewAddTaskHandler,
-		command2.NewStartCampaignHandler,
-		command2.NewRunBacktestHandler,
-		query2.NewRewardQueryStore,
-		query2.NewUserQueryStore,
+		command.NewCreateCampaignHandler,
+		command.NewAddTaskHandler,
+		command.NewStartCampaignHandler,
+		command.NewRunBacktestHandler,
+		query.NewRewardQueryStore,
+		query.NewUserQueryStore,
 
 		// entity layer
-		biz2.NewCampaignService,
-		grpc2.NewCampaignServiceClient,
-		biz2.NewTaskService,
-		biz2.NewBacktestService,
-		biz2.NewUserService,
+		biz.NewCampaignService,
+		biz.NewTaskService,
+		biz.NewBacktestService,
+		biz.NewUserService,
+		grpc.NewCampaignServiceClient,
 
 		// repo layer
-		pg2.NewCampaignRepo,
-		pg2.NewCampaignCreator,
-		pg2.NewCampaignGetter,
-		pg2.NewCampaignUpdater,
-		pg2.NewCampaignDeleter,
-		pg2.NewTaskRepo,
-		pg2.NewTaskCreator,
-		pg2.NewTransactionRepoImpl,
-		pg2.NewRewardRepo,
-		pg2.NewRewardGetter,
+		pg.NewCampaignRepo,
+		pg.NewCampaignCreator,
+		pg.NewCampaignGetter,
+		pg.NewCampaignUpdater,
+		pg.NewCampaignDeleter,
+		pg.NewTaskRepo,
+		pg.NewTaskCreator,
+		pg.NewTransactionRepoImpl,
+		pg.NewRewardRepo,
+		pg.NewRewardGetter,
 		etherscan.NewTransactionRepoImpl,
 		etherscan.NewTransactionAdapter,
 		composite.NewTransactionCompositeRepoImpl,
