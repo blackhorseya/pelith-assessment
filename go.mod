@@ -3,7 +3,7 @@ module github.com/blackhorseya/pelith-assessment
 go 1.23.2
 
 require (
-	github.com/ethereum/go-ethereum v1.14.12
+	github.com/ethereum/go-ethereum v1.14.13
 	github.com/gin-contrib/multitemplate v1.0.1
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/gin v1.10.0
